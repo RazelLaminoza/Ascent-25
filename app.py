@@ -29,7 +29,7 @@ def generate_qr(data):
 
 # ---------------- SET BACKGROUND IMAGE ----------------
 def set_bg_local(image_file):
-    """Set background image and professional fonts/colors."""
+    """Set background image and professional fonts/colors without visible boxes."""
     with open(image_file, "rb") as f:
         encoded = base64.b64encode(f.read()).decode()
 
@@ -43,7 +43,7 @@ def set_bg_local(image_file):
             background-attachment: fixed;
         }}
         [data-testid="stSidebar"] {{
-            background-color: rgba(255,255,255,0.8);
+            background-color: rgba(255,255,255,0.0);
         }}
 
         h1, h2, h3, h4, .stText, .stMarkdown {{
@@ -60,12 +60,13 @@ def set_bg_local(image_file):
             margin-top: 20px;
         }}
 
+        /* Transparent forms, no edges */
         .form-container {{
-            background-color: rgba(255,255,255,0.9);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0px 8px 20px rgba(0,0,0,0.3);
-            width: 400px;
+            background-color: rgba(255,255,255,0.0);
+            padding: 0px;
+            border-radius: 0px;
+            box-shadow: none;
+            width: 350px;
         }}
 
         .landing-text {{
@@ -91,7 +92,7 @@ def set_bg_local(image_file):
     )
 
 # Apply professional background
-set_bg_local("bgna.png")  # changed to bgna.png
+set_bg_local("bgna.png")  # bgna.png
 
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
