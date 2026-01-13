@@ -1,4 +1,5 @@
 import streamlit as st
+import sqlite3
 import random
 import qrcode
 import io
@@ -42,16 +43,28 @@ def set_bg_local(image_file):
         unsafe_allow_html=True
     )
 
-# Set your background image here
+# Set your background image
 set_bg_local("bg.png")
 
-# ---------------- SESSION STATE INIT ----------------
-if "entries" not in st.session_state:
-    st.session_state.entries = []  # list of tuples (name, emp_number)
-if "winner" not in st.session_state:
-    st.session_state.winner = None
-if "admin" not in st.session_state:
-    st.session_state.admin = False
+# ---------------- DATABASE ----------------
+conn = sqlite3.connect("raffle.db", check_same_thread=False)
+c = conn.cursor()
+
+# Create tables if they don't exist
+c.execute("""
+CREATE TABLE IF NOT EXISTS entries (
+    name TEXT,
+    emp_number TEXT
+)
+""")
+
+c.execute("""
+CREATE TABLE IF NOT EXISTS winner (
+    name TEXT,
+    emp_number TEXT
+)
+""")
+conn.commit()
 
 # ---------------- FUNCTIONS ----------------
 def generate_qr(data):
@@ -77,9 +90,12 @@ if role == "User":
 
         if submit:
             if name and emp_number:
-                st.session_state.entries.append((name, emp_number))
+                # Save to database
+                c.execute("INSERT INTO entries VALUES (?, ?)", (name, emp_number))
+                conn.commit()
                 st.success("You are registered!")
 
+                # Generate QR code
                 qr_data = f"Name: {name}\nEmployee Number: {emp_number}"
                 qr_img = generate_qr(qr_data)
                 buf = io.BytesIO()
@@ -94,6 +110,9 @@ if role == "User":
 elif role == "Admin":
     st.markdown('<div class="admin-container">', unsafe_allow_html=True)
     st.subheader("🔐 Admin Login")
+
+    if "admin" not in st.session_state:
+        st.session_state.admin = False
 
     admin_user = st.text_input("Admin Username")
     admin_pass = st.text_input("Admin Password", type="password")
@@ -110,12 +129,16 @@ elif role == "Admin":
     if st.session_state.admin:
         st.header("🎉 Admin Raffle Panel")
 
-        if st.session_state.entries:
-            st.subheader("📋 Registered Employees")
-            st.table(st.session_state.entries)  # show entries directly
+        # Fetch all entries from DB
+        c.execute("SELECT * FROM entries")
+        entries = c.fetchall()
 
-            # ---------- DOWNLOAD AS EXCEL ----------
-            df = pd.DataFrame(st.session_state.entries, columns=["Name", "Employee Number"])
+        if entries:
+            st.subheader("📋 Registered Employees")
+            df = pd.DataFrame(entries, columns=["Name", "Employee Number"])
+            st.table(df)  # display all names
+
+            # ---------- DOWNLOAD EXCEL ----------
             excel_bytes = io.BytesIO()
             df.to_excel(excel_bytes, index=False, engine='openpyxl')
             excel_bytes.seek(0)
@@ -129,8 +152,11 @@ elif role == "Admin":
 
             # ---------- RUN RAFFLE ----------
             if st.button("🎲 Run Raffle"):
-                winner = random.choice(st.session_state.entries)
-                st.session_state.winner = winner
+                winner = random.choice(entries)
+                # Save winner to DB
+                c.execute("DELETE FROM winner")
+                c.execute("INSERT INTO winner VALUES (?, ?)", winner)
+                conn.commit()
                 st.success(f"Winner: {winner[0]} (Employee Number: {winner[1]})")
         else:
             st.info("No entries yet")
@@ -138,8 +164,11 @@ elif role == "Admin":
         # Show winner
         st.divider()
         st.subheader("🏆 Winner")
-        if st.session_state.winner:
-            st.success(f"{st.session_state.winner[0]} (Employee Number: {st.session_state.winner[1]})")
+        c.execute("SELECT * FROM winner")
+        winner = c.fetchone()
+        if winner:
+            st.success(f"{winner[0]} (Employee Number: {winner[1]})")
         else:
             st.info("No winner selected yet")
+
     st.markdown('</div>', unsafe_allow_html=True)
