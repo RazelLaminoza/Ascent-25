@@ -34,21 +34,35 @@ def set_bg_local(image_file):
             border-radius: 15px;
             box-shadow: 0px 8px 20px rgba(0,0,0,0.3);
         }}
-        h1, h2, h3, h4, .stText, .stMarkdown {{
-            color: #fff !important;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+        .landing-text {{
+            position: absolute;
+            top: 30%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.8);
+        }}
+        .landing-button button {{
+            font-size: 20px;
+            padding: 10px 30px;
+            border-radius: 10px;
+            background-color: #FF4B4B;
+            color: white;
+            border: none;
+            cursor: pointer;
         }}
         </style>
         """,
         unsafe_allow_html=True
     )
 
-# Set your background
-set_bg_local("bg.png")  # replace with your landing page image
+# Set background
+set_bg_local("welcome_photo.png")  # Your landing page photo
 
 # ---------------- SESSION STATE ----------------
 if "page" not in st.session_state:
-    st.session_state.page = "landing"  # first page
+    st.session_state.page = "landing"
 
 if "entries" not in st.session_state:
     st.session_state.entries = []
@@ -68,19 +82,28 @@ def generate_qr(data):
 # ---------------- DATABASE ----------------
 conn = sqlite3.connect("raffle.db", check_same_thread=False)
 c = conn.cursor()
-
-# Create tables if they don't exist
 c.execute("""CREATE TABLE IF NOT EXISTS entries (name TEXT, emp_number TEXT)""")
 c.execute("""CREATE TABLE IF NOT EXISTS winner (name TEXT, emp_number TEXT)""")
 conn.commit()
 
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
-    st.title("🎉 Welcome to the Employee Raffle!")
-    
-    # Insert your welcome photo
-    st.image("welcome_photo.png", use_column_width=True)  # replace with your photo file
+    st.markdown(
+        """
+        <div class="landing-text">
+            <h1>🎉 Welcome to the Employee Raffle!</h1>
+            <p><strong>Venue:</strong> Okada Manila Ballroom 1-3</p>
+            <p><strong>Date:</strong> January 25, 2026</p>
+            <p><strong>Time:</strong> 5:00 PM</p>
+            <div class="landing-button">
+                <button onclick="window.location.reload()">Proceed</button>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
+    # Smooth transition: when the button is clicked, change page state
     if st.button("Proceed"):
         st.session_state.page = "main"
 
@@ -101,7 +124,6 @@ elif st.session_state.page == "main":
 
             if submit:
                 if name and emp_number:
-                    # Save to database
                     c.execute("INSERT INTO entries VALUES (?, ?)", (name, emp_number))
                     conn.commit()
                     st.success("You are registered!")
@@ -135,7 +157,6 @@ elif st.session_state.page == "main":
         # ---------------- ADMIN PANEL ----------------
         if st.session_state.admin:
             st.header("🎉 Admin Raffle Panel")
-
             c.execute("SELECT * FROM entries")
             entries = c.fetchall()
 
