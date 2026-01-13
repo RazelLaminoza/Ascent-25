@@ -44,7 +44,7 @@ def set_bg_local(image_file):
     )
 
 # Set your background image
-set_bg_local("Ascent_Microsite_Banner_BG@300x-100.png")
+set_bg_local("bgna.png")
 
 # ---------------- DATABASE ----------------
 conn = sqlite3.connect("raffle.db", check_same_thread=False)
