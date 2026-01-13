@@ -5,11 +5,9 @@ import qrcode
 import io
 import base64
 
-# ---------------- ROBUST BACKGROUND ----------------
+# ---------------- SET BACKGROUND IMAGE ----------------
 def set_bg_local(image_file):
-    """
-    Sets a local image (in the same folder as app.py) as the Streamlit background.
-    """
+    """Set a local image as Streamlit background with high contrast container."""
     with open(image_file, "rb") as f:
         encoded = base64.b64encode(f.read()).decode()
     
@@ -23,29 +21,33 @@ def set_bg_local(image_file):
             background-position: center;
             background-attachment: fixed;
         }}
-        /* Sidebar background (optional) */
+        /* Sidebar background */
         [data-testid="stSidebar"] {{
-            background-color: rgba(255,255,255,0.9);
+            background-color: rgba(255,255,255,0.95);
         }}
-        /* Main content box */
+        /* Main content container */
         .block-container {{
-            background-color: rgba(255,255,255,0.85);
-            padding: 20px;
-            border-radius: 10px;
+            background-color: rgba(255,255,255,0.95); /* high opacity for visibility */
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 8px 20px rgba(0,0,0,0.3); /* subtle shadow */
+        }}
+        /* Text color for readability */
+        h1, h2, h3, h4, .stText, .stMarkdown {{
+            color: #111 !important;
         }}
         </style>
         """,
         unsafe_allow_html=True
     )
 
-# Call it with your image in the main folder
+# Use your uploaded image path
 set_bg_local("bg.png")
 
 # ---------------- DATABASE ----------------
 conn = sqlite3.connect("raffle.db", check_same_thread=False)
 c = conn.cursor()
 
-# Create tables if they do not exist
 c.execute("""
 CREATE TABLE IF NOT EXISTS entries (
     name TEXT,
@@ -79,7 +81,6 @@ with st.form("register_form"):
 
     if submit:
         if name and emp_number:
-            # Save to database
             c.execute("INSERT INTO entries VALUES (?, ?)", (name, emp_number))
             conn.commit()
             st.success("You are registered!")
@@ -88,7 +89,6 @@ with st.form("register_form"):
             qr_data = f"Name: {name}\nEmployee Number: {emp_number}"
             qr_img = generate_qr(qr_data)
 
-            # Convert to BytesIO for Streamlit
             buf = io.BytesIO()
             qr_img.save(buf, format="PNG")
             buf.seek(0)
