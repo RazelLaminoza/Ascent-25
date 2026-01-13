@@ -7,7 +7,6 @@ import base64
 
 # ---------------- SET BACKGROUND IMAGE ----------------
 def set_bg_local(image_file):
-    """Set a local image as Streamlit background with high contrast container."""
     with open(image_file, "rb") as f:
         encoded = base64.b64encode(f.read()).decode()
     
@@ -23,25 +22,31 @@ def set_bg_local(image_file):
         }}
         /* Sidebar background */
         [data-testid="stSidebar"] {{
-            background-color: rgba(255,255,255,0.95);
+            background-color: rgba(255,255,255,0.8);
         }}
-        /* Main content container */
-        .block-container {{
-            background-color: rgba(255,255,255,0.95); /* high opacity for visibility */
+        /* Registration form container */
+        .user-container {{
+            background-color: transparent; /* fully transparent */
             padding: 30px;
             border-radius: 15px;
-            box-shadow: 0px 8px 20px rgba(0,0,0,0.3); /* subtle shadow */
         }}
-        /* Text color for readability */
+        /* Admin/Winner panel */
+        .admin-container {{
+            background-color: rgba(255,255,255,0.9); /* slightly opaque for readability */
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 8px 20px rgba(0,0,0,0.3);
+        }}
+        /* Text styling */
         h1, h2, h3, h4, .stText, .stMarkdown {{
-            color: #111 !important;
+            color: #fff !important;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
         }}
         </style>
         """,
         unsafe_allow_html=True
     )
 
-# Use your uploaded image path
 set_bg_local("bg.png")
 
 # ---------------- DATABASE ----------------
@@ -71,75 +76,83 @@ def generate_qr(data):
     img = qr.make_image(fill_color="black", back_color="white")
     return img
 
+# ---------------- ROLE SELECTION ----------------
+st.title("🎟 Welcome to Employee Raffle")
+role = st.radio("Are you a User or Admin?", ["User", "Admin"])
+
 # ---------------- USER REGISTRATION ----------------
-st.title("🎟 Employee Registration")
+if role == "User":
+    st.markdown('<div class="user-container">', unsafe_allow_html=True)
+    st.subheader("Employee Registration")
 
-with st.form("register_form"):
-    name = st.text_input("Name")
-    emp_number = st.text_input("Employee Number")
-    submit = st.form_submit_button("Submit")
+    with st.form("register_form"):
+        name = st.text_input("Name")
+        emp_number = st.text_input("Employee Number")
+        submit = st.form_submit_button("Submit")
 
-    if submit:
-        if name and emp_number:
-            c.execute("INSERT INTO entries VALUES (?, ?)", (name, emp_number))
-            conn.commit()
-            st.success("You are registered!")
+        if submit:
+            if name and emp_number:
+                c.execute("INSERT INTO entries VALUES (?, ?)", (name, emp_number))
+                conn.commit()
+                st.success("You are registered!")
 
-            # Generate QR code
-            qr_data = f"Name: {name}\nEmployee Number: {emp_number}"
-            qr_img = generate_qr(qr_data)
+                # Generate QR code
+                qr_data = f"Name: {name}\nEmployee Number: {emp_number}"
+                qr_img = generate_qr(qr_data)
 
-            buf = io.BytesIO()
-            qr_img.save(buf, format="PNG")
-            buf.seek(0)
-            st.image(buf, caption="Your QR Code")
-        else:
-            st.error("Please fill in all fields")
+                buf = io.BytesIO()
+                qr_img.save(buf, format="PNG")
+                buf.seek(0)
+                st.image(buf, caption="Your QR Code")
+            else:
+                st.error("Please fill in all fields")
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # ---------------- ADMIN LOGIN ----------------
-st.divider()
-st.subheader("🔐 Admin Login")
+elif role == "Admin":
+    if "admin" not in st.session_state:
+        st.session_state.admin = False
 
-if "admin" not in st.session_state:
-    st.session_state.admin = False
+    st.markdown('<div class="admin-container">', unsafe_allow_html=True)
+    st.subheader("🔐 Admin Login")
 
-admin_user = st.text_input("Admin Username")
-admin_pass = st.text_input("Admin Password", type="password")
+    admin_user = st.text_input("Admin Username")
+    admin_pass = st.text_input("Admin Password", type="password")
 
-if st.button("Login"):
-    if (admin_user == st.secrets["ADMIN_USER"] and
-        admin_pass == st.secrets["ADMIN_PASS"]):
-        st.session_state.admin = True
-        st.success("Admin logged in")
-    else:
-        st.error("Invalid admin credentials")
-
-# ---------------- ADMIN RAFFLE PANEL ----------------
-if st.session_state.admin:
-    st.header("🎉 Admin Raffle Panel")
-
-    c.execute("SELECT * FROM entries")
-    entries = c.fetchall()
-    st.write(f"Total entries: {len(entries)}")
-
-    if st.button("🎲 Run Raffle"):
-        if entries:
-            winner = random.choice(entries)
-            c.execute("DELETE FROM winner")
-            c.execute("INSERT INTO winner VALUES (?, ?)", winner)
-            conn.commit()
-            st.success(f"Winner: {winner[0]} (Employee Number: {winner[1]})")
+    if st.button("Login"):
+        if (admin_user == st.secrets["ADMIN_USER"] and
+            admin_pass == st.secrets["ADMIN_PASS"]):
+            st.session_state.admin = True
+            st.success("Admin logged in")
         else:
-            st.error("No entries yet")
+            st.error("Invalid admin credentials")
 
-# ---------------- SHOW WINNER ----------------
-st.divider()
-st.subheader("🏆 Winner")
+    # ---------------- ADMIN RAFFLE PANEL ----------------
+    if st.session_state.admin:
+        st.header("🎉 Admin Raffle Panel")
 
-c.execute("SELECT * FROM winner")
-winner = c.fetchone()
+        c.execute("SELECT * FROM entries")
+        entries = c.fetchall()
+        st.write(f"Total entries: {len(entries)}")
 
-if winner:
-    st.success(f"{winner[0]} (Employee Number: {winner[1]})")
-else:
-    st.info("No winner selected yet")
+        if st.button("🎲 Run Raffle"):
+            if entries:
+                winner = random.choice(entries)
+                c.execute("DELETE FROM winner")
+                c.execute("INSERT INTO winner VALUES (?, ?)", winner)
+                conn.commit()
+                st.success(f"Winner: {winner[0]} (Employee Number: {winner[1]})")
+            else:
+                st.error("No entries yet")
+
+        # ---------------- SHOW WINNER ----------------
+        st.divider()
+        st.subheader("🏆 Winner")
+        c.execute("SELECT * FROM winner")
+        winner = c.fetchone()
+
+        if winner:
+            st.success(f"{winner[0]} (Employee Number: {winner[1]})")
+        else:
+            st.info("No winner selected yet")
+    st.markdown('</div>', unsafe_allow_html=True)
