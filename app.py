@@ -6,67 +6,6 @@ import io
 import pandas as pd
 import base64
 
-# ---------------- SET BACKGROUND IMAGE ----------------
-def set_bg_local(image_file):
-    """Set a local image as app background with professional styling."""
-    with open(image_file, "rb") as f:
-        encoded = base64.b64encode(f.read()).decode()
-
-    st.markdown(
-        f"""
-        <style>
-        /* Background */
-        [data-testid="stAppViewContainer"] {{
-            background-image: url("data:image/png;base64,{encoded}");
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-        }}
-        [data-testid="stSidebar"] {{
-            background-color: rgba(255,255,255,0.8);
-        }}
-
-        /* Modern fonts */
-        h1, h2, h3, h4, .stText, .stMarkdown {{
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            color: #b00000;  /* professional dark red */
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-        }}
-
-        /* User/Admin container */
-        .user-container {{
-            background-color: transparent;
-            padding: 30px;
-            border-radius: 15px;
-        }}
-        .admin-container {{
-            background-color: rgba(255,255,255,0.9);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0px 8px 20px rgba(0,0,0,0.3);
-        }}
-
-        /* Landing page elements */
-        .landing-text {{
-            text-align:center;
-            color: #b00000;
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            margin-top: 20px;
-        }}
-        .landing-button button {{
-            font-size: 18px;
-            padding: 10px 25px;
-            border-radius: 8px;
-            background-color: #b00000;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }}
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
 # ---------------- DATABASE ----------------
 conn = sqlite3.connect("raffle.db", check_same_thread=False)
 c = conn.cursor()
@@ -88,15 +27,77 @@ def generate_qr(data):
     img = qr.make_image(fill_color="black", back_color="white")
     return img
 
-# ---------------- SET APP BACKGROUND ----------------
-set_bg_local("bgna.png")  # keep your professional background
+# ---------------- SET BACKGROUND IMAGE ----------------
+def set_bg_local(image_file):
+    """Set background image and professional fonts/colors."""
+    with open(image_file, "rb") as f:
+        encoded = base64.b64encode(f.read()).decode()
+
+    st.markdown(
+        f"""
+        <style>
+        [data-testid="stAppViewContainer"] {{
+            background-image: url("data:image/png;base64,{encoded}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }}
+        [data-testid="stSidebar"] {{
+            background-color: rgba(255,255,255,0.8);
+        }}
+
+        h1, h2, h3, h4, .stText, .stMarkdown {{
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #b00000;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }}
+
+        .center-container {{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            margin-top: 20px;
+        }}
+
+        .form-container {{
+            background-color: rgba(255,255,255,0.9);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 8px 20px rgba(0,0,0,0.3);
+            width: 350px;
+        }}
+
+        .landing-text {{
+            text-align:center;
+            color: #b00000;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin-top: 20px;
+        }}
+
+        .landing-button button {{
+            font-size: 18px;
+            padding: 10px 25px;
+            border-radius: 8px;
+            background-color: #b00000;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+# Apply background
+set_bg_local("bgna.png")
 
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
     st.title("Welcome to the Employee Raffle")
     
     # Centered landing photo
-    st.image("welcome_photo.png", use_column_width=True)  # your centered event photo
+    st.image("welcome_photo.png", use_column_width=True)
 
     # Event info below the photo
     st.markdown(
@@ -119,9 +120,13 @@ elif st.session_state.page == "main":
     st.title("Employee Raffle")
     role = st.radio("Select Role", ["User", "Admin"])
 
+    # Center container for form
+    st.markdown('<div class="center-container">', unsafe_allow_html=True)
+
     # ---------------- USER REGISTRATION ----------------
     if role == "User":
         st.subheader("Employee Registration")
+        st.markdown('<div class="form-container">', unsafe_allow_html=True)
         with st.form("register_form"):
             name = st.text_input("Name")
             emp_number = st.text_input("Employee Number")
@@ -140,10 +145,12 @@ elif st.session_state.page == "main":
                     st.image(buf, caption="Your QR Code")
                 else:
                     st.error("Please complete all fields")
+        st.markdown('</div>', unsafe_allow_html=True)
 
     # ---------------- ADMIN LOGIN ----------------
     elif role == "Admin":
         st.subheader("Admin Login")
+        st.markdown('<div class="form-container">', unsafe_allow_html=True)
         admin_user = st.text_input("Username")
         admin_pass = st.text_input("Password", type="password")
         if st.button("Login"):
@@ -153,6 +160,7 @@ elif st.session_state.page == "main":
                 st.success("Logged in successfully")
             else:
                 st.error("Invalid credentials")
+        st.markdown('</div>', unsafe_allow_html=True)
 
         # ---------------- ADMIN PANEL ----------------
         if st.session_state.admin:
@@ -195,3 +203,6 @@ elif st.session_state.page == "main":
                 st.success(f"{winner[0]} (Employee Number: {winner[1]})")
             else:
                 st.info("No winner selected yet")
+
+    st.markdown('</div>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
