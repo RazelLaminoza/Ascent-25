@@ -58,7 +58,7 @@ def set_bg_local(image_file):
     )
 
 # Set background
-set_bg_local("welcome_photo.png")  # Your landing page photo
+set_bg_local("bgna.png")  # Your landing page photo
 
 # ---------------- SESSION STATE ----------------
 if "page" not in st.session_state:
