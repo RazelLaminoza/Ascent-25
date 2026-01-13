@@ -65,7 +65,7 @@ def set_bg_local(image_file):
             padding: 30px;
             border-radius: 15px;
             box-shadow: 0px 8px 20px rgba(0,0,0,0.3);
-            width: 350px;
+            width: 400px;
         }}
 
         .landing-text {{
@@ -73,6 +73,7 @@ def set_bg_local(image_file):
             color: #b00000;
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             margin-top: 20px;
+            font-size: 18px;
         }}
 
         .landing-button button {{
@@ -89,8 +90,8 @@ def set_bg_local(image_file):
         unsafe_allow_html=True
     )
 
-# Apply background
-set_bg_local("bgna.png")
+# Apply professional background
+set_bg_local("bgna.png")  # changed to bgna.png
 
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
