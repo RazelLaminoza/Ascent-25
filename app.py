@@ -5,22 +5,30 @@ import qrcode
 import io
 import base64
 
-# ---------------- SET BACKGROUND IMAGE ----------------
+# ---------------- ROBUST BACKGROUND ----------------
 def set_bg_local(image_file):
-    """Set a local image as Streamlit background."""
+    """
+    Sets a local image (in the same folder as app.py) as the Streamlit background.
+    """
     with open(image_file, "rb") as f:
         encoded = base64.b64encode(f.read()).decode()
+    
     st.markdown(
         f"""
         <style>
-        body {{
+        /* Main page background */
+        [data-testid="stAppViewContainer"] {{
             background-image: url("data:image/png;base64,{encoded}");
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
         }}
-        /* Make the main container slightly transparent for readability */
-        .css-18e3th9 {{
+        /* Sidebar background (optional) */
+        [data-testid="stSidebar"] {{
+            background-color: rgba(255,255,255,0.9);
+        }}
+        /* Main content box */
+        .block-container {{
             background-color: rgba(255,255,255,0.85);
             padding: 20px;
             border-radius: 10px;
@@ -30,8 +38,8 @@ def set_bg_local(image_file):
         unsafe_allow_html=True
     )
 
-# Call the function with your image in the main folder
-set_bg_local("bg.png")  # <-- image file in the same folder as app.py
+# Call it with your image in the main folder
+set_bg_local("bg.png")
 
 # ---------------- DATABASE ----------------
 conn = sqlite3.connect("raffle.db", check_same_thread=False)
