@@ -3,12 +3,41 @@ import sqlite3
 import random
 import qrcode
 import io
+import base64
+
+# ---------------- SET BACKGROUND IMAGE ----------------
+def set_bg_local(image_file):
+    """Set a local image as Streamlit background."""
+    with open(image_file, "rb") as f:
+        encoded = base64.b64encode(f.read()).decode()
+    st.markdown(
+        f"""
+        <style>
+        body {{
+            background-image: url("data:image/png;base64,{encoded}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }}
+        /* Make the main container slightly transparent for readability */
+        .css-18e3th9 {{
+            background-color: rgba(255,255,255,0.85);
+            padding: 20px;
+            border-radius: 10px;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+# Call the function with your image in the main folder
+set_bg_local("bg.png")  # <-- image file in the same folder as app.py
 
 # ---------------- DATABASE ----------------
 conn = sqlite3.connect("raffle.db", check_same_thread=False)
 c = conn.cursor()
 
-# Create tables if not exist
+# Create tables if they do not exist
 c.execute("""
 CREATE TABLE IF NOT EXISTS entries (
     name TEXT,
