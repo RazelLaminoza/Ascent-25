@@ -6,6 +6,67 @@ import io
 import pandas as pd
 import base64
 
+# ---------------- SET BACKGROUND IMAGE ----------------
+def set_bg_local(image_file):
+    """Set a local image as app background with professional styling."""
+    with open(image_file, "rb") as f:
+        encoded = base64.b64encode(f.read()).decode()
+
+    st.markdown(
+        f"""
+        <style>
+        /* Background */
+        [data-testid="stAppViewContainer"] {{
+            background-image: url("data:image/png;base64,{encoded}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }}
+        [data-testid="stSidebar"] {{
+            background-color: rgba(255,255,255,0.8);
+        }}
+
+        /* Modern fonts */
+        h1, h2, h3, h4, .stText, .stMarkdown {{
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #b00000;  /* professional dark red */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }}
+
+        /* User/Admin container */
+        .user-container {{
+            background-color: transparent;
+            padding: 30px;
+            border-radius: 15px;
+        }}
+        .admin-container {{
+            background-color: rgba(255,255,255,0.9);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 8px 20px rgba(0,0,0,0.3);
+        }}
+
+        /* Landing page elements */
+        .landing-text {{
+            text-align:center;
+            color: #b00000;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin-top: 20px;
+        }}
+        .landing-button button {{
+            font-size: 18px;
+            padding: 10px 25px;
+            border-radius: 8px;
+            background-color: #b00000;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
 # ---------------- DATABASE ----------------
 conn = sqlite3.connect("raffle.db", check_same_thread=False)
 c = conn.cursor()
@@ -27,30 +88,36 @@ def generate_qr(data):
     img = qr.make_image(fill_color="black", back_color="white")
     return img
 
+# ---------------- SET APP BACKGROUND ----------------
+set_bg_local("bgna.png")  # keep your professional background
+
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
-    st.title("🎉 Welcome to the Employee Raffle!")
+    st.title("Welcome to the Employee Raffle")
     
-    # Show the centered landing photo
-    st.image("welcome_photo.png", use_column_width=True)  # replace with your photo file
-    
+    # Centered landing photo
+    st.image("welcome_photo.png", use_column_width=True)  # your centered event photo
+
     # Event info below the photo
-    st.markdown("""
-        <div style="text-align:center; color: #111; font-size:18px; margin-top:10px;">
+    st.markdown(
+        """
+        <div class="landing-text">
             <p><strong>Venue:</strong> Okada Manila Ballroom 1-3</p>
             <p><strong>Date:</strong> January 25, 2026</p>
             <p><strong>Time:</strong> 5:00 PM</p>
         </div>
-    """, unsafe_allow_html=True)
-    
+        """,
+        unsafe_allow_html=True
+    )
+
     # Proceed button
     if st.button("Proceed"):
         st.session_state.page = "main"
 
 # ---------------- MAIN PAGE ----------------
 elif st.session_state.page == "main":
-    st.title("🎟 Employee Raffle")
-    role = st.radio("Are you a User or Admin?", ["User", "Admin"])
+    st.title("Employee Raffle")
+    role = st.radio("Select Role", ["User", "Admin"])
 
     # ---------------- USER REGISTRATION ----------------
     if role == "User":
@@ -63,7 +130,7 @@ elif st.session_state.page == "main":
                 if name and emp_number:
                     c.execute("INSERT INTO entries VALUES (?, ?)", (name, emp_number))
                     conn.commit()
-                    st.success("You are registered!")
+                    st.success("Registration successful")
 
                     qr_data = f"Name: {name}\nEmployee Number: {emp_number}"
                     qr_img = generate_qr(qr_data)
@@ -72,29 +139,29 @@ elif st.session_state.page == "main":
                     buf.seek(0)
                     st.image(buf, caption="Your QR Code")
                 else:
-                    st.error("Please fill in all fields")
+                    st.error("Please complete all fields")
 
     # ---------------- ADMIN LOGIN ----------------
     elif role == "Admin":
-        st.subheader("🔐 Admin Login")
-        admin_user = st.text_input("Admin Username")
-        admin_pass = st.text_input("Admin Password", type="password")
+        st.subheader("Admin Login")
+        admin_user = st.text_input("Username")
+        admin_pass = st.text_input("Password", type="password")
         if st.button("Login"):
             if (admin_user == st.secrets["ADMIN_USER"] and
                 admin_pass == st.secrets["ADMIN_PASS"]):
                 st.session_state.admin = True
-                st.success("Admin logged in")
+                st.success("Logged in successfully")
             else:
-                st.error("Invalid admin credentials")
+                st.error("Invalid credentials")
 
         # ---------------- ADMIN PANEL ----------------
         if st.session_state.admin:
-            st.header("🎉 Admin Raffle Panel")
+            st.header("Admin Panel")
             c.execute("SELECT * FROM entries")
             entries = c.fetchall()
 
             if entries:
-                st.subheader("📋 Registered Employees")
+                st.subheader("Registered Employees")
                 df = pd.DataFrame(entries, columns=["Name", "Employee Number"])
                 st.table(df)
 
@@ -103,14 +170,14 @@ elif st.session_state.page == "main":
                 df.to_excel(excel_bytes, index=False, engine='openpyxl')
                 excel_bytes.seek(0)
                 st.download_button(
-                    label="📥 Download as Excel",
+                    label="Download as Excel",
                     data=excel_bytes,
                     file_name="raffle_entries.xlsx",
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
 
                 # Run raffle
-                if st.button("🎲 Run Raffle"):
+                if st.button("Run Raffle"):
                     winner = random.choice(entries)
                     c.execute("DELETE FROM winner")
                     c.execute("INSERT INTO winner VALUES (?, ?)", winner)
@@ -121,7 +188,7 @@ elif st.session_state.page == "main":
 
             # Show winner
             st.divider()
-            st.subheader("🏆 Winner")
+            st.subheader("Winner")
             c.execute("SELECT * FROM winner")
             winner = c.fetchone()
             if winner:
