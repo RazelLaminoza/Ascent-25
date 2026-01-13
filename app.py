@@ -2,10 +2,7 @@ import streamlit as st
 import sqlite3
 import random
 import qrcode
-from PIL import Image
 import io
-import smtplib
-from email.message import EmailMessage
 
 # ---------------- DATABASE ----------------
 conn = sqlite3.connect("raffle.db", check_same_thread=False)
@@ -15,14 +12,14 @@ c = conn.cursor()
 c.execute("""
 CREATE TABLE IF NOT EXISTS entries (
     name TEXT,
-    email TEXT
+    emp_number TEXT
 )
 """)
 
 c.execute("""
 CREATE TABLE IF NOT EXISTS winner (
     name TEXT,
-    email TEXT
+    emp_number TEXT
 )
 """)
 conn.commit()
@@ -35,60 +32,30 @@ def generate_qr(data):
     img = qr.make_image(fill_color="black", back_color="white")
     return img
 
-def send_email(to_email, subject, body, qr_image):
-    msg = EmailMessage()
-    msg['Subject'] = subject
-    msg['From'] = st.secrets["EMAIL_USER"]
-    msg['To'] = to_email
-    msg.set_content(body)
-
-    # Convert QR PIL image to bytes
-    buf = io.BytesIO()
-    qr_image.save(buf, format='PNG')
-    buf.seek(0)
-    msg.add_attachment(buf.read(), maintype='image', subtype='png', filename='qr.png')
-
-    # Connect to Gmail SMTP
-    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
-        smtp.login(st.secrets["EMAIL_USER"], st.secrets["EMAIL_PASS"])
-        smtp.send_message(msg)
-
 # ---------------- USER REGISTRATION ----------------
-st.title("🎟 Event Registration")
+st.title("🎟 Employee Registration")
 
 with st.form("register_form"):
     name = st.text_input("Name")
-    email = st.text_input("Email")
+    emp_number = st.text_input("Employee Number")
     submit = st.form_submit_button("Submit")
 
     if submit:
-        if name and email:
+        if name and emp_number:
             # Save to database
-            c.execute("INSERT INTO entries VALUES (?, ?)", (name, email))
+            c.execute("INSERT INTO entries VALUES (?, ?)", (name, emp_number))
             conn.commit()
             st.success("You are registered!")
 
             # Generate QR code
-            qr_data = f"Name: {name}\nEmail: {email}"
+            qr_data = f"Name: {name}\nEmployee Number: {emp_number}"
             qr_img = generate_qr(qr_data)
 
-            # Convert PIL image to BytesIO for Streamlit Cloud
+            # Convert to BytesIO for Streamlit
             buf = io.BytesIO()
             qr_img.save(buf, format="PNG")
             buf.seek(0)
             st.image(buf, caption="Your QR Code")
-
-            # Send QR via email
-            try:
-                send_email(
-                    to_email=email,
-                    subject="Your Event QR Code",
-                    body=f"Hi {name},\n\nHere is your QR code for the event.",
-                    qr_image=qr_img
-                )
-                st.success("QR code sent to your email!")
-            except Exception as e:
-                st.error(f"Failed to send email: {e}")
         else:
             st.error("Please fill in all fields")
 
@@ -124,7 +91,7 @@ if st.session_state.admin:
             c.execute("DELETE FROM winner")
             c.execute("INSERT INTO winner VALUES (?, ?)", winner)
             conn.commit()
-            st.success(f"Winner: {winner[0]} ({winner[1]})")
+            st.success(f"Winner: {winner[0]} (Employee Number: {winner[1]})")
         else:
             st.error("No entries yet")
 
@@ -136,6 +103,6 @@ c.execute("SELECT * FROM winner")
 winner = c.fetchone()
 
 if winner:
-    st.success(f"{winner[0]} ({winner[1]})")
+    st.success(f"{winner[0]} (Employee Number: {winner[1]})")
 else:
     st.info("No winner selected yet")
