@@ -114,7 +114,7 @@ elif role == "Admin":
         st.session_state.admin = False
 
     st.markdown('<div class="admin-container">', unsafe_allow_html=True)
-    st.subheader("🔐 Admin Login")
+    st.subheader("Admin Login")
 
     admin_user = st.text_input("Admin Username")
     admin_pass = st.text_input("Admin Password", type="password")
@@ -129,13 +129,13 @@ elif role == "Admin":
 
     # ---------------- ADMIN RAFFLE PANEL ----------------
     if st.session_state.admin:
-        st.header("🎉 Admin Raffle Panel")
+        st.header("Admin Raffle Panel")
 
         c.execute("SELECT * FROM entries")
         entries = c.fetchall()
         st.write(f"Total entries: {len(entries)}")
 
-        if st.button("🎲 Run Raffle"):
+        if st.button("Run Raffle"):
             if entries:
                 winner = random.choice(entries)
                 c.execute("DELETE FROM winner")
@@ -147,7 +147,7 @@ elif role == "Admin":
 
         # ---------------- SHOW WINNER ----------------
         st.divider()
-        st.subheader("🏆 Winner")
+        st.subheader("Winner")
         c.execute("SELECT * FROM winner")
         winner = c.fetchone()
 
