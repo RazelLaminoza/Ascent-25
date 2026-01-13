@@ -157,20 +157,39 @@ elif st.session_state.page == "raffle":
         st.subheader("Registered Employees")
         st.table(df)
 
+        # ---------------- Excel Download ----------------
+        excel_bytes = io.BytesIO()
+        df.to_excel(excel_bytes, index=False, engine='openpyxl')
+        excel_bytes.seek(0)
+        st.download_button(
+            label="Download Entries as Excel",
+            data=excel_bytes,
+            file_name="raffle_entries.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+
+        # ---------------- Shuffle Raffle ----------------
         if st.button("Run Shuffle Raffle"):
             placeholder = st.empty()
             winner_name = ""
             # Shuffle animation
             for _ in range(30):
                 winner_name = random.choice(entries)[0]
-                placeholder.markdown(f"<h2 style='color:#b00000'>{winner_name}</h2>", unsafe_allow_html=True)
+                placeholder.markdown(
+                    f"<h1 style='color:#b00000; text-align:center; font-size:70px;'>{winner_name}</h1>",
+                    unsafe_allow_html=True
+                )
                 time.sleep(0.05)
             # Commit winner
             winner = random.choice(entries)
             c.execute("DELETE FROM winner")
             c.execute("INSERT INTO winner VALUES (?, ?)", winner)
             conn.commit()
-            placeholder.markdown(f"<h2 style='color:#b00000'>Winner: {winner[0]}</h2>", unsafe_allow_html=True)
+            # Display final winner big and centered
+            placeholder.markdown(
+                f"<h1 style='color:#b00000; text-align:center; font-size:100px; font-weight:bold;'>{winner[0]}</h1>",
+                unsafe_allow_html=True
+            )
     else:
         st.info("No entries yet. Please register employees first.")
 
