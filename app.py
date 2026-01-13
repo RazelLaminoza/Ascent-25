@@ -11,7 +11,7 @@ from email.message import EmailMessage
 conn = sqlite3.connect("raffle.db", check_same_thread=False)
 c = conn.cursor()
 
-# Create tables
+# Create tables if not exist
 c.execute("""
 CREATE TABLE IF NOT EXISTS entries (
     name TEXT,
@@ -42,11 +42,13 @@ def send_email(to_email, subject, body, qr_image):
     msg['To'] = to_email
     msg.set_content(body)
 
+    # Convert QR PIL image to bytes
     buf = io.BytesIO()
     qr_image.save(buf, format='PNG')
     buf.seek(0)
     msg.add_attachment(buf.read(), maintype='image', subtype='png', filename='qr.png')
 
+    # Connect to Gmail SMTP
     with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
         smtp.login(st.secrets["EMAIL_USER"], st.secrets["EMAIL_PASS"])
         smtp.send_message(msg)
@@ -69,7 +71,12 @@ with st.form("register_form"):
             # Generate QR code
             qr_data = f"Name: {name}\nEmail: {email}"
             qr_img = generate_qr(qr_data)
-            st.image(qr_img, caption="Your QR Code")
+
+            # Convert PIL image to BytesIO for Streamlit Cloud
+            buf = io.BytesIO()
+            qr_img.save(buf, format="PNG")
+            buf.seek(0)
+            st.image(buf, caption="Your QR Code")
 
             # Send QR via email
             try:
