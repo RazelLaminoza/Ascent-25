@@ -149,37 +149,6 @@ elif st.session_state.page == "register":
                 st.error("Please fill both Name and Employee ID")
 
     st.markdown("</div>", unsafe_allow_html=True)
-
-    st.markdown("---")
-    st.markdown("### Bulk Upload via Excel")
-    uploaded_file = st.file_uploader("Upload Excel (.xlsx)", type=["xlsx"])
-    if uploaded_file:
-        try:
-            df_upload = pd.read_excel(uploaded_file)
-            if "name" in df_upload.columns and "emp_number" in df_upload.columns:
-                # Remove duplicates with existing entries
-                new_entries = []
-                for _, row in df_upload.iterrows():
-                    if not any(e["emp_number"] == str(row["emp_number"]) for e in st.session_state.entries):
-                        new_entries.append({"name": row["name"], "emp_number": str(row["emp_number"])})
-                st.session_state.entries.extend(new_entries)
-                save_data()
-                st.success(f"{len(new_entries)} entries added from Excel!")
-            else:
-                st.error("Excel must have columns: 'name' and 'emp_number'")
-        except Exception as e:
-            st.error(f"Error reading file: {e}")
-
-    # Remove all entries
-    st.markdown("---")
-    st.markdown("### Remove All Entries")
-    if st.checkbox("Confirm deletion of all entries"):
-        if st.button("⚠ Remove All Entries"):
-            st.session_state.entries = []
-            st.session_state.winner = None
-            save_data()
-            st.success("All entries removed!")
-
     if st.button("Admin Login"):
         st.session_state.page = "admin"
 
@@ -210,6 +179,39 @@ elif st.session_state.page == "raffle":
             st.session_state.page = "landing"
 
     entries = st.session_state.entries
+
+    # -------- ADMIN BULK ACTIONS --------
+    st.markdown("---")
+    st.subheader("Admin Actions")
+
+    # Bulk Excel upload
+    uploaded_file = st.file_uploader("Upload Excel (.xlsx) to Add Entries", type=["xlsx"])
+    if uploaded_file:
+        try:
+            df_upload = pd.read_excel(uploaded_file)
+            if "name" in df_upload.columns and "emp_number" in df_upload.columns:
+                # Avoid duplicates
+                new_entries = []
+                for _, row in df_upload.iterrows():
+                    if not any(e["emp_number"] == str(row["emp_number"]) for e in st.session_state.entries):
+                        new_entries.append({"name": row["name"], "emp_number": str(row["emp_number"])})
+                st.session_state.entries.extend(new_entries)
+                save_data()
+                st.success(f"{len(new_entries)} entries added from Excel!")
+            else:
+                st.error("Excel must have columns: 'name' and 'emp_number'")
+        except Exception as e:
+            st.error(f"Error reading file: {e}")
+
+    # Remove all entries
+    if st.checkbox("Confirm deletion of all entries"):
+        if st.button("⚠ Remove All Entries"):
+            st.session_state.entries = []
+            st.session_state.winner = None
+            save_data()
+            st.success("All entries removed!")
+
+    # -------- REGISTERED EMPLOYEES TABLE --------
     if entries:
         st.subheader("Registered Employees (Editable)")
         df = pd.DataFrame(entries)
