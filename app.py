@@ -26,6 +26,8 @@ if "entries" not in st.session_state:
     st.session_state.entries = []
 if "winner" not in st.session_state:
     st.session_state.winner = None
+if "show_form" not in st.session_state:
+    st.session_state.show_form = False  # Controls overlay form
 
 # Load saved data
 if os.path.exists(DATA_FILE):
@@ -76,12 +78,15 @@ def landing_css(bg):
         align-items: center;
         justify-content: center;
         text-align: center;
+        flex-direction: column;
+        position: relative;
     }}
 
     .hero-content {{
         color: white;
         max-width: 900px;
         padding: 30px;
+        z-index: 1;
     }}
 
     .hero-title {{
@@ -103,7 +108,7 @@ def landing_css(bg):
         line-height: 1.6;
     }}
 
-    /* Centered CTA button */
+    /* Yellow CTA button overlay */
     div.stButton > button {{
         background-color: #FFD400;
         color: black;
@@ -112,23 +117,34 @@ def landing_css(bg):
         border-radius: 40px;
         border: none;
         font-size: 18px;
+        margin-top: 20px;
+        z-index: 2;
     }}
 
-    /* Style text_input and submit button in form */
-    div.stTextInput > label {{
-        font-weight: 600;
-        color: #333;
+    /* Overlay registration form modal */
+    .overlay {{
+        position: fixed;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        background: rgba(0,0,0,0.7);
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        z-index: 999;
     }}
 
-    div.stButton > button {{
-        background-color: #FFD400;
-        color: black;
-        font-weight: 700;
-        padding: 10px 30px;
-        border-radius: 30px;
-        border: none;
-        font-size: 16px;
+    .overlay-content {{
+        background: rgba(255,255,255,0.95);
+        padding: 30px;
+        border-radius: 20px;
+        width: 90%;
+        max-width: 400px;
+        text-align: center;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
     }}
+
     </style>
     """, unsafe_allow_html=True)
 
@@ -136,13 +152,11 @@ def landing_css(bg):
 if st.session_state.page == "landing":
     landing_css("bgna.png")
 
-    st.markdown("""
+    st.markdown(f"""
     <div class="hero">
         <div class="hero-content">
             <div class="hero-title">ASCENT APAC 2025</div>
-            <div class="hero-sub">
-                Pre-register now and take part in the raffle
-            </div>
+            <div class="hero-sub">Pre-register now and take part in the raffle</div>
             <div class="event">
                 November 09, 2025<br>
                 Okada Manila – Grand Ballroom<br>
@@ -152,35 +166,41 @@ if st.session_state.page == "landing":
     </div>
     """, unsafe_allow_html=True)
 
-    # ---------------- REGISTRATION FORM BELOW EVENT DETAILS ----------------
-    st.markdown("""
-    <div style="max-width:500px; margin:30px auto; padding:20px; background: rgba(255,255,255,0.95); 
-                border-radius:20px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); text-align:center;">
-        <h3 style="color:#333;">Register Now</h3>
-    </div>
-    """, unsafe_allow_html=True)
+    # ---------------- PRE-REGISTER BUTTON ----------------
+    center = st.columns([1,2,1])
+    with center[1]:
+        if st.button("Pre-Register"):
+            st.session_state.show_form = True
 
-    with st.form("register_form"):
-        name = st.text_input("Full Name")
-        emp = st.text_input("Employee ID")
-        submit = st.form_submit_button("Submit")
+    # ---------------- OVERLAY REGISTRATION FORM ----------------
+    if st.session_state.show_form:
+        st.markdown("""
+        <div class="overlay">
+            <div class="overlay-content">
+                <h3>Register Now</h3>
+        """, unsafe_allow_html=True)
 
-        if submit:
-            if not name or not emp:
-                st.error("Please complete all fields")
-            elif any(e["emp_number"] == emp for e in st.session_state.entries):
-                st.warning("Employee already registered")
-            else:
-                st.session_state.entries.append({
-                    "name": name,
-                    "emp_number": emp
-                })
-                save_data()
-                st.success("Registration successful!")
-                qr = generate_qr(f"{name} | {emp}")
-                buf = io.BytesIO()
-                qr.save(buf, format="PNG")
-                st.image(buf.getvalue(), caption="Your QR Code")
+        with st.form("register_form"):
+            name = st.text_input("Full Name")
+            emp = st.text_input("Employee ID")
+            submit = st.form_submit_button("Submit")
+
+            if submit:
+                if not name or not emp:
+                    st.error("Please complete all fields")
+                elif any(e["emp_number"] == emp for e in st.session_state.entries):
+                    st.warning("Employee already registered")
+                else:
+                    st.session_state.entries.append({"name": name, "emp_number": emp})
+                    save_data()
+                    st.success("Registration successful!")
+                    qr = generate_qr(f"{name} | {emp}")
+                    buf = io.BytesIO()
+                    qr.save(buf, format="PNG")
+                    st.image(buf.getvalue(), caption="Your QR Code")
+        
+        # Close overlay div
+        st.markdown("</div></div>", unsafe_allow_html=True)
 
     # ---------------- ADMIN LOGIN ----------------
     if st.button("Admin Login"):
