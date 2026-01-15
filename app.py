@@ -108,7 +108,15 @@ def landing_css(bg):
         line-height: 1.6;
     }}
 
-    /* Yellow CTA button overlay */
+    /* Overlay registration button on hero */
+    .pre-register-btn {{
+        position: absolute;
+        bottom: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+    }}
+
     div.stButton > button {{
         background-color: #FFD400;
         color: black;
@@ -117,8 +125,6 @@ def landing_css(bg):
         border-radius: 40px;
         border: none;
         font-size: 18px;
-        margin-top: 20px;
-        z-index: 2;
     }}
 
     /* Overlay registration form modal */
@@ -152,6 +158,7 @@ def landing_css(bg):
 if st.session_state.page == "landing":
     landing_css("bgna.png")
 
+    # Hero section with overlay button
     st.markdown(f"""
     <div class="hero">
         <div class="hero-content">
@@ -166,7 +173,7 @@ if st.session_state.page == "landing":
     </div>
     """, unsafe_allow_html=True)
 
-    # ---------------- PRE-REGISTER BUTTON ----------------
+    # Centered overlay button
     center = st.columns([1,2,1])
     with center[1]:
         if st.button("Pre-Register"):
@@ -198,8 +205,7 @@ if st.session_state.page == "landing":
                     buf = io.BytesIO()
                     qr.save(buf, format="PNG")
                     st.image(buf.getvalue(), caption="Your QR Code")
-        
-        # Close overlay div
+
         st.markdown("</div></div>", unsafe_allow_html=True)
 
     # ---------------- ADMIN LOGIN ----------------
