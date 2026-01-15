@@ -7,11 +7,13 @@ import base64
 import time
 import json
 import os
+from openpyxl import Workbook
+from openpyxl.drawing.image import Image as XLImage
 
 # ---------------- STORAGE FILE ----------------
 DATA_FILE = "raffle_data.json"
 
-# Load entries from file
+# Load previous entries if available
 if os.path.exists(DATA_FILE):
     with open(DATA_FILE, "r") as f:
         data = json.load(f)
@@ -39,6 +41,25 @@ def generate_qr(data):
     qr.add_data(data)
     qr.make(fit=True)
     return qr.make_image(fill_color="black", back_color="white")
+
+def generate_excel_with_qr(entries, file_path="raffle_entries.xlsx"):
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Entries"
+    ws.append(["Name", "Employee ID", "QR Code"])
+    for idx, e in enumerate(entries, start=2):
+        ws.cell(row=idx, column=1, value=e["Name"])
+        ws.cell(row=idx, column=2, value=e["Employee ID"])
+        qr_data = f"Name: {e['Name']}\nEmployee ID: {e['Employee ID']}"
+        qr_img = qrcode.make(qr_data)
+        buf = io.BytesIO()
+        qr_img.save(buf, format="PNG")
+        buf.seek(0)
+        img = XLImage(buf)
+        img.width = 100
+        img.height = 100
+        ws.add_image(img, f"C{idx}")
+    wb.save(file_path)
 
 def set_bg_local(image_file):
     with open(image_file, "rb") as f:
@@ -82,7 +103,6 @@ def set_bg_local(image_file):
         85%{{color:#8B00FF;}}
         100%{{color:#FF0000;}}
     }}
-    /* ---------- FLAT INPUT FIELDS ---------- */
     div.stTextInput > label {{
         color: white !important;
         font-weight: 600;
@@ -90,7 +110,7 @@ def set_bg_local(image_file):
     div.stTextInput > div > input,
     div.stTextInput > div > div > input,
     div.stTextInput > div > textarea {{
-        color: black !important; /* typed text black */
+        color: black !important;
         background: transparent !important;
         border: none !important;
         border-radius: 0px !important;
@@ -134,10 +154,10 @@ elif st.session_state.page == "register":
         submit = st.form_submit_button("Submit")
         if submit:
             if name and emp_number:
-                if any(e["emp_number"] == emp_number for e in st.session_state.entries):
+                if any(e["Employee ID"] == emp_number for e in st.session_state.entries):
                     st.warning("Employee ID already registered")
                 else:
-                    st.session_state.entries.append({"name": name, "emp_number": emp_number})
+                    st.session_state.entries.append({"Name": name, "Employee ID": emp_number})
                     save_data()
                     st.success("Registration successful!")
                     qr = generate_qr(f"Name: {name}\nEmployee ID: {emp_number}")
@@ -176,48 +196,47 @@ elif st.session_state.page == "raffle":
             st.session_state.admin = False
             st.session_state.page = "landing"
 
+    st.subheader("Upload Excel with Name and Employee ID")
+    uploaded_file = st.file_uploader("Choose Excel file", type=["xlsx"])
+    if uploaded_file:
+        df = pd.read_excel(uploaded_file)
+        if "Name" in df.columns and "Employee ID" in df.columns:
+            st.session_state.entries = df.to_dict("records")
+            save_data()
+            st.success("Excel uploaded successfully!")
+        else:
+            st.error("Excel must have 'Name' and 'Employee ID' columns")
+
     entries = st.session_state.entries
     if entries:
-        st.subheader("Registered Employees (Editable)")
-        df = pd.DataFrame(entries)
-        
-        # Editable table
-        edited_df = st.data_editor(df, num_rows="dynamic")
-        
-        # Save edits back
-        if st.button("Save Table Changes"):
-            st.session_state.entries = edited_df.to_dict("records")
-            save_data()
-            st.success("Table changes saved!")
+        st.subheader("Registered Employees")
+        st.table(pd.DataFrame(entries))
 
-        # Excel download
-        excel = io.BytesIO()
-        edited_df.to_excel(excel, index=False)
-        excel.seek(0)
-        st.download_button("Download Excel", excel, "registered_employees.xlsx")
+        # Download Excel with QR
+        if st.button("Download Excel with QR"):
+            generate_excel_with_qr(entries)
+            with open("raffle_entries.xlsx", "rb") as f:
+                st.download_button("Download Excel with QR", f, file_name="raffle_entries.xlsx")
 
         placeholder = st.empty()
-
-        # Random winner button
         if st.button("Run Raffle"):
             for _ in range(30):
-                current = random.choice(st.session_state.entries)
+                current = random.choice(entries)
                 placeholder.markdown(
-                    f"<h1 style='color:white;font-size:70px'>{current['name']} ({current['emp_number']})</h1>",
+                    f"<h1 style='color:white;font-size:70px'>{current['Name']} ({current['Employee ID']})</h1>",
                     unsafe_allow_html=True
                 )
                 time.sleep(0.07)
 
-            winner = random.choice(st.session_state.entries)
+            winner = random.choice(entries)
             st.session_state.winner = winner
             save_data()
-
             placeholder.markdown(
-                f"<div class='rainbow'>{winner['name']} ({winner['emp_number']})</div>",
+                f"<div class='rainbow'>{winner['Name']} ({winner['Employee ID']})</div>",
                 unsafe_allow_html=True
             )
 
-            # Dynamic confetti
+            # Confetti
             confetti_html = """
             <div id="confetti-container"></div>
             <script>
@@ -235,6 +254,5 @@ elif st.session_state.page == "raffle":
             </script>
             """
             st.components.v1.html(confetti_html, height=0, width=0)
-
     else:
-        st.info("No registrations yet")
+        st.info("No entries yet. Upload an Excel file first.")
