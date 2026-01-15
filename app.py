@@ -48,9 +48,11 @@ def generate_excel_with_qr(entries, file_path="raffle_entries.xlsx"):
     ws.title = "Entries"
     ws.append(["Name", "Employee ID", "QR Code"])
     for idx, e in enumerate(entries, start=2):
-        ws.cell(row=idx, column=1, value=e["Name"])
-        ws.cell(row=idx, column=2, value=e["Employee ID"])
-        qr_data = f"Name: {e['Name']}\nEmployee ID: {e['Employee ID']}"
+        name = e.get("Name", "")
+        emp_id = e.get("Employee ID", "")
+        ws.cell(row=idx, column=1, value=name)
+        ws.cell(row=idx, column=2, value=emp_id)
+        qr_data = f"Name: {name}\nEmployee ID: {emp_id}"
         qr_img = qrcode.make(qr_data)
         buf = io.BytesIO()
         qr_img.save(buf, format="PNG")
@@ -154,7 +156,8 @@ elif st.session_state.page == "register":
         submit = st.form_submit_button("Submit")
         if submit:
             if name and emp_number:
-                if any(e["Employee ID"] == emp_number for e in st.session_state.entries):
+                # Safe check using .get()
+                if any(e.get("Employee ID", "") == emp_number for e in st.session_state.entries):
                     st.warning("Employee ID already registered")
                 else:
                     st.session_state.entries.append({"Name": name, "Employee ID": emp_number})
@@ -201,7 +204,8 @@ elif st.session_state.page == "raffle":
     if uploaded_file:
         df = pd.read_excel(uploaded_file)
         if "Name" in df.columns and "Employee ID" in df.columns:
-            st.session_state.entries = df.to_dict("records")
+            # Normalize keys safely
+            st.session_state.entries = [{"Name": r["Name"], "Employee ID": r["Employee ID"]} for _, r in df.iterrows()]
             save_data()
             st.success("Excel uploaded successfully!")
         else:
@@ -223,7 +227,7 @@ elif st.session_state.page == "raffle":
             for _ in range(30):
                 current = random.choice(entries)
                 placeholder.markdown(
-                    f"<h1 style='color:white;font-size:70px'>{current['Name']} ({current['Employee ID']})</h1>",
+                    f"<h1 style='color:white;font-size:70px'>{current.get('Name','')} ({current.get('Employee ID','')})</h1>",
                     unsafe_allow_html=True
                 )
                 time.sleep(0.07)
@@ -232,7 +236,7 @@ elif st.session_state.page == "raffle":
             st.session_state.winner = winner
             save_data()
             placeholder.markdown(
-                f"<div class='rainbow'>{winner['Name']} ({winner['Employee ID']})</div>",
+                f"<div class='rainbow'>{winner.get('Name','')} ({winner.get('Employee ID','')})</div>",
                 unsafe_allow_html=True
             )
 
