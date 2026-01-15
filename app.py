@@ -203,13 +203,13 @@ elif st.session_state.page == "raffle":
         except Exception as e:
             st.error(f"Error reading file: {e}")
 
-    # Remove all entries
-    if st.checkbox("Confirm deletion of all entries"):
-        if st.button("⚠ Remove All Entries"):
-            st.session_state.entries = []
-            st.session_state.winner = None
-            save_data()
-            st.success("All entries removed!")
+    # Delete all entries button
+    st.markdown("### ⚠ Delete All Registered Entries")
+    if st.button("Delete All Entries in Table"):
+        st.session_state.entries = []  # Clear all entries
+        st.session_state.winner = None
+        save_data()
+        st.success("All table entries deleted!")
 
     # -------- REGISTERED EMPLOYEES TABLE --------
     if entries:
