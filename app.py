@@ -178,17 +178,19 @@ elif st.session_state.page == "register":
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # Show current entries with QR immediately
+    # Editable table visible to everyone
     if st.session_state.entries:
         st.subheader("Current Registered Employees (Editable)")
         df = pd.DataFrame([
             {"Name": e["Name"], "Employee ID": e["Employee ID"]} 
             for e in st.session_state.entries
         ])
-        st.data_editor(df, num_rows="dynamic")
+        edited_df = st.data_editor(df, num_rows="dynamic")
+        st.session_state.entries = edited_df.to_dict("records")
 
-        # Display QR images below table
-        for e in st.session_state.entries:
+        # Show last 20 QR codes
+        st.subheader("QR Codes")
+        for e in st.session_state.entries[-20:]:
             qr_img_html = f'<img src="data:image/png;base64,{e["QR"]}" width="100"/>'
             st.markdown(f"{e['Name']} ({e['Employee ID']})<br>{qr_img_html}", unsafe_allow_html=True)
 
@@ -235,7 +237,7 @@ elif st.session_state.page == "raffle":
     entries = st.session_state.entries
     if entries:
         st.subheader("Registered Employees (Editable)")
-        # ---- Editable table ----
+        # Editable table visible to everyone
         edited_df = st.data_editor(pd.DataFrame(entries), num_rows="dynamic")
         st.session_state.entries = edited_df.to_dict("records")
 
