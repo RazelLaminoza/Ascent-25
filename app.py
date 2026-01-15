@@ -53,9 +53,25 @@ def set_bg_local(image_file):
         box-shadow: none;
     }}
     .accent {{
-        color: var(--accent);
         text-align: center;
         font-weight: bold;
+    }}
+    /* Rainbow text animation */
+    @keyframes rainbow {{
+        0%{{color:#FF0000;}}
+        14%{{color:#FF7F00;}}
+        28%{{color:#FFFF00;}}
+        42%{{color:#00FF00;}}
+        57%{{color:#0000FF;}}
+        71%{{color:#4B0082;}}
+        85%{{color:#8B00FF;}}
+        100%{{color:#FF0000;}}
+    }}
+    .rainbow {{
+        animation: rainbow 2s linear infinite;
+        font-size: 90px;
+        font-weight: bold;
+        text-align:center;
     }}
     .confetti {{
         position: fixed;
@@ -67,7 +83,7 @@ def set_bg_local(image_file):
         background-position: center;
         background-size: cover;
         z-index: 9999;
-        animation: fadeout 3s forwards;
+        animation: fadeout 4s forwards;
     }}
     @keyframes fadeout {{
         0% {{opacity: 1;}}
@@ -175,9 +191,9 @@ elif st.session_state.page == "raffle":
                 time.sleep(0.07)
             winner = random.choice(entries)
             st.session_state.winner = winner
+            # Rainbow winner + confetti
             placeholder.markdown(
-                f"<h1 class='accent' style='font-size:90px'>{winner}</h1>"
-                f"<div class='confetti'></div>",
+                f"<div class='rainbow'>{winner}</div><div class='confetti'></div>",
                 unsafe_allow_html=True
             )
     else:
