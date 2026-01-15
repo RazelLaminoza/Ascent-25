@@ -93,13 +93,13 @@ def set_bg_local(image_file):
     }}
     /* ---------- FLAT INPUT FIELDS ---------- */
     div.stTextInput > label {{
-        color: white !important;
+        color: white !important; /* labels stay white */
         font-weight: 600;
     }}
     div.stTextInput > div > input,
     div.stTextInput > div > div > input,
     div.stTextInput > div > textarea {{
-        color: white !important;
+        color: black !important;        /* text typed by user is black */
         background: transparent !important; /* remove box */
         border: none !important;           /* remove border */
         border-radius: 0px !important;
