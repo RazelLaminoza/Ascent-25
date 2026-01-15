@@ -82,7 +82,6 @@ def set_bg_local(image_file):
         85%{{color:#8B00FF;}}
         100%{{color:#FF0000;}}
     }}
-    /* ---------- FLAT INPUT FIELDS ---------- */
     div.stTextInput > label {{
         color: white !important;
         font-weight: 600;
@@ -90,7 +89,7 @@ def set_bg_local(image_file):
     div.stTextInput > div > input,
     div.stTextInput > div > div > input,
     div.stTextInput > div > textarea {{
-        color: black !important; /* typed text black */
+        color: black !important;
         background: transparent !important;
         border: none !important;
         border-radius: 0px !important;
@@ -128,6 +127,8 @@ if st.session_state.page == "landing":
 elif st.session_state.page == "register":
     st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
     st.markdown("<div class='card'>", unsafe_allow_html=True)
+
+    # Individual registration form
     with st.form("register_form"):
         name = st.text_input("Full Name")
         emp_number = st.text_input("Employee ID")
@@ -146,7 +147,39 @@ elif st.session_state.page == "register":
                     st.image(buf.getvalue(), caption="Your QR Code")
             else:
                 st.error("Please fill both Name and Employee ID")
+
     st.markdown("</div>", unsafe_allow_html=True)
+
+    st.markdown("---")
+    st.markdown("### Bulk Upload via Excel")
+    uploaded_file = st.file_uploader("Upload Excel (.xlsx)", type=["xlsx"])
+    if uploaded_file:
+        try:
+            df_upload = pd.read_excel(uploaded_file)
+            if "name" in df_upload.columns and "emp_number" in df_upload.columns:
+                # Remove duplicates with existing entries
+                new_entries = []
+                for _, row in df_upload.iterrows():
+                    if not any(e["emp_number"] == str(row["emp_number"]) for e in st.session_state.entries):
+                        new_entries.append({"name": row["name"], "emp_number": str(row["emp_number"])})
+                st.session_state.entries.extend(new_entries)
+                save_data()
+                st.success(f"{len(new_entries)} entries added from Excel!")
+            else:
+                st.error("Excel must have columns: 'name' and 'emp_number'")
+        except Exception as e:
+            st.error(f"Error reading file: {e}")
+
+    # Remove all entries
+    st.markdown("---")
+    st.markdown("### Remove All Entries")
+    if st.checkbox("Confirm deletion of all entries"):
+        if st.button("⚠ Remove All Entries"):
+            st.session_state.entries = []
+            st.session_state.winner = None
+            save_data()
+            st.success("All entries removed!")
+
     if st.button("Admin Login"):
         st.session_state.page = "admin"
 
@@ -235,6 +268,5 @@ elif st.session_state.page == "raffle":
             </script>
             """
             st.components.v1.html(confetti_html, height=0, width=0)
-
     else:
         st.info("No registrations yet")
