@@ -1,36 +1,39 @@
 import streamlit as st
-import sqlite3
 import random
 import qrcode
 import io
 import pandas as pd
 import base64
 import time
+import json
+import os
 
-# ---------------- DATABASE ----------------
-conn = sqlite3.connect("raffle.db", check_same_thread=False)
-c = conn.cursor()
+# ---------------- STORAGE FILE ----------------
+DATA_FILE = "raffle_data.json"
 
-c.execute("""
-CREATE TABLE IF NOT EXISTS entries (
-    emp_number TEXT UNIQUE
-)
-""")
+# Load entries from file
+if os.path.exists(DATA_FILE):
+    with open(DATA_FILE, "r") as f:
+        data = json.load(f)
+        st.session_state.entries = data.get("entries", [])
+        st.session_state.winner = data.get("winner", None)
+else:
+    st.session_state.entries = []
+    st.session_state.winner = None
 
-c.execute("""
-CREATE TABLE IF NOT EXISTS winner (
-    emp_number TEXT
-)
-""")
-conn.commit()
-
-# ---------------- SESSION STATE ----------------
 if "page" not in st.session_state:
     st.session_state.page = "landing"
 if "admin" not in st.session_state:
     st.session_state.admin = False
 
 # ---------------- FUNCTIONS ----------------
+def save_data():
+    with open(DATA_FILE, "w") as f:
+        json.dump({
+            "entries": st.session_state.entries,
+            "winner": st.session_state.winner
+        }, f)
+
 def generate_qr(data):
     qr = qrcode.QRCode(box_size=10, border=4)
     qr.add_data(data)
@@ -40,14 +43,8 @@ def generate_qr(data):
 def set_bg_local(image_file):
     with open(image_file, "rb") as f:
         encoded = base64.b64encode(f.read()).decode()
-
     st.markdown(f"""
     <style>
-    :root {{
-        --accent: #c2185b;
-        --text: #111;
-    }}
-
     [data-testid="stAppViewContainer"] {{
         background-image: url("data:image/png;base64,{encoded}");
         background-size: cover;
@@ -55,56 +52,68 @@ def set_bg_local(image_file):
         background-attachment: fixed;
         font-family: Helvetica, Arial, sans-serif;
     }}
-
-    h1, h2, h3, p, label {{
-        font-family: Helvetica, Arial, sans-serif;
-        color: var(--text);
+    h1, h2, h3 {{
+        color: white;
+        text-align: center;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
     }}
-
     .card {{
-        background: rgba(255,255,255,0.22);
+        background: rgba(255,255,255,0.2);
         padding: 25px;
         border-radius: 18px;
         backdrop-filter: blur(8px);
-        max-width: 380px;
-        margin: 20px auto; 
-        box-shadow: none; 
+        max-width: 400px;
+        margin: 20px auto;
+        box-shadow: none;
     }}
-
-    .accent {{
-        color: var(--accent);
-        text-align: center;
+    .rainbow {{
+        animation: rainbow 2s linear infinite;
+        font-size: 90px;
         font-weight: bold;
+        text-align:center;
     }}
-
-    .confetti {{
-        position: fixed;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        background-image: url("https://i.ibb.co/4pDNDk1/confetti.gif");
-        background-repeat: no-repeat;
-        background-position: center;
-        background-size: cover;
-        z-index: 9999;
-        animation: fadeout 3s forwards;
+    @keyframes rainbow {{
+        0%{{color:#FF0000;}}
+        14%{{color:#FF7F00;}}
+        28%{{color:#FFFF00;}}
+        42%{{color:#00FF00;}}
+        57%{{color:#0000FF;}}
+        71%{{color:#4B0082;}}
+        85%{{color:#8B00FF;}}
+        100%{{color:#FF0000;}}
     }}
-
-    @keyframes fadeout {{
-        0% {{opacity: 1;}}
-        100% {{opacity: 0;}}
+    /* ---------- FLAT INPUT FIELDS ---------- */
+    div.stTextInput > label {{
+        color: white !important;
+        font-weight: 600;
+    }}
+    div.stTextInput > div > input,
+    div.stTextInput > div > div > input,
+    div.stTextInput > div > textarea {{
+        color: black !important; /* typed text black */
+        background: transparent !important;
+        border: none !important;
+        border-radius: 0px !important;
+        padding: 4px 2px !important;
+        font-size: 16px;
+        font-family: Helvetica, Arial, sans-serif;
+    }}
+    div.stTextInput > div > input:focus,
+    div.stTextInput > div > div > input:focus,
+    div.stTextInput > div > textarea:focus {{
+        outline: none;
+        border: none;
+        background: transparent;
     }}
     </style>
     """, unsafe_allow_html=True)
 
-# Apply background
 set_bg_local("bgna.png")
 
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
-    st.markdown("<h1 class='accent'>Welcome</h1>", unsafe_allow_html=True)
+    st.markdown("<h1>Welcome</h1>", unsafe_allow_html=True)
     st.image("welcome_photo.png", use_column_width=True)
-
     st.markdown("""
     <div class="card">
         <p><strong>Venue:</strong> Okada Manila Ballroom 1–3</p>
@@ -112,51 +121,42 @@ if st.session_state.page == "landing":
         <p><strong>Time:</strong> 5:00 PM</p>
     </div>
     """, unsafe_allow_html=True)
-
     if st.button("Register Here"):
         st.session_state.page = "register"
 
 # ---------------- REGISTRATION PAGE ----------------
 elif st.session_state.page == "register":
-    st.markdown("<h1 class='accent'>Register Here</h1>", unsafe_allow_html=True)
-    
+    st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
     st.markdown("<div class='card'>", unsafe_allow_html=True)
     with st.form("register_form"):
-        emp_number = st.text_input("Employee Number")
+        name = st.text_input("Full Name")
+        emp_number = st.text_input("Employee ID")
         submit = st.form_submit_button("Submit")
-
         if submit:
-            if emp_number:
-                try:
-                    c.execute("INSERT INTO entries VALUES (?)", (emp_number,))
-                    conn.commit()
+            if name and emp_number:
+                if any(e["emp_number"] == emp_number for e in st.session_state.entries):
+                    st.warning("Employee ID already registered")
+                else:
+                    st.session_state.entries.append({"name": name, "emp_number": emp_number})
+                    save_data()
                     st.success("Registration successful!")
-
-                    qr = generate_qr(f"Employee Number: {emp_number}")
+                    qr = generate_qr(f"Name: {name}\nEmployee ID: {emp_number}")
                     buf = io.BytesIO()
                     qr.save(buf, format="PNG")
                     st.image(buf.getvalue(), caption="Your QR Code")
-
-                except sqlite3.IntegrityError:
-                    st.warning("Employee number already registered")
             else:
-                st.error("Employee Number is required")
+                st.error("Please fill both Name and Employee ID")
     st.markdown("</div>", unsafe_allow_html=True)
-
-    # Admin navigation only
     if st.button("Admin Login"):
         st.session_state.page = "admin"
 
 # ---------------- ADMIN LOGIN ----------------
 elif st.session_state.page == "admin":
-    st.markdown("<h2 class='accent'>Admin Login</h2>", unsafe_allow_html=True)
-
+    st.markdown("<h2>Admin Login</h2>", unsafe_allow_html=True)
     user = st.text_input("Username")
     pwd = st.text_input("Password", type="password")
-
     if st.button("⬅ Back to Register"):
         st.session_state.page = "register"
-
     if st.button("Login"):
         if user == st.secrets["ADMIN_USER"] and pwd == st.secrets["ADMIN_PASS"]:
             st.session_state.admin = True
@@ -166,9 +166,7 @@ elif st.session_state.page == "admin":
 
 # ---------------- RAFFLE PAGE ----------------
 elif st.session_state.page == "raffle":
-    st.markdown("<h1 class='accent'>🎲 Raffle Draw</h1>", unsafe_allow_html=True)
-
-    # Navigation buttons
+    st.markdown("<h1>Raffle Draw</h1>", unsafe_allow_html=True)
     nav1, nav2 = st.columns(2)
     with nav1:
         if st.button("⬅ Register"):
@@ -178,45 +176,65 @@ elif st.session_state.page == "raffle":
             st.session_state.admin = False
             st.session_state.page = "landing"
 
-    # Fetch entries
-    c.execute("SELECT emp_number FROM entries")
-    entries = c.fetchall()
-
+    entries = st.session_state.entries
     if entries:
-        df = pd.DataFrame(entries, columns=["Employee Number"])
         st.subheader("Registered Employees (Editable)")
-        st.data_editor(df, key="editable_entries")  # Admin can edit entries
+        df = pd.DataFrame(entries)
+        
+        # Editable table
+        edited_df = st.data_editor(df, num_rows="dynamic")
+        
+        # Save edits back
+        if st.button("Save Table Changes"):
+            st.session_state.entries = edited_df.to_dict("records")
+            save_data()
+            st.success("Table changes saved!")
 
         # Excel download
         excel = io.BytesIO()
-        df.to_excel(excel, index=False)
+        edited_df.to_excel(excel, index=False)
         excel.seek(0)
         st.download_button("Download Excel", excel, "registered_employees.xlsx")
 
-        # Winner animation + confetti
+        placeholder = st.empty()
+
+        # Random winner button
         if st.button("Run Raffle"):
-            placeholder = st.empty()
-            # Shuffle animation
             for _ in range(30):
-                current = random.choice(entries)[0]
+                current = random.choice(st.session_state.entries)
                 placeholder.markdown(
-                    f"<h1 class='accent' style='font-size:70px'>{current}</h1>",
+                    f"<h1 style='color:white;font-size:70px'>{current['name']} ({current['emp_number']})</h1>",
                     unsafe_allow_html=True
                 )
                 time.sleep(0.07)
 
-            # Final winner
-            winner = random.choice(entries)[0]
-            c.execute("DELETE FROM winner")
-            c.execute("INSERT INTO winner VALUES (?)", (winner,))
-            conn.commit()
+            winner = random.choice(st.session_state.entries)
+            st.session_state.winner = winner
+            save_data()
 
             placeholder.markdown(
-                f"""
-                <h1 class='accent' style='font-size:90px'>{winner}</h1>
-                <div class='confetti'></div>
-                """,
+                f"<div class='rainbow'>{winner['name']} ({winner['emp_number']})</div>",
                 unsafe_allow_html=True
             )
+
+            # Dynamic confetti
+            confetti_html = """
+            <div id="confetti-container"></div>
+            <script>
+            const colors = ['#FF0000','#FF7F00','#FFFF00','#00FF00','#0000FF','#4B0082','#8B00FF'];
+            for(let i=0;i<100;i++){
+                let div = document.createElement('div');
+                div.className = 'confetti-piece';
+                div.style.left = Math.random() * window.innerWidth + 'px';
+                div.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
+                div.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                div.style.width = div.style.height = (Math.random() * 8 + 4) + 'px';
+                document.body.appendChild(div);
+            }
+            setTimeout(()=>{document.getElementById('confetti-container').remove()}, 4000);
+            </script>
+            """
+            st.components.v1.html(confetti_html, height=0, width=0)
+
     else:
         st.info("No registrations yet")
