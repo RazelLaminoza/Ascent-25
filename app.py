@@ -156,7 +156,6 @@ elif st.session_state.page == "register":
         submit = st.form_submit_button("Submit")
         if submit:
             if name and emp_number:
-                # Safe check using .get()
                 if any(e.get("Employee ID", "") == emp_number for e in st.session_state.entries):
                     st.warning("Employee ID already registered")
                 else:
@@ -204,7 +203,6 @@ elif st.session_state.page == "raffle":
     if uploaded_file:
         df = pd.read_excel(uploaded_file)
         if "Name" in df.columns and "Employee ID" in df.columns:
-            # Normalize keys safely
             st.session_state.entries = [{"Name": r["Name"], "Employee ID": r["Employee ID"]} for _, r in df.iterrows()]
             save_data()
             st.success("Excel uploaded successfully!")
@@ -213,26 +211,28 @@ elif st.session_state.page == "raffle":
 
     entries = st.session_state.entries
     if entries:
-        st.subheader("Registered Employees")
-        st.table(pd.DataFrame(entries))
+        st.subheader("Registered Employees (Editable)")
+        # ---- Editable table ----
+        edited_df = st.data_editor(pd.DataFrame(entries), num_rows="dynamic")
+        st.session_state.entries = edited_df.to_dict("records")
 
         # Download Excel with QR
         if st.button("Download Excel with QR"):
-            generate_excel_with_qr(entries)
+            generate_excel_with_qr(st.session_state.entries)
             with open("raffle_entries.xlsx", "rb") as f:
                 st.download_button("Download Excel with QR", f, file_name="raffle_entries.xlsx")
 
         placeholder = st.empty()
         if st.button("Run Raffle"):
             for _ in range(30):
-                current = random.choice(entries)
+                current = random.choice(st.session_state.entries)
                 placeholder.markdown(
                     f"<h1 style='color:white;font-size:70px'>{current.get('Name','')} ({current.get('Employee ID','')})</h1>",
                     unsafe_allow_html=True
                 )
                 time.sleep(0.07)
 
-            winner = random.choice(entries)
+            winner = random.choice(st.session_state.entries)
             st.session_state.winner = winner
             save_data()
             placeholder.markdown(
