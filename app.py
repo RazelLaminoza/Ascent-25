@@ -22,7 +22,6 @@ CREATE TABLE IF NOT EXISTS winner (
     emp_number TEXT
 )
 """)
-
 conn.commit()
 
 # ---------------- SESSION STATE ----------------
@@ -76,6 +75,25 @@ def set_bg_local(image_file):
         text-align: center;
         font-weight: bold;
     }}
+
+    /* Simple confetti effect */
+    .confetti {{
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        background-image: url("https://i.ibb.co/4pDNDk1/confetti.gif");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: cover;
+        z-index: 9999;
+        animation: fadeout 3s forwards;
+    }}
+
+    @keyframes fadeout {{
+        0% {{opacity: 1;}}
+        100% {{opacity: 0;}}
+    }}
     </style>
     """, unsafe_allow_html=True)
 
@@ -100,8 +118,8 @@ if st.session_state.page == "landing":
 # ---------------- REGISTRATION PAGE ----------------
 elif st.session_state.page == "register":
     st.markdown("<h1 class='accent'>Register Here</h1>", unsafe_allow_html=True)
-
     st.markdown("<div class='card'>", unsafe_allow_html=True)
+
     with st.form("register_form"):
         emp_number = st.text_input("Employee Number")
         submit = st.form_submit_button("Submit")
@@ -109,10 +127,7 @@ elif st.session_state.page == "register":
         if submit:
             if emp_number:
                 try:
-                    c.execute(
-                        "INSERT INTO entries VALUES (?)",
-                        (emp_number,)
-                    )
+                    c.execute("INSERT INTO entries VALUES (?)", (emp_number,))
                     conn.commit()
 
                     st.success("Registration successful!")
@@ -126,11 +141,17 @@ elif st.session_state.page == "register":
                     st.warning("Employee number already registered")
             else:
                 st.error("Employee Number is required")
+
     st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown("---")
-    if st.button("Admin Login"):
-        st.session_state.page = "admin"
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("Admin Login"):
+            st.session_state.page = "admin"
+    with col2:
+        if st.button("Landing"):
+            st.session_state.page = "landing"
 
 # ---------------- ADMIN LOGIN ----------------
 elif st.session_state.page == "admin":
@@ -138,6 +159,14 @@ elif st.session_state.page == "admin":
 
     user = st.text_input("Username")
     pwd = st.text_input("Password", type="password")
+
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("⬅ Back to Register"):
+            st.session_state.page = "register"
+    with col2:
+        if st.button("🏠 Back to Landing"):
+            st.session_state.page = "landing"
 
     if st.button("Login"):
         if user == st.secrets["ADMIN_USER"] and pwd == st.secrets["ADMIN_PASS"]:
@@ -150,6 +179,20 @@ elif st.session_state.page == "admin":
 elif st.session_state.page == "raffle":
     st.markdown("<h1 class='accent'>🎲 Raffle Draw</h1>", unsafe_allow_html=True)
 
+    # Navigation buttons
+    nav1, nav2, nav3 = st.columns(3)
+    with nav1:
+        if st.button("⬅ Register"):
+            st.session_state.page = "register"
+    with nav2:
+        if st.button("🏠 Landing"):
+            st.session_state.page = "landing"
+    with nav3:
+        if st.button("🚪 Logout Admin"):
+            st.session_state.admin = False
+            st.session_state.page = "landing"
+
+    # Fetch entries
     c.execute("SELECT emp_number FROM entries")
     entries = c.fetchall()
 
@@ -160,33 +203,34 @@ elif st.session_state.page == "raffle":
         excel = io.BytesIO()
         df.to_excel(excel, index=False)
         excel.seek(0)
-        st.download_button(
-            "Download Excel",
-            excel,
-            "registered_employees.xlsx"
-        )
+        st.download_button("Download Excel", excel, "registered_employees.xlsx")
 
+        # ---------------- WINNER ANIMATION ----------------
         if st.button("Run Raffle"):
-            slot = st.empty()
+            placeholder = st.empty()
+            winner = None
+            # Shuffle animation
             for _ in range(30):
-                slot.markdown(
-                    f"<h1 class='accent'>{random.choice(entries)[0]}</h1>",
+                current = random.choice(entries)[0]
+                placeholder.markdown(
+                    f"<h1 class='accent' style='font-size:70px'>{current}</h1>",
                     unsafe_allow_html=True
                 )
-                time.sleep(0.05)
+                time.sleep(0.07)
 
+            # Final winner
             winner = random.choice(entries)[0]
             c.execute("DELETE FROM winner")
             c.execute("INSERT INTO winner VALUES (?)", (winner,))
             conn.commit()
 
-            slot.markdown(
-                f"<h1 class='accent' style='font-size:90px'>{winner}</h1>",
+            # Display final winner big + confetti
+            placeholder.markdown(
+                f"""
+                <h1 class='accent' style='font-size:90px'>{winner}</h1>
+                <div class='confetti'></div>
+                """,
                 unsafe_allow_html=True
             )
     else:
         st.info("No registrations yet")
-
-    if st.button("Logout"):
-        st.session_state.page = "landing"
-        st.session_state.admin = False
