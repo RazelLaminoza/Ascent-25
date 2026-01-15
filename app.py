@@ -150,6 +150,8 @@ if st.session_state.page == "landing":
 elif st.session_state.page == "register":
     st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
     st.markdown("<div class='card'>", unsafe_allow_html=True)
+
+    # Registration Form
     with st.form("register_form"):
         name = st.text_input("Full Name")
         emp_number = st.text_input("Employee ID")
@@ -159,16 +161,37 @@ elif st.session_state.page == "register":
                 if any(e.get("Employee ID", "") == emp_number for e in st.session_state.entries):
                     st.warning("Employee ID already registered")
                 else:
-                    st.session_state.entries.append({"Name": name, "Employee ID": emp_number})
+                    # Generate QR
+                    qr_img = generate_qr(f"Name: {name}\nEmployee ID: {emp_number}")
+                    buf = io.BytesIO()
+                    qr_img.save(buf, format="PNG")
+                    qr_b64 = base64.b64encode(buf.getvalue()).decode()
+
+                    # Save entry with QR
+                    st.session_state.entries.append({
+                        "Name": name,
+                        "Employee ID": emp_number,
+                        "QR": qr_b64
+                    })
                     save_data()
                     st.success("Registration successful!")
-                    qr = generate_qr(f"Name: {name}\nEmployee ID: {emp_number}")
-                    buf = io.BytesIO()
-                    qr.save(buf, format="PNG")
-                    st.image(buf.getvalue(), caption="Your QR Code")
-            else:
-                st.error("Please fill both Name and Employee ID")
+
     st.markdown("</div>", unsafe_allow_html=True)
+
+    # Show current entries with QR immediately
+    if st.session_state.entries:
+        st.subheader("Current Registered Employees (Editable)")
+        df = pd.DataFrame([
+            {"Name": e["Name"], "Employee ID": e["Employee ID"]} 
+            for e in st.session_state.entries
+        ])
+        st.data_editor(df, num_rows="dynamic")
+
+        # Display QR images below table
+        for e in st.session_state.entries:
+            qr_img_html = f'<img src="data:image/png;base64,{e["QR"]}" width="100"/>'
+            st.markdown(f"{e['Name']} ({e['Employee ID']})<br>{qr_img_html}", unsafe_allow_html=True)
+
     if st.button("Admin Login"):
         st.session_state.page = "admin"
 
