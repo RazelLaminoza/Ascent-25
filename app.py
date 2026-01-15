@@ -91,29 +91,28 @@ def set_bg_local(image_file):
         85%{{color:#8B00FF;}}
         100%{{color:#FF0000;}}
     }}
-    /* ---------- FORM STYLING ---------- */
-    div.stTextInput > label, 
-    div.stTextInput > div > input, 
-    div.stTextInput > div > div > input,
-    div.stTextInput > div > textarea {{
-        color: white !important;
-        background: rgba(255,255,255,0.2);
-        border: 1px solid rgba(255,255,255,0.5);
-        border-radius: 8px;
-        padding: 8px 10px;
-        font-size: 16px;
-        font-family: Helvetica, Arial, sans-serif;
-    }}
+    /* ---------- FLAT INPUT FIELDS ---------- */
     div.stTextInput > label {{
         color: white !important;
         font-weight: 600;
     }}
-    div.stTextInput > div > input:focus, 
+    div.stTextInput > div > input,
+    div.stTextInput > div > div > input,
+    div.stTextInput > div > textarea {{
+        color: white !important;
+        background: transparent !important; /* remove box */
+        border: none !important;           /* remove border */
+        border-radius: 0px !important;
+        padding: 4px 2px !important;
+        font-size: 16px;
+        font-family: Helvetica, Arial, sans-serif;
+    }}
+    div.stTextInput > div > input:focus,
     div.stTextInput > div > div > input:focus,
     div.stTextInput > div > textarea:focus {{
         outline: none;
-        border: 2px solid var(--accent);
-        background: rgba(255,255,255,0.3);
+        border: none;
+        background: transparent;
     }}
     </style>
     """, unsafe_allow_html=True)
