@@ -7,32 +7,22 @@ import pandas as pd
 import base64
 import time
 
-# ---------------- CONFIG ----------------
-EXPIRY_DAYS = 15
-NOW_TS = int(time.time())
-EXPIRY_TS = NOW_TS - (EXPIRY_DAYS * 24 * 60 * 60)
-
 # ---------------- DATABASE ----------------
 conn = sqlite3.connect("raffle.db", check_same_thread=False)
 c = conn.cursor()
 
 c.execute("""
 CREATE TABLE IF NOT EXISTS entries (
-    emp_number TEXT UNIQUE,
-    created_at INTEGER
+    emp_number TEXT UNIQUE
 )
 """)
 
 c.execute("""
 CREATE TABLE IF NOT EXISTS winner (
-    emp_number TEXT,
-    created_at INTEGER
+    emp_number TEXT
 )
 """)
 
-# Auto-delete expired records
-c.execute("DELETE FROM entries WHERE created_at < ?", (EXPIRY_TS,))
-c.execute("DELETE FROM winner WHERE created_at < ?", (EXPIRY_TS,))
 conn.commit()
 
 # ---------------- SESSION STATE ----------------
@@ -120,8 +110,8 @@ elif st.session_state.page == "register":
             if emp_number:
                 try:
                     c.execute(
-                        "INSERT INTO entries VALUES (?, ?)",
-                        (emp_number, int(time.time()))
+                        "INSERT INTO entries VALUES (?)",
+                        (emp_number,)
                     )
                     conn.commit()
 
@@ -160,10 +150,7 @@ elif st.session_state.page == "admin":
 elif st.session_state.page == "raffle":
     st.markdown("<h1 class='accent'>🎲 Raffle Draw</h1>", unsafe_allow_html=True)
 
-    c.execute(
-        "SELECT emp_number FROM entries WHERE created_at >= ?",
-        (EXPIRY_TS,)
-    )
+    c.execute("SELECT emp_number FROM entries")
     entries = c.fetchall()
 
     if entries:
@@ -190,10 +177,7 @@ elif st.session_state.page == "raffle":
 
             winner = random.choice(entries)[0]
             c.execute("DELETE FROM winner")
-            c.execute(
-                "INSERT INTO winner VALUES (?, ?)",
-                (winner, int(time.time()))
-            )
+            c.execute("INSERT INTO winner VALUES (?)", (winner,))
             conn.commit()
 
             slot.markdown(
@@ -201,7 +185,7 @@ elif st.session_state.page == "raffle":
                 unsafe_allow_html=True
             )
     else:
-        st.info("No valid registrations (older than 15 days auto-removed)")
+        st.info("No registrations yet")
 
     if st.button("Logout"):
         st.session_state.page = "landing"
