@@ -4,7 +4,6 @@ import qrcode
 import io
 import pandas as pd
 import base64
-import time
 import json
 import os
 
@@ -114,6 +113,22 @@ def landing_css(bg):
         border: none;
         font-size: 18px;
     }}
+
+    /* Style text_input and submit button in form */
+    div.stTextInput > label {{
+        font-weight: 600;
+        color: #333;
+    }}
+
+    div.stButton > button {{
+        background-color: #FFD400;
+        color: black;
+        font-weight: 700;
+        padding: 10px 30px;
+        border-radius: 30px;
+        border: none;
+        font-size: 16px;
+    }}
     </style>
     """, unsafe_allow_html=True)
 
@@ -137,14 +152,13 @@ if st.session_state.page == "landing":
     </div>
     """, unsafe_allow_html=True)
 
-    center = st.columns([1, 2, 1])
-    with center[1]:
-        if st.button("Pre-Register"):
-            st.session_state.page = "register"
-
-# ---------------- REGISTRATION ----------------
-elif st.session_state.page == "register":
-    st.title("Event Registration")
+    # ---------------- REGISTRATION FORM BELOW EVENT DETAILS ----------------
+    st.markdown("""
+    <div style="max-width:500px; margin:30px auto; padding:20px; background: rgba(255,255,255,0.95); 
+                border-radius:20px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); text-align:center;">
+        <h3 style="color:#333;">Register Now</h3>
+    </div>
+    """, unsafe_allow_html=True)
 
     with st.form("register_form"):
         name = st.text_input("Full Name")
@@ -168,6 +182,7 @@ elif st.session_state.page == "register":
                 qr.save(buf, format="PNG")
                 st.image(buf.getvalue(), caption="Your QR Code")
 
+    # ---------------- ADMIN LOGIN ----------------
     if st.button("Admin Login"):
         st.session_state.page = "admin"
 
