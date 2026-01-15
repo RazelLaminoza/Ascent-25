@@ -8,23 +8,32 @@ import time
 import json
 import os
 
+# ---------------- PAGE CONFIG ----------------
+st.set_page_config(
+    page_title="ASCENT APAC 2025",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
 # ---------------- STORAGE FILE ----------------
 DATA_FILE = "raffle_data.json"
 
-# Load entries from file
+# ---------------- SESSION STATE ----------------
+if "page" not in st.session_state:
+    st.session_state.page = "landing"
+if "admin" not in st.session_state:
+    st.session_state.admin = False
+if "entries" not in st.session_state:
+    st.session_state.entries = []
+if "winner" not in st.session_state:
+    st.session_state.winner = None
+
+# Load saved data
 if os.path.exists(DATA_FILE):
     with open(DATA_FILE, "r") as f:
         data = json.load(f)
         st.session_state.entries = data.get("entries", [])
         st.session_state.winner = data.get("winner", None)
-else:
-    st.session_state.entries = []
-    st.session_state.winner = None
-
-if "page" not in st.session_state:
-    st.session_state.page = "landing"
-if "admin" not in st.session_state:
-    st.session_state.admin = False
 
 # ---------------- FUNCTIONS ----------------
 def save_data():
@@ -40,127 +49,170 @@ def generate_qr(data):
     qr.make(fit=True)
     return qr.make_image(fill_color="black", back_color="white")
 
-def set_bg_local(image_file):
-    with open(image_file, "rb") as f:
+def fullscreen_landing_css(bg):
+    with open(bg, "rb") as f:
         encoded = base64.b64encode(f.read()).decode()
+
     st.markdown(f"""
     <style>
-    [data-testid="stAppViewContainer"] {{
+    .block-container {{
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100vw !important;
+    }}
+
+    header, footer {{
+        visibility: hidden;
+        height: 0px;
+    }}
+
+    .landing {{
+        width: 100vw;
+        height: 100vh;
         background-image: url("data:image/png;base64,{encoded}");
         background-size: cover;
         background-position: center;
-        background-attachment: fixed;
-        font-family: Helvetica, Arial, sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }}
-    h1, h2, h3 {{
-        color: white;
+
+    .overlay {{
+        background: rgba(0,0,0,0.6);
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         text-align: center;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
     }}
-    .card {{
-        background: rgba(255,255,255,0.2);
-        padding: 25px;
-        border-radius: 18px;
-        backdrop-filter: blur(8px);
-        max-width: 400px;
-        margin: 20px auto;
-        box-shadow: none;
+
+    .content {{
+        color: white;
+        max-width: 900px;
+        padding: 20px;
     }}
-    .rainbow {{
-        animation: rainbow 2s linear infinite;
-        font-size: 90px;
-        font-weight: bold;
-        text-align:center;
+
+    .title {{
+        font-size: clamp(2.5rem, 6vw, 5rem);
+        font-weight: 900;
+        letter-spacing: 2px;
     }}
-    @keyframes rainbow {{
-        0%{{color:#FF0000;}}
-        14%{{color:#FF7F00;}}
-        28%{{color:#FFFF00;}}
-        42%{{color:#00FF00;}}
-        57%{{color:#0000FF;}}
-        71%{{color:#4B0082;}}
-        85%{{color:#8B00FF;}}
-        100%{{color:#FF0000;}}
+
+    .subtitle {{
+        font-size: clamp(1rem, 2vw, 1.5rem);
+        margin-top: 10px;
     }}
-    div.stTextInput > label {{
-        color: white !important;
+
+    .event {{
+        margin-top: 25px;
+        font-size: clamp(0.9rem, 1.5vw, 1.2rem);
+        color: #FFD400;
         font-weight: 600;
     }}
-    div.stTextInput > div > input,
-    div.stTextInput > div > div > input,
-    div.stTextInput > div > textarea {{
-        color: black !important;
-        background: transparent !important;
-        border: none !important;
-        border-radius: 0px !important;
-        padding: 4px 2px !important;
-        font-size: 16px;
-        font-family: Helvetica, Arial, sans-serif;
+
+    .buttons {{
+        margin-top: 40px;
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
     }}
-    div.stTextInput > div > input:focus,
-    div.stTextInput > div > div > input:focus,
-    div.stTextInput > div > textarea:focus {{
-        outline: none;
+
+    .btn {{
+        padding: 14px 38px;
+        border-radius: 30px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
         border: none;
+    }}
+
+    .primary {{
+        background: #FFD400;
+        color: black;
+    }}
+
+    .outline {{
         background: transparent;
+        border: 2px solid white;
+        color: white;
     }}
     </style>
     """, unsafe_allow_html=True)
 
-set_bg_local("bgna.png")
-
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
-    st.markdown("<h1>Welcome</h1>", unsafe_allow_html=True)
-    st.image("welcome_photo.png", use_column_width=True)
+    fullscreen_landing_css("bgna.png")
+
     st.markdown("""
-    <div class="card">
-        <p><strong>Venue:</strong> Okada Manila Ballroom 1–3</p>
-        <p><strong>Date:</strong> January 25, 2026</p>
-        <p><strong>Time:</strong> 5:00 PM</p>
+    <div class="landing">
+        <div class="overlay">
+            <div class="content">
+                <div class="title">ASCENT APAC 2025</div>
+                <div class="subtitle">
+                    Pre-register now and take part in the raffle
+                </div>
+
+                <div class="event">
+                    November 09, 2025<br>
+                    Okada Manila – Grand Ballroom<br>
+                    Entertainment City, Parañaque
+                </div>
+
+                <div class="buttons">
+                    <form>
+                        <button class="btn outline">Reminders</button>
+                        <button class="btn primary">Pre-Register</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
     """, unsafe_allow_html=True)
-    if st.button("Register Here"):
-        st.session_state.page = "register"
+
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("Pre-Register", key="go_register"):
+            st.session_state.page = "register"
+    with col2:
+        if st.button("Reminders", key="go_reminder"):
+            st.info("Reminder feature coming soon")
 
 # ---------------- REGISTRATION PAGE ----------------
 elif st.session_state.page == "register":
-    st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.title("Event Registration")
 
-    # Individual registration form
-    with st.form("register_form"):
+    with st.form("register"):
         name = st.text_input("Full Name")
-        emp_number = st.text_input("Employee ID")
+        emp = st.text_input("Employee ID")
         submit = st.form_submit_button("Submit")
-        if submit:
-            if name and emp_number:
-                if any(e["emp_number"] == emp_number for e in st.session_state.entries):
-                    st.warning("Employee ID already registered")
-                else:
-                    st.session_state.entries.append({"name": name, "emp_number": emp_number})
-                    save_data()
-                    st.success("Registration successful!")
-                    qr = generate_qr(f"Name: {name}\nEmployee ID: {emp_number}")
-                    buf = io.BytesIO()
-                    qr.save(buf, format="PNG")
-                    st.image(buf.getvalue(), caption="Your QR Code")
-            else:
-                st.error("Please fill both Name and Employee ID")
 
-    st.markdown("</div>", unsafe_allow_html=True)
+        if submit:
+            if not name or not emp:
+                st.error("Please complete all fields")
+            elif any(e["emp_number"] == emp for e in st.session_state.entries):
+                st.warning("Employee already registered")
+            else:
+                st.session_state.entries.append({"name": name, "emp_number": emp})
+                save_data()
+                st.success("Registration successful!")
+                qr = generate_qr(f"{name} | {emp}")
+                buf = io.BytesIO()
+                qr.save(buf, format="PNG")
+                st.image(buf.getvalue(), caption="Your QR Code")
+
     if st.button("Admin Login"):
         st.session_state.page = "admin"
 
 # ---------------- ADMIN LOGIN ----------------
 elif st.session_state.page == "admin":
-    st.markdown("<h2>Admin Login</h2>", unsafe_allow_html=True)
-    user = st.text_input("Username")
-    pwd = st.text_input("Password", type="password")
-    if st.button("⬅ Back to Register"):
-        st.session_state.page = "register"
+    st.title("Admin Login")
+    u = st.text_input("Username")
+    p = st.text_input("Password", type="password")
+
     if st.button("Login"):
-        if user == st.secrets["ADMIN_USER"] and pwd == st.secrets["ADMIN_PASS"]:
+        if u == st.secrets["ADMIN_USER"] and p == st.secrets["ADMIN_PASS"]:
             st.session_state.admin = True
             st.session_state.page = "raffle"
         else:
@@ -168,107 +220,25 @@ elif st.session_state.page == "admin":
 
 # ---------------- RAFFLE PAGE ----------------
 elif st.session_state.page == "raffle":
-    st.markdown("<h1>Raffle Draw</h1>", unsafe_allow_html=True)
-    nav1, nav2 = st.columns(2)
-    with nav1:
-        if st.button("⬅ Register"):
-            st.session_state.page = "register"
-    with nav2:
-        if st.button("🚪 Logout Admin"):
-            st.session_state.admin = False
-            st.session_state.page = "landing"
+    st.title("🎉 Raffle Draw")
 
-    entries = st.session_state.entries
+    if st.button("Logout"):
+        st.session_state.admin = False
+        st.session_state.page = "landing"
 
-    # -------- ADMIN BULK ACTIONS --------
-    st.markdown("---")
-    st.subheader("Admin Actions")
+    if st.session_state.entries:
+        df = pd.DataFrame(st.session_state.entries)
+        edited = st.data_editor(df, num_rows="dynamic")
 
-    # Bulk Excel upload
-    uploaded_file = st.file_uploader("Upload Excel (.xlsx) to Add Entries", type=["xlsx"])
-    if uploaded_file:
-        try:
-            df_upload = pd.read_excel(uploaded_file)
-            if "name" in df_upload.columns and "emp_number" in df_upload.columns:
-                # Avoid duplicates
-                new_entries = []
-                for _, row in df_upload.iterrows():
-                    if not any(e["emp_number"] == str(row["emp_number"]) for e in st.session_state.entries):
-                        new_entries.append({"name": row["name"], "emp_number": str(row["emp_number"])})
-                st.session_state.entries.extend(new_entries)
-                save_data()
-                st.success(f"{len(new_entries)} entries added from Excel!")
-            else:
-                st.error("Excel must have columns: 'name' and 'emp_number'")
-        except Exception as e:
-            st.error(f"Error reading file: {e}")
-
-    # Delete all entries button
-    st.markdown("### ⚠ Delete All Registered Entries")
-    if st.button("Delete All Entries in Table"):
-        st.session_state.entries = []  # Clear all entries
-        st.session_state.winner = None
-        save_data()
-        st.success("All table entries deleted!")
-
-    # -------- REGISTERED EMPLOYEES TABLE --------
-    if entries:
-        st.subheader("Registered Employees (Editable)")
-        df = pd.DataFrame(entries)
-        
-        # Editable table
-        edited_df = st.data_editor(df, num_rows="dynamic")
-        
-        # Save edits back
-        if st.button("Save Table Changes"):
-            st.session_state.entries = edited_df.to_dict("records")
+        if st.button("Save Changes"):
+            st.session_state.entries = edited.to_dict("records")
             save_data()
-            st.success("Table changes saved!")
 
-        # Excel download
-        excel = io.BytesIO()
-        edited_df.to_excel(excel, index=False)
-        excel.seek(0)
-        st.download_button("Download Excel", excel, "registered_employees.xlsx")
-
-        placeholder = st.empty()
-
-        # Random winner button
         if st.button("Run Raffle"):
-            for _ in range(30):
-                current = random.choice(st.session_state.entries)
-                placeholder.markdown(
-                    f"<h1 style='color:white;font-size:70px'>{current['name']} ({current['emp_number']})</h1>",
-                    unsafe_allow_html=True
-                )
-                time.sleep(0.07)
-
             winner = random.choice(st.session_state.entries)
             st.session_state.winner = winner
             save_data()
+            st.success(f"🎊 Winner: {winner['name']} ({winner['emp_number']})")
 
-            placeholder.markdown(
-                f"<div class='rainbow'>{winner['name']} ({winner['emp_number']})</div>",
-                unsafe_allow_html=True
-            )
-
-            # Dynamic confetti
-            confetti_html = """
-            <div id="confetti-container"></div>
-            <script>
-            const colors = ['#FF0000','#FF7F00','#FFFF00','#00FF00','#0000FF','#4B0082','#8B00FF'];
-            for(let i=0;i<100;i++){
-                let div = document.createElement('div');
-                div.className = 'confetti-piece';
-                div.style.left = Math.random() * window.innerWidth + 'px';
-                div.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
-                div.style.animationDuration = (Math.random() * 3 + 2) + 's';
-                div.style.width = div.style.height = (Math.random() * 8 + 4) + 'px';
-                document.body.appendChild(div);
-            }
-            setTimeout(()=>{document.getElementById('confetti-container').remove()}, 4000);
-            </script>
-            """
-            st.components.v1.html(confetti_html, height=0, width=0)
     else:
-        st.info("No registrations yet")
+        st.info("No entries yet")
