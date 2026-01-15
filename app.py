@@ -5,18 +5,35 @@ import io
 import pandas as pd
 import base64
 import time
+import json
+import os
 
-# ---------------- SESSION STATE "DATABASE" ----------------
-if "entries" not in st.session_state:
-    st.session_state.entries = []  # list of employee numbers
-if "winner" not in st.session_state:
+# ---------------- STORAGE FILE ----------------
+DATA_FILE = "raffle_data.json"
+
+# Load entries from file
+if os.path.exists(DATA_FILE):
+    with open(DATA_FILE, "r") as f:
+        data = json.load(f)
+        st.session_state.entries = data.get("entries", [])
+        st.session_state.winner = data.get("winner", None)
+else:
+    st.session_state.entries = []
     st.session_state.winner = None
+
 if "page" not in st.session_state:
     st.session_state.page = "landing"
 if "admin" not in st.session_state:
     st.session_state.admin = False
 
 # ---------------- FUNCTIONS ----------------
+def save_data():
+    with open(DATA_FILE, "w") as f:
+        json.dump({
+            "entries": st.session_state.entries,
+            "winner": st.session_state.winner
+        }, f)
+
 def generate_qr(data):
     qr = qrcode.QRCode(box_size=10, border=4)
     qr.add_data(data)
@@ -56,7 +73,12 @@ def set_bg_local(image_file):
         text-align: center;
         font-weight: bold;
     }}
-    /* Rainbow text animation */
+    .rainbow {{
+        animation: rainbow 2s linear infinite;
+        font-size: 90px;
+        font-weight: bold;
+        text-align:center;
+    }}
     @keyframes rainbow {{
         0%{{color:#FF0000;}}
         14%{{color:#FF7F00;}}
@@ -66,12 +88,6 @@ def set_bg_local(image_file):
         71%{{color:#4B0082;}}
         85%{{color:#8B00FF;}}
         100%{{color:#FF0000;}}
-    }}
-    .rainbow {{
-        animation: rainbow 2s linear infinite;
-        font-size: 90px;
-        font-weight: bold;
-        text-align:center;
     }}
     .confetti {{
         position: fixed;
@@ -116,22 +132,26 @@ elif st.session_state.page == "register":
 
     st.markdown("<div class='card'>", unsafe_allow_html=True)
     with st.form("register_form"):
-        emp_number = st.text_input("Employee Number")
+        name = st.text_input("Full Name")
+        emp_number = st.text_input("Employee ID")
         submit = st.form_submit_button("Submit")
 
         if submit:
-            if emp_number:
-                if emp_number not in st.session_state.entries:
-                    st.session_state.entries.append(emp_number)
+            if name and emp_number:
+                # Prevent duplicate Employee ID
+                if any(e["emp_number"] == emp_number for e in st.session_state.entries):
+                    st.warning("Employee ID already registered")
+                else:
+                    st.session_state.entries.append({"name": name, "emp_number": emp_number})
+                    save_data()
                     st.success("Registration successful!")
-                    qr = generate_qr(f"Employee Number: {emp_number}")
+
+                    qr = generate_qr(f"Name: {name}\nEmployee ID: {emp_number}")
                     buf = io.BytesIO()
                     qr.save(buf, format="PNG")
                     st.image(buf.getvalue(), caption="Your QR Code")
-                else:
-                    st.warning("Employee number already registered")
             else:
-                st.error("Employee Number is required")
+                st.error("Please fill both Name and Employee ID")
     st.markdown("</div>", unsafe_allow_html=True)
 
     if st.button("Admin Login"):
@@ -170,7 +190,7 @@ elif st.session_state.page == "raffle":
     entries = st.session_state.entries
 
     if entries:
-        df = pd.DataFrame(entries, columns=["Employee Number"])
+        df = pd.DataFrame(entries)
         st.table(df)
 
         # Excel download
@@ -179,21 +199,23 @@ elif st.session_state.page == "raffle":
         excel.seek(0)
         st.download_button("Download Excel", excel, "registered_employees.xlsx")
 
-        # ---------------- WINNER ANIMATION ----------------
+        # Winner animation
         if st.button("Run Raffle"):
             placeholder = st.empty()
             for _ in range(30):
                 current = random.choice(entries)
                 placeholder.markdown(
-                    f"<h1 class='accent' style='font-size:70px'>{current}</h1>",
+                    f"<h1 class='accent' style='font-size:70px'>{current['name']} ({current['emp_number']})</h1>",
                     unsafe_allow_html=True
                 )
                 time.sleep(0.07)
+
             winner = random.choice(entries)
             st.session_state.winner = winner
-            # Rainbow winner + confetti
+            save_data()
             placeholder.markdown(
-                f"<div class='rainbow'>{winner}</div><div class='confetti'></div>",
+                f"<div class='rainbow'>{winner['name']} ({winner['emp_number']})</div>"
+                "<div class='confetti'></div>",
                 unsafe_allow_html=True
             )
     else:
