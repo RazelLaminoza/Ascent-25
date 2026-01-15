@@ -1,5 +1,4 @@
 import streamlit as st
-import sqlite3
 import random
 import qrcode
 import io
@@ -7,24 +6,11 @@ import pandas as pd
 import base64
 import time
 
-# ---------------- DATABASE ----------------
-conn = sqlite3.connect("raffle.db", check_same_thread=False)
-c = conn.cursor()
-
-c.execute("""
-CREATE TABLE IF NOT EXISTS entries (
-    emp_number TEXT UNIQUE
-)
-""")
-
-c.execute("""
-CREATE TABLE IF NOT EXISTS winner (
-    emp_number TEXT
-)
-""")
-conn.commit()
-
-# ---------------- SESSION STATE ----------------
+# ---------------- SESSION STATE "DATABASE" ----------------
+if "entries" not in st.session_state:
+    st.session_state.entries = []  # list of employee numbers
+if "winner" not in st.session_state:
+    st.session_state.winner = None
 if "page" not in st.session_state:
     st.session_state.page = "landing"
 if "admin" not in st.session_state:
@@ -40,14 +26,12 @@ def generate_qr(data):
 def set_bg_local(image_file):
     with open(image_file, "rb") as f:
         encoded = base64.b64encode(f.read()).decode()
-
     st.markdown(f"""
     <style>
     :root {{
         --accent: #c2185b;
         --text: #111;
     }}
-
     [data-testid="stAppViewContainer"] {{
         background-image: url("data:image/png;base64,{encoded}");
         background-size: cover;
@@ -55,28 +39,24 @@ def set_bg_local(image_file):
         background-attachment: fixed;
         font-family: Helvetica, Arial, sans-serif;
     }}
-
     h1, h2, h3, p, label {{
         font-family: Helvetica, Arial, sans-serif;
         color: var(--text);
     }}
-
     .card {{
         background: rgba(255,255,255,0.22);
         padding: 25px;
         border-radius: 18px;
         backdrop-filter: blur(8px);
         max-width: 380px;
-        margin: 20px auto;        /* spacing around card */
-        box-shadow: none;         /* remove rectangle shadow */
+        margin: 20px auto;
+        box-shadow: none;
     }}
-
     .accent {{
         color: var(--accent);
         text-align: center;
         font-weight: bold;
     }}
-
     .confetti {{
         position: fixed;
         width: 100%;
@@ -89,7 +69,6 @@ def set_bg_local(image_file):
         z-index: 9999;
         animation: fadeout 3s forwards;
     }}
-
     @keyframes fadeout {{
         0% {{opacity: 1;}}
         100% {{opacity: 0;}}
@@ -118,7 +97,7 @@ if st.session_state.page == "landing":
 # ---------------- REGISTRATION PAGE ----------------
 elif st.session_state.page == "register":
     st.markdown("<h1 class='accent'>Register Here</h1>", unsafe_allow_html=True)
-    
+
     st.markdown("<div class='card'>", unsafe_allow_html=True)
     with st.form("register_form"):
         emp_number = st.text_input("Employee Number")
@@ -126,23 +105,19 @@ elif st.session_state.page == "register":
 
         if submit:
             if emp_number:
-                try:
-                    c.execute("INSERT INTO entries VALUES (?)", (emp_number,))
-                    conn.commit()
+                if emp_number not in st.session_state.entries:
+                    st.session_state.entries.append(emp_number)
                     st.success("Registration successful!")
-
                     qr = generate_qr(f"Employee Number: {emp_number}")
                     buf = io.BytesIO()
                     qr.save(buf, format="PNG")
                     st.image(buf.getvalue(), caption="Your QR Code")
-
-                except sqlite3.IntegrityError:
+                else:
                     st.warning("Employee number already registered")
             else:
                 st.error("Employee Number is required")
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # Admin navigation only, no Landing button
     if st.button("Admin Login"):
         st.session_state.page = "admin"
 
@@ -167,8 +142,7 @@ elif st.session_state.page == "admin":
 elif st.session_state.page == "raffle":
     st.markdown("<h1 class='accent'>🎲 Raffle Draw</h1>", unsafe_allow_html=True)
 
-    # Navigation buttons
-    nav1, nav2, nav3 = st.columns(3)
+    nav1, nav2 = st.columns(2)
     with nav1:
         if st.button("⬅ Register"):
             st.session_state.page = "register"
@@ -177,14 +151,13 @@ elif st.session_state.page == "raffle":
             st.session_state.admin = False
             st.session_state.page = "landing"
 
-    # Fetch entries
-    c.execute("SELECT emp_number FROM entries")
-    entries = c.fetchall()
+    entries = st.session_state.entries
 
     if entries:
         df = pd.DataFrame(entries, columns=["Employee Number"])
         st.table(df)
 
+        # Excel download
         excel = io.BytesIO()
         df.to_excel(excel, index=False)
         excel.seek(0)
@@ -193,26 +166,18 @@ elif st.session_state.page == "raffle":
         # ---------------- WINNER ANIMATION ----------------
         if st.button("Run Raffle"):
             placeholder = st.empty()
-            # Shuffle animation
             for _ in range(30):
-                current = random.choice(entries)[0]
+                current = random.choice(entries)
                 placeholder.markdown(
                     f"<h1 class='accent' style='font-size:70px'>{current}</h1>",
                     unsafe_allow_html=True
                 )
                 time.sleep(0.07)
-
-            # Final winner
-            winner = random.choice(entries)[0]
-            c.execute("DELETE FROM winner")
-            c.execute("INSERT INTO winner VALUES (?)", (winner,))
-            conn.commit()
-
+            winner = random.choice(entries)
+            st.session_state.winner = winner
             placeholder.markdown(
-                f"""
-                <h1 class='accent' style='font-size:90px'>{winner}</h1>
-                <div class='confetti'></div>
-                """,
+                f"<h1 class='accent' style='font-size:90px'>{winner}</h1>"
+                f"<div class='confetti'></div>",
                 unsafe_allow_html=True
             )
     else:
