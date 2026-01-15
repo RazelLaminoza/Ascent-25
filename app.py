@@ -45,10 +45,6 @@ def set_bg_local(image_file):
         encoded = base64.b64encode(f.read()).decode()
     st.markdown(f"""
     <style>
-    :root {{
-        --accent: #c2185b;
-        --text: #ffffff;
-    }}
     [data-testid="stAppViewContainer"] {{
         background-image: url("data:image/png;base64,{encoded}");
         background-size: cover;
@@ -57,7 +53,6 @@ def set_bg_local(image_file):
         font-family: Helvetica, Arial, sans-serif;
     }}
     h1, h2, h3 {{
-        font-family: Helvetica, Arial, sans-serif;
         color: white;
         text-align: center;
         text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
@@ -70,10 +65,6 @@ def set_bg_local(image_file):
         max-width: 400px;
         margin: 20px auto;
         box-shadow: none;
-    }}
-    .accent {{
-        text-align: center;
-        font-weight: bold;
     }}
     .rainbow {{
         animation: rainbow 2s linear infinite;
@@ -93,15 +84,15 @@ def set_bg_local(image_file):
     }}
     /* ---------- FLAT INPUT FIELDS ---------- */
     div.stTextInput > label {{
-        color: white !important; /* labels stay white */
+        color: white !important;
         font-weight: 600;
     }}
     div.stTextInput > div > input,
     div.stTextInput > div > div > input,
     div.stTextInput > div > textarea {{
-        color: black !important;        /* text typed by user is black */
-        background: transparent !important; /* remove box */
-        border: none !important;           /* remove border */
+        color: black !important; /* typed text black */
+        background: transparent !important;
+        border: none !important;
         border-radius: 0px !important;
         padding: 4px 2px !important;
         font-size: 16px;
@@ -187,35 +178,46 @@ elif st.session_state.page == "raffle":
 
     entries = st.session_state.entries
     if entries:
+        st.subheader("Registered Employees (Editable)")
         df = pd.DataFrame(entries)
-        st.table(df)
+        
+        # Editable table
+        edited_df = st.data_editor(df, num_rows="dynamic")
+        
+        # Save edits back
+        if st.button("Save Table Changes"):
+            st.session_state.entries = edited_df.to_dict("records")
+            save_data()
+            st.success("Table changes saved!")
+
+        # Excel download
         excel = io.BytesIO()
-        df.to_excel(excel, index=False)
+        edited_df.to_excel(excel, index=False)
         excel.seek(0)
         st.download_button("Download Excel", excel, "registered_employees.xlsx")
 
-        # -------- WINNER ANIMATION WITH DYNAMIC CONFETTI --------
+        placeholder = st.empty()
+
+        # Random winner button
         if st.button("Run Raffle"):
-            placeholder = st.empty()
             for _ in range(30):
-                current = random.choice(entries)
+                current = random.choice(st.session_state.entries)
                 placeholder.markdown(
                     f"<h1 style='color:white;font-size:70px'>{current['name']} ({current['emp_number']})</h1>",
                     unsafe_allow_html=True
                 )
                 time.sleep(0.07)
 
-            winner = random.choice(entries)
+            winner = random.choice(st.session_state.entries)
             st.session_state.winner = winner
             save_data()
 
-            # Rainbow winner
             placeholder.markdown(
                 f"<div class='rainbow'>{winner['name']} ({winner['emp_number']})</div>",
                 unsafe_allow_html=True
             )
 
-            # Dynamic rainbow confetti
+            # Dynamic confetti
             confetti_html = """
             <div id="confetti-container"></div>
             <script>
