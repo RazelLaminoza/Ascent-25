@@ -6,11 +6,11 @@ import io
 import pandas as pd
 import base64
 import time
-from datetime import datetime, timedelta
 
 # ---------------- CONFIG ----------------
 EXPIRY_DAYS = 15
-expiry_date = datetime.now() - timedelta(days=EXPIRY_DAYS)
+NOW_TS = int(time.time())
+EXPIRY_TS = NOW_TS - (EXPIRY_DAYS * 24 * 60 * 60)
 
 # ---------------- DATABASE ----------------
 conn = sqlite3.connect("raffle.db", check_same_thread=False)
@@ -19,26 +19,20 @@ c = conn.cursor()
 c.execute("""
 CREATE TABLE IF NOT EXISTS entries (
     emp_number TEXT UNIQUE,
-    created_at TEXT
+    created_at INTEGER
 )
 """)
 
 c.execute("""
 CREATE TABLE IF NOT EXISTS winner (
     emp_number TEXT,
-    created_at TEXT
+    created_at INTEGER
 )
 """)
 
-# Auto-clean old data
-c.execute(
-    "DELETE FROM entries WHERE datetime(created_at) < datetime(?)",
-    (expiry_date.isoformat(),)
-)
-c.execute(
-    "DELETE FROM winner WHERE datetime(created_at) < datetime(?)",
-    (expiry_date.isoformat(),)
-)
+# Auto-delete expired records
+c.execute("DELETE FROM entries WHERE created_at < ?", (EXPIRY_TS,))
+c.execute("DELETE FROM winner WHERE created_at < ?", (EXPIRY_TS,))
 conn.commit()
 
 # ---------------- SESSION STATE ----------------
@@ -79,7 +73,7 @@ def set_bg_local(image_file):
     }}
 
     .card {{
-        background: rgba(255,255,255,0.2);
+        background: rgba(255,255,255,0.22);
         padding: 25px;
         border-radius: 18px;
         backdrop-filter: blur(8px);
@@ -127,7 +121,7 @@ elif st.session_state.page == "register":
                 try:
                     c.execute(
                         "INSERT INTO entries VALUES (?, ?)",
-                        (emp_number, datetime.now().isoformat())
+                        (emp_number, int(time.time()))
                     )
                     conn.commit()
 
@@ -166,17 +160,16 @@ elif st.session_state.page == "admin":
 elif st.session_state.page == "raffle":
     st.markdown("<h1 class='accent'>🎲 Raffle Draw</h1>", unsafe_allow_html=True)
 
-    c.execute("""
-        SELECT emp_number FROM entries
-        WHERE datetime(created_at) >= datetime(?)
-    """, (expiry_date.isoformat(),))
+    c.execute(
+        "SELECT emp_number FROM entries WHERE created_at >= ?",
+        (EXPIRY_TS,)
+    )
     entries = c.fetchall()
 
     if entries:
         df = pd.DataFrame(entries, columns=["Employee Number"])
         st.table(df)
 
-        # Excel export
         excel = io.BytesIO()
         df.to_excel(excel, index=False)
         excel.seek(0)
@@ -199,7 +192,7 @@ elif st.session_state.page == "raffle":
             c.execute("DELETE FROM winner")
             c.execute(
                 "INSERT INTO winner VALUES (?, ?)",
-                (winner, datetime.now().isoformat())
+                (winner, int(time.time()))
             )
             conn.commit()
 
@@ -208,7 +201,7 @@ elif st.session_state.page == "raffle":
                 unsafe_allow_html=True
             )
     else:
-        st.info("No valid registrations (older than 15 days are auto-removed)")
+        st.info("No valid registrations (older than 15 days auto-removed)")
 
     if st.button("Logout"):
         st.session_state.page = "landing"
