@@ -15,7 +15,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# ---------------- STORAGE FILE ----------------
+# ---------------- STORAGE ----------------
 DATA_FILE = "raffle_data.json"
 
 # ---------------- SESSION STATE ----------------
@@ -28,14 +28,13 @@ if "entries" not in st.session_state:
 if "winner" not in st.session_state:
     st.session_state.winner = None
 
-# Load saved data
 if os.path.exists(DATA_FILE):
     with open(DATA_FILE, "r") as f:
         data = json.load(f)
         st.session_state.entries = data.get("entries", [])
         st.session_state.winner = data.get("winner", None)
 
-# ---------------- FUNCTIONS ----------------
+# ---------------- HELPERS ----------------
 def save_data():
     with open(DATA_FILE, "w") as f:
         json.dump({
@@ -49,7 +48,7 @@ def generate_qr(data):
     qr.make(fit=True)
     return qr.make_image(fill_color="black", back_color="white")
 
-def fullscreen_landing_css(bg):
+def landing_css(bg):
     with open(bg, "rb") as f:
         encoded = base64.b64encode(f.read()).decode()
 
@@ -62,128 +61,96 @@ def fullscreen_landing_css(bg):
     }}
 
     header, footer {{
-        visibility: hidden;
-        height: 0px;
+        display: none !important;
     }}
 
-    .landing {{
+    .hero {{
         width: 100vw;
         height: 100vh;
-        background-image: url("data:image/png;base64,{encoded}");
+        background:
+            linear-gradient(rgba(0,0,0,.65), rgba(0,0,0,.65)),
+            url("data:image/png;base64,{encoded}");
         background-size: cover;
         background-position: center;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }}
-
-    .overlay {{
-        background: rgba(0,0,0,0.6);
-        width: 100%;
-        height: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
         text-align: center;
     }}
 
-    .content {{
+    .hero-content {{
         color: white;
         max-width: 900px;
-        padding: 20px;
+        padding: 30px;
     }}
 
-    .title {{
-        font-size: clamp(2.5rem, 6vw, 5rem);
+    .hero-title {{
+        font-size: clamp(2.8rem, 6vw, 5rem);
         font-weight: 900;
-        letter-spacing: 2px;
+        letter-spacing: 3px;
     }}
 
-    .subtitle {{
-        font-size: clamp(1rem, 2vw, 1.5rem);
-        margin-top: 10px;
+    .hero-sub {{
+        font-size: clamp(1.1rem, 2vw, 1.6rem);
+        margin-top: 12px;
     }}
 
     .event {{
-        margin-top: 25px;
-        font-size: clamp(0.9rem, 1.5vw, 1.2rem);
+        margin-top: 26px;
+        font-size: clamp(1rem, 1.5vw, 1.25rem);
+        font-weight: 700;
         color: #FFD400;
-        font-weight: 600;
+        line-height: 1.6;
     }}
 
-    .buttons {{
+    .cta {{
         margin-top: 40px;
         display: flex;
-        gap: 20px;
         justify-content: center;
+        gap: 20px;
         flex-wrap: wrap;
-    }}
-
-    .btn {{
-        padding: 14px 38px;
-        border-radius: 30px;
-        font-size: 16px;
-        font-weight: 700;
-        cursor: pointer;
-        border: none;
-    }}
-
-    .primary {{
-        background: #FFD400;
-        color: black;
-    }}
-
-    .outline {{
-        background: transparent;
-        border: 2px solid white;
-        color: white;
     }}
     </style>
     """, unsafe_allow_html=True)
 
-# ---------------- LANDING PAGE ----------------
+# ---------------- LANDING ----------------
 if st.session_state.page == "landing":
-    fullscreen_landing_css("bgna.png")
+    landing_css("bgna.png")
 
     st.markdown("""
-    <div class="landing">
-        <div class="overlay">
-            <div class="content">
-                <div class="title">ASCENT APAC 2025</div>
-                <div class="subtitle">
-                    Pre-register now and take part in the raffle
-                </div>
-
-                <div class="event">
-                    November 09, 2025<br>
-                    Okada Manila – Grand Ballroom<br>
-                    Entertainment City, Parañaque
-                </div>
-
-                <div class="buttons">
-                    <form>
-                        <button class="btn outline">Reminders</button>
-                        <button class="btn primary">Pre-Register</button>
-                    </form>
-                </div>
+    <div class="hero">
+        <div class="hero-content">
+            <div class="hero-title">ASCENT APAC 2025</div>
+            <div class="hero-sub">
+                Pre-register now and take part in the raffle
+            </div>
+            <div class="event">
+                November 09, 2025<br>
+                Okada Manila – Grand Ballroom<br>
+                Entertainment City, Parañaque
             </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("Pre-Register", key="go_register"):
-            st.session_state.page = "register"
-    with col2:
-        if st.button("Reminders", key="go_reminder"):
+    st.markdown("<div class='cta'>", unsafe_allow_html=True)
+    c1, c2 = st.columns(2)
+
+    with c1:
+        if st.button("Reminders"):
             st.info("Reminder feature coming soon")
 
-# ---------------- REGISTRATION PAGE ----------------
+    with c2:
+        if st.button("Pre-Register"):
+            st.session_state.page = "register"
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# ---------------- REGISTRATION ----------------
 elif st.session_state.page == "register":
     st.title("Event Registration")
 
-    with st.form("register"):
+    with st.form("register_form"):
         name = st.text_input("Full Name")
         emp = st.text_input("Employee ID")
         submit = st.form_submit_button("Submit")
@@ -194,7 +161,10 @@ elif st.session_state.page == "register":
             elif any(e["emp_number"] == emp for e in st.session_state.entries):
                 st.warning("Employee already registered")
             else:
-                st.session_state.entries.append({"name": name, "emp_number": emp})
+                st.session_state.entries.append({
+                    "name": name,
+                    "emp_number": emp
+                })
                 save_data()
                 st.success("Registration successful!")
                 qr = generate_qr(f"{name} | {emp}")
@@ -218,7 +188,7 @@ elif st.session_state.page == "admin":
         else:
             st.error("Invalid credentials")
 
-# ---------------- RAFFLE PAGE ----------------
+# ---------------- RAFFLE ----------------
 elif st.session_state.page == "raffle":
     st.title("🎉 Raffle Draw")
 
@@ -239,6 +209,5 @@ elif st.session_state.page == "raffle":
             st.session_state.winner = winner
             save_data()
             st.success(f"🎊 Winner: {winner['name']} ({winner['emp_number']})")
-
     else:
         st.info("No entries yet")
