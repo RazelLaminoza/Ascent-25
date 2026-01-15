@@ -67,7 +67,8 @@ def set_bg_local(image_file):
         border-radius: 18px;
         backdrop-filter: blur(8px);
         max-width: 380px;
-        margin: auto;
+        margin: 20px auto;        /* spacing around card */
+        box-shadow: none;         /* remove rectangle shadow */
     }}
 
     .accent {{
@@ -76,7 +77,6 @@ def set_bg_local(image_file):
         font-weight: bold;
     }}
 
-    /* Simple confetti effect */
     .confetti {{
         position: fixed;
         width: 100%;
@@ -118,8 +118,8 @@ if st.session_state.page == "landing":
 # ---------------- REGISTRATION PAGE ----------------
 elif st.session_state.page == "register":
     st.markdown("<h1 class='accent'>Register Here</h1>", unsafe_allow_html=True)
+    
     st.markdown("<div class='card'>", unsafe_allow_html=True)
-
     with st.form("register_form"):
         emp_number = st.text_input("Employee Number")
         submit = st.form_submit_button("Submit")
@@ -129,7 +129,6 @@ elif st.session_state.page == "register":
                 try:
                     c.execute("INSERT INTO entries VALUES (?)", (emp_number,))
                     conn.commit()
-
                     st.success("Registration successful!")
 
                     qr = generate_qr(f"Employee Number: {emp_number}")
@@ -141,17 +140,11 @@ elif st.session_state.page == "register":
                     st.warning("Employee number already registered")
             else:
                 st.error("Employee Number is required")
-
     st.markdown("</div>", unsafe_allow_html=True)
 
-    st.markdown("---")
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("Admin Login"):
-            st.session_state.page = "admin"
-    with col2:
-        if st.button("Landing"):
-            st.session_state.page = "landing"
+    # Admin navigation only, no Landing button
+    if st.button("Admin Login"):
+        st.session_state.page = "admin"
 
 # ---------------- ADMIN LOGIN ----------------
 elif st.session_state.page == "admin":
@@ -160,13 +153,8 @@ elif st.session_state.page == "admin":
     user = st.text_input("Username")
     pwd = st.text_input("Password", type="password")
 
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("⬅ Back to Register"):
-            st.session_state.page = "register"
-    with col2:
-        if st.button("🏠 Back to Landing"):
-            st.session_state.page = "landing"
+    if st.button("⬅ Back to Register"):
+        st.session_state.page = "register"
 
     if st.button("Login"):
         if user == st.secrets["ADMIN_USER"] and pwd == st.secrets["ADMIN_PASS"]:
@@ -185,9 +173,6 @@ elif st.session_state.page == "raffle":
         if st.button("⬅ Register"):
             st.session_state.page = "register"
     with nav2:
-        if st.button("🏠 Landing"):
-            st.session_state.page = "landing"
-    with nav3:
         if st.button("🚪 Logout Admin"):
             st.session_state.admin = False
             st.session_state.page = "landing"
@@ -208,7 +193,6 @@ elif st.session_state.page == "raffle":
         # ---------------- WINNER ANIMATION ----------------
         if st.button("Run Raffle"):
             placeholder = st.empty()
-            winner = None
             # Shuffle animation
             for _ in range(30):
                 current = random.choice(entries)[0]
@@ -224,7 +208,6 @@ elif st.session_state.page == "raffle":
             c.execute("INSERT INTO winner VALUES (?)", (winner,))
             conn.commit()
 
-            # Display final winner big + confetti
             placeholder.markdown(
                 f"""
                 <h1 class='accent' style='font-size:90px'>{winner}</h1>
