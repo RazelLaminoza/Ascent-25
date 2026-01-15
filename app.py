@@ -6,23 +6,50 @@ import io
 import pandas as pd
 import base64
 import time
+from datetime import datetime, timedelta
+
+# ---------------- CONFIG ----------------
+EXPIRY_DAYS = 15
+expiry_date = datetime.now() - timedelta(days=EXPIRY_DAYS)
 
 # ---------------- DATABASE ----------------
 conn = sqlite3.connect("raffle.db", check_same_thread=False)
 c = conn.cursor()
-c.execute("""CREATE TABLE IF NOT EXISTS entries (emp_number TEXT)""")
-c.execute("""CREATE TABLE IF NOT EXISTS winner (emp_number TEXT)""")
+
+c.execute("""
+CREATE TABLE IF NOT EXISTS entries (
+    emp_number TEXT UNIQUE,
+    created_at TEXT
+)
+""")
+
+c.execute("""
+CREATE TABLE IF NOT EXISTS winner (
+    emp_number TEXT,
+    created_at TEXT
+)
+""")
+
+# Auto-clean old data
+c.execute(
+    "DELETE FROM entries WHERE datetime(created_at) < datetime(?)",
+    (expiry_date.isoformat(),)
+)
+c.execute(
+    "DELETE FROM winner WHERE datetime(created_at) < datetime(?)",
+    (expiry_date.isoformat(),)
+)
 conn.commit()
 
 # ---------------- SESSION STATE ----------------
 if "page" not in st.session_state:
-    st.session_state.page = "register"
+    st.session_state.page = "landing"
 if "admin" not in st.session_state:
     st.session_state.admin = False
 
 # ---------------- FUNCTIONS ----------------
 def generate_qr(data):
-    qr = qrcode.QRCode(version=1, box_size=10, border=4)
+    qr = qrcode.QRCode(box_size=10, border=4)
     qr.add_data(data)
     qr.make(fit=True)
     return qr.make_image(fill_color="black", back_color="white")
@@ -42,52 +69,77 @@ def set_bg_local(image_file):
         background-image: url("data:image/png;base64,{encoded}");
         background-size: cover;
         background-position: center;
+        background-attachment: fixed;
         font-family: Helvetica, Arial, sans-serif;
     }}
 
     h1, h2, h3, p, label {{
-        color: var(--text);
         font-family: Helvetica, Arial, sans-serif;
+        color: var(--text);
     }}
 
     .card {{
-        background: rgba(255,255,255,0.15);
+        background: rgba(255,255,255,0.2);
         padding: 25px;
-        border-radius: 16px;
-        backdrop-filter: blur(6px);
+        border-radius: 18px;
+        backdrop-filter: blur(8px);
         max-width: 380px;
         margin: auto;
     }}
 
     .accent {{
         color: var(--accent);
-        font-weight: bold;
         text-align: center;
+        font-weight: bold;
     }}
     </style>
     """, unsafe_allow_html=True)
 
 set_bg_local("bgna.png")
 
-# ---------------- REGISTER PAGE ----------------
-if st.session_state.page == "register":
+# ---------------- LANDING PAGE ----------------
+if st.session_state.page == "landing":
+    st.markdown("<h1 class='accent'>Welcome</h1>", unsafe_allow_html=True)
+    st.image("welcome_photo.png", use_column_width=True)
+
+    st.markdown("""
+    <div class="card">
+        <p><strong>Venue:</strong> Okada Manila Ballroom 1–3</p>
+        <p><strong>Date:</strong> January 25, 2026</p>
+        <p><strong>Time:</strong> 5:00 PM</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    if st.button("Register Here"):
+        st.session_state.page = "register"
+
+# ---------------- REGISTRATION PAGE ----------------
+elif st.session_state.page == "register":
     st.markdown("<h1 class='accent'>Register Here</h1>", unsafe_allow_html=True)
 
     st.markdown("<div class='card'>", unsafe_allow_html=True)
-    with st.form("register"):
+    with st.form("register_form"):
         emp_number = st.text_input("Employee Number")
         submit = st.form_submit_button("Submit")
 
         if submit:
             if emp_number:
-                c.execute("INSERT INTO entries VALUES (?)", (emp_number,))
-                conn.commit()
+                try:
+                    c.execute(
+                        "INSERT INTO entries VALUES (?, ?)",
+                        (emp_number, datetime.now().isoformat())
+                    )
+                    conn.commit()
 
-                st.success("Registration successful!")
-                qr = generate_qr(f"Employee Number: {emp_number}")
-                buf = io.BytesIO()
-                qr.save(buf, format="PNG")
-                st.image(buf.getvalue())
+                    st.success("Registration successful!")
+
+                    qr = generate_qr(f"Employee Number: {emp_number}")
+                    buf = io.BytesIO()
+                    qr.save(buf, format="PNG")
+                    st.image(buf.getvalue(), caption="Your QR Code")
+
+                except sqlite3.IntegrityError:
+                    st.warning("Employee number already registered")
             else:
                 st.error("Employee Number is required")
     st.markdown("</div>", unsafe_allow_html=True)
@@ -114,7 +166,10 @@ elif st.session_state.page == "admin":
 elif st.session_state.page == "raffle":
     st.markdown("<h1 class='accent'>🎲 Raffle Draw</h1>", unsafe_allow_html=True)
 
-    c.execute("SELECT emp_number FROM entries")
+    c.execute("""
+        SELECT emp_number FROM entries
+        WHERE datetime(created_at) >= datetime(?)
+    """, (expiry_date.isoformat(),))
     entries = c.fetchall()
 
     if entries:
@@ -141,14 +196,20 @@ elif st.session_state.page == "raffle":
                 time.sleep(0.05)
 
             winner = random.choice(entries)[0]
+            c.execute("DELETE FROM winner")
+            c.execute(
+                "INSERT INTO winner VALUES (?, ?)",
+                (winner, datetime.now().isoformat())
+            )
+            conn.commit()
+
             slot.markdown(
                 f"<h1 class='accent' style='font-size:90px'>{winner}</h1>",
                 unsafe_allow_html=True
             )
-
     else:
-        st.info("No registrations yet")
+        st.info("No valid registrations (older than 15 days are auto-removed)")
 
     if st.button("Logout"):
-        st.session_state.page = "register"
+        st.session_state.page = "landing"
         st.session_state.admin = False
