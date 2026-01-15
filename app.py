@@ -28,6 +28,7 @@ if "entries" not in st.session_state:
 if "winner" not in st.session_state:
     st.session_state.winner = None
 
+# Load saved data
 if os.path.exists(DATA_FILE):
     with open(DATA_FILE, "r") as f:
         data = json.load(f)
@@ -103,12 +104,15 @@ def landing_css(bg):
         line-height: 1.6;
     }}
 
-    .cta {{
-        margin-top: 40px;
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-        flex-wrap: wrap;
+    /* Centered CTA button */
+    div.stButton > button {{
+        background-color: #FFD400;
+        color: black;
+        font-weight: 800;
+        padding: 14px 42px;
+        border-radius: 40px;
+        border: none;
+        font-size: 18px;
     }}
     </style>
     """, unsafe_allow_html=True)
@@ -133,18 +137,10 @@ if st.session_state.page == "landing":
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown("<div class='cta'>", unsafe_allow_html=True)
-    c1, c2 = st.columns(2)
-
-    with c1:
-        if st.button("Reminders"):
-            st.info("Reminder feature coming soon")
-
-    with c2:
+    center = st.columns([1, 2, 1])
+    with center[1]:
         if st.button("Pre-Register"):
             st.session_state.page = "register"
-
-    st.markdown("</div>", unsafe_allow_html=True)
 
 # ---------------- REGISTRATION ----------------
 elif st.session_state.page == "register":
