@@ -43,9 +43,7 @@ def set_bg_local(image_file):
     with open(image_file, "rb") as f:
         encoded = base64.b64encode(f.read()).decode()
     st.markdown(f"""
-    <!-- Load Roboto font -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    
     <style>
     [data-testid="stAppViewContainer"] {{
         background-image: url("data:image/png;base64,{encoded}");
@@ -60,8 +58,6 @@ def set_bg_local(image_file):
         text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
         font-family: 'Roboto', sans-serif;
     }}
-
-    /* Transparent, modern form */
     .stForm {{
         background: rgba(255, 255, 255, 0.05) !important;
         padding: 20px 25px !important;
@@ -71,7 +67,6 @@ def set_bg_local(image_file):
         box-shadow: none !important;
         border: none !important;
     }}
-
     .stTextInput>div>div>input, .stTextInput>div>div>textarea {{
         background: rgba(255, 255, 255, 0.1) !important;
         border: none !important;
@@ -80,11 +75,9 @@ def set_bg_local(image_file):
         color: white !important;
         font-family: 'Roboto', sans-serif !important;
     }}
-
     .stTextInput>div>div>input::placeholder {{
         color: rgba(255,255,255,0.6) !important;
     }}
-
     button[kind="primary"] {{
         background-color: #FFD000 !important;
         color: black !important;
@@ -98,14 +91,12 @@ def set_bg_local(image_file):
     button[kind="primary"]:hover {{
         background-color: #FFB700 !important;
     }}
-
     .fixed-logo {{
         position: fixed;
         top: 20px;
         left: 20px;
         z-index: 9999;
     }}
-
     [data-testid="stAppViewContainer"] {{
         padding: 0 !important;
         margin: 0 !important;
@@ -128,7 +119,6 @@ def set_bg_local(image_file):
     #MainMenu {{visibility: hidden;}}
     header {{visibility: hidden;}}
     footer {{visibility: hidden;}}
-
     @media (max-width: 768px) {{
         html, body {{ overflow-y: auto !important; }}
         .fixed-logo {{ position: static; margin-bottom: 16px; }}
@@ -141,9 +131,6 @@ def set_bg_local(image_file):
     """, unsafe_allow_html=True)
 
 set_bg_local("bgna.png")
-
-# Friendly URL
-FRIENDLY_URL_HTML = '<a href="https://ascent-25-mjulgiqllfljvmfdphzn5c.streamlit.app/" target="_blank">https://ascentapac2026.com/</a>'
 
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
@@ -163,7 +150,7 @@ if st.session_state.page == "landing":
             st.session_state.page = "register"
 
     st.markdown(
-        f'<p style="text-align:center;color:white;font-size:18px">Visit our app: {FRIENDLY_URL_HTML}</p>',
+        '<p style="text-align:center;color:white;font-size:18px">Visit our app: https://ascentapac2026.com/</p>',
         unsafe_allow_html=True
     )
 
@@ -193,7 +180,7 @@ elif st.session_state.page == "register":
             st.session_state.page = "admin"
 
     st.markdown(
-        f'<p style="text-align:center;color:white;font-size:16px">App link: {FRIENDLY_URL_HTML}</p>',
+        '<p style="text-align:center;color:white;font-size:16px">App link: https://ascentapac2026.com/</p>',
         unsafe_allow_html=True
     )
 
@@ -287,9 +274,8 @@ elif st.session_state.page == "raffle":
             </script>
             """, height=0, width=0)
 
-        # Friendly URL
         st.markdown(
-            f'<p style="text-align:center;color:white;font-size:16px">Share the raffle: {FRIENDLY_URL_HTML}</p>',
+            '<p style="text-align:center;color:white;font-size:16px">Share the raffle: https://ascentapac2026.com/</p>',
             unsafe_allow_html=True
         )
     else:
