@@ -43,27 +43,48 @@ def set_bg_local(image_file):
     with open(image_file, "rb") as f:
         encoded = base64.b64encode(f.read()).decode()
     st.markdown(f"""
+    <!-- Load Roboto font -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    
     <style>
     [data-testid="stAppViewContainer"] {{
         background-image: url("data:image/png;base64,{encoded}");
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
-        font-family: Helvetica, Arial, sans-serif;
+        font-family: 'Roboto', sans-serif;
     }}
     h1, h2, h3 {{
         color: white;
         text-align: center;
         text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        font-family: 'Roboto', sans-serif;
     }}
-    .card {{
-        background: rgba(255,255,255,0.2);
-        padding: 25px;
-        border-radius: 18px;
+
+    /* Transparent, modern form */
+    .stForm {{
+        background: rgba(255, 255, 255, 0.05) !important;
+        padding: 20px 25px !important;
+        border-radius: 15px !important;
         backdrop-filter: blur(8px);
-        max-width: 420px;
-        margin: 20px auto;
+        font-family: 'Roboto', sans-serif !important;
+        box-shadow: none !important;
+        border: none !important;
     }}
+
+    .stTextInput>div>div>input, .stTextInput>div>div>textarea {{
+        background: rgba(255, 255, 255, 0.1) !important;
+        border: none !important;
+        border-radius: 10px !important;
+        padding: 12px !important;
+        color: white !important;
+        font-family: 'Roboto', sans-serif !important;
+    }}
+
+    .stTextInput>div>div>input::placeholder {{
+        color: rgba(255,255,255,0.6) !important;
+    }}
+
     button[kind="primary"] {{
         background-color: #FFD000 !important;
         color: black !important;
@@ -72,16 +93,19 @@ def set_bg_local(image_file):
         font-size: 18px;
         font-weight: 700;
         border: none;
+        font-family: 'Roboto', sans-serif !important;
     }}
     button[kind="primary"]:hover {{
         background-color: #FFB700 !important;
     }}
+
     .fixed-logo {{
         position: fixed;
         top: 20px;
         left: 20px;
         z-index: 9999;
     }}
+
     [data-testid="stAppViewContainer"] {{
         padding: 0 !important;
         margin: 0 !important;
@@ -104,18 +128,22 @@ def set_bg_local(image_file):
     #MainMenu {{visibility: hidden;}}
     header {{visibility: hidden;}}
     footer {{visibility: hidden;}}
+
     @media (max-width: 768px) {{
         html, body {{ overflow-y: auto !important; }}
         .fixed-logo {{ position: static; margin-bottom: 16px; }}
         h1 {{ font-size: 32px !important; }}
         img {{ max-width: 100% !important; height: auto !important; }}
         button {{ width: 100% !important; font-size: 16px !important; height: 50px !important; }}
-        .card {{ max-width: 90% !important; padding: 18px !important; }}
+        .stForm {{ max-width: 90% !important; padding: 18px !important; }}
     }}
     </style>
     """, unsafe_allow_html=True)
 
-set_bg_local("bgna.png")  # Make sure your background image is in the same folder
+set_bg_local("bgna.png")
+
+# Friendly URL
+FRIENDLY_URL_HTML = '<a href="https://ascent-25-mjulgiqllfljvmfdphzn5c.streamlit.app/" target="_blank">https://ascentapac2026.com/</a>'
 
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
@@ -134,10 +162,14 @@ if st.session_state.page == "landing":
         if st.button("Register", use_container_width=True):
             st.session_state.page = "register"
 
+    st.markdown(
+        f'<p style="text-align:center;color:white;font-size:18px">Visit our app: {FRIENDLY_URL_HTML}</p>',
+        unsafe_allow_html=True
+    )
+
 # ---------------- REGISTRATION PAGE ----------------
 elif st.session_state.page == "register":
     st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
     with st.form("register_form"):
         name = st.text_input("Full Name")
         emp_number = st.text_input("Employee ID")
@@ -156,10 +188,14 @@ elif st.session_state.page == "register":
                     st.image(buf.getvalue(), caption="Your QR Code")
             else:
                 st.error("Please fill both Name and Employee ID")
-    st.markdown("</div>", unsafe_allow_html=True)
     if not st.session_state.admin:
         if st.button("Admin Login"):
             st.session_state.page = "admin"
+
+    st.markdown(
+        f'<p style="text-align:center;color:white;font-size:16px">App link: {FRIENDLY_URL_HTML}</p>',
+        unsafe_allow_html=True
+    )
 
 # ---------------- ADMIN LOGIN ----------------
 elif st.session_state.page == "admin":
@@ -250,5 +286,11 @@ elif st.session_state.page == "raffle":
             })();
             </script>
             """, height=0, width=0)
+
+        # Friendly URL
+        st.markdown(
+            f'<p style="text-align:center;color:white;font-size:16px">Share the raffle: {FRIENDLY_URL_HTML}</p>',
+            unsafe_allow_html=True
+        )
     else:
         st.info("No registrations yet")
