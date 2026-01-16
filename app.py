@@ -44,6 +44,7 @@ def set_bg_local(image_file):
         encoded = base64.b64encode(f.read()).decode()
     st.markdown(f"""
     <style>
+    /* ---------- BACKGROUND ---------- */
     [data-testid="stAppViewContainer"] {{
         background-image: url("data:image/png;base64,{encoded}");
         background-size: cover;
@@ -80,6 +81,64 @@ def set_bg_local(image_file):
     button[kind="primary"]:hover {{
         background-color: #FFB700 !important;
     }}
+
+    /* ---------- FIXED LOGO TOP LEFT ---------- */
+    .fixed-logo {{
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 9999;
+    }}
+
+    /* ---------- FULL SCREEN ---------- */
+    [data-testid="stAppViewContainer"] {{
+        padding: 0 !important;
+        margin: 0 !important;
+    }}
+    [data-testid="block-container"] {{
+        padding: 0.5rem 0.5rem 0.5rem 0.5rem !important;
+        max-width: 100% !important;
+    }}
+
+    /* ---------- HIDE SCROLLBARS ---------- */
+    html, body {{
+        overflow: hidden !important;
+    }}
+    ::-webkit-scrollbar {{
+        width: 0px;
+        height: 0px;
+        display: none;
+    }}
+    * {{
+        scrollbar-width: none;
+    }}
+
+    /* ---------- MOBILE RESPONSIVE ---------- */
+    @media (max-width: 768px) {{
+        html, body {{
+            overflow-y: auto !important;
+        }}
+        .fixed-logo {{
+            position: static;
+            margin-bottom: 16px;
+        }}
+        h1 {{
+            font-size: 32px !important;
+        }}
+        img {{
+            max-width: 100% !important;
+            height: auto !important;
+        }}
+        button {{
+            width: 100% !important;
+            font-size: 16px !important;
+            height: 50px !important;
+        }}
+        .card {{
+            max-width: 90% !important;
+            padding: 18px !important;
+        }}
+    }}
     </style>
     """, unsafe_allow_html=True)
 
@@ -87,75 +146,59 @@ set_bg_local("bgna.png")
 
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
-
-    # TOP LEFT LOGO (2.png)
-    col_logo, col_space = st.columns([1, 6])
-    with col_logo:
-        st.image("2.png", width=160)
+    # FIXED LOGO TOP LEFT
+    st.markdown('<div class="fixed-logo">', unsafe_allow_html=True)
+    st.image("2.png", width=160)
+    st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown("<br><br>", unsafe_allow_html=True)
 
-    # MAIN HERO IMAGE (1.png)
-    col1, col2, col3 = st.columns([1, 3, 1])
+    # MAIN HERO IMAGE CENTERED
+    col1, col2, col3 = st.columns([1,3,1])
     with col2:
         st.image("1.png", use_column_width=True)
 
     st.markdown("<br><br>", unsafe_allow_html=True)
 
-    # REGISTER BUTTON (USER FLOW ONLY)
-    colb1, colb2, colb3 = st.columns([2, 1, 2])
+    # REGISTER BUTTON
+    colb1, colb2, colb3 = st.columns([2,1,2])
     with colb2:
         if st.button("Register", use_container_width=True):
             st.session_state.page = "register"
 
-    st.markdown("<br><br>", unsafe_allow_html=True)
-
-
 # ---------------- REGISTRATION PAGE ----------------
 elif st.session_state.page == "register":
-
     st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
-
     st.markdown("<div class='card'>", unsafe_allow_html=True)
     with st.form("register_form"):
         name = st.text_input("Full Name")
         emp_number = st.text_input("Employee ID")
         submit = st.form_submit_button("Submit")
-
         if submit:
             if name and emp_number:
                 if any(e["emp_number"] == emp_number for e in st.session_state.entries):
                     st.warning("Employee ID already registered")
                 else:
-                    st.session_state.entries.append({
-                        "name": name,
-                        "emp_number": emp_number
-                    })
+                    st.session_state.entries.append({"name": name, "emp_number": emp_number})
                     save_data()
                     st.success("Registration successful!")
-
-                    qr = generate_qr(f"{name} | {emp_number}")
+                    qr = generate_qr(f"Name: {name}\nEmployee ID: {emp_number}")
                     buf = io.BytesIO()
                     qr.save(buf, format="PNG")
                     st.image(buf.getvalue(), caption="Your QR Code")
             else:
-                st.error("Please fill all fields")
+                st.error("Please fill both Name and Employee ID")
     st.markdown("</div>", unsafe_allow_html=True)
-
     if st.button("Admin Login"):
         st.session_state.page = "admin"
 
 # ---------------- ADMIN LOGIN ----------------
 elif st.session_state.page == "admin":
-
     st.markdown("<h2>Admin Login</h2>", unsafe_allow_html=True)
-
     user = st.text_input("Username")
     pwd = st.text_input("Password", type="password")
-
     if st.button("⬅ Back"):
         st.session_state.page = "register"
-
     if st.button("Login"):
         if user == st.secrets["ADMIN_USER"] and pwd == st.secrets["ADMIN_PASS"]:
             st.session_state.admin = True
@@ -165,9 +208,7 @@ elif st.session_state.page == "admin":
 
 # ---------------- RAFFLE PAGE ----------------
 elif st.session_state.page == "raffle":
-
     st.markdown("<h1>Raffle Draw</h1>", unsafe_allow_html=True)
-
     nav1, nav2 = st.columns(2)
     with nav1:
         if st.button("⬅ Register"):
@@ -177,15 +218,15 @@ elif st.session_state.page == "raffle":
             st.session_state.admin = False
             st.session_state.page = "landing"
 
-    if st.session_state.entries:
-
-        df = pd.DataFrame(st.session_state.entries)
+    entries = st.session_state.entries
+    if entries:
+        st.subheader("Registered Employees (Editable)")
+        df = pd.DataFrame(entries)
         edited_df = st.data_editor(df, num_rows="dynamic")
-
         if st.button("Save Table Changes"):
             st.session_state.entries = edited_df.to_dict("records")
             save_data()
-            st.success("Saved")
+            st.success("Table changes saved!")
 
         excel = io.BytesIO()
         edited_df.to_excel(excel, index=False)
@@ -195,21 +236,40 @@ elif st.session_state.page == "raffle":
         placeholder = st.empty()
 
         if st.button("Run Raffle"):
-            for _ in range(25):
-                pick = random.choice(st.session_state.entries)
+            for _ in range(30):
+                current = random.choice(st.session_state.entries)
                 placeholder.markdown(
-                    f"<h1 style='font-size:65px'>{pick['name']} ({pick['emp_number']})</h1>",
+                    f"<h1 style='color:white;font-size:70px'>{current['name']} ({current['emp_number']})</h1>",
                     unsafe_allow_html=True
                 )
-                time.sleep(0.08)
+                time.sleep(0.07)
 
             winner = random.choice(st.session_state.entries)
             st.session_state.winner = winner
             save_data()
 
             placeholder.markdown(
-                f"<h1 style='font-size:80px;color:#FFD000'>{winner['name']} ({winner['emp_number']})</h1>",
+                f"<div class='rainbow'>{winner['name']} ({winner['emp_number']})</div>",
                 unsafe_allow_html=True
             )
+
+            # Confetti effect
+            confetti_html = """
+            <div id="confetti-container"></div>
+            <script>
+            const colors = ['#FF0000','#FF7F00','#FFFF00','#00FF00','#0000FF','#4B0082','#8B00FF'];
+            for(let i=0;i<100;i++){
+                let div = document.createElement('div');
+                div.className = 'confetti-piece';
+                div.style.left = Math.random() * window.innerWidth + 'px';
+                div.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
+                div.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                div.style.width = div.style.height = (Math.random() * 8 + 4) + 'px';
+                document.body.appendChild(div);
+            }
+            setTimeout(()=>{document.getElementById('confetti-container').remove()}, 4000);
+            </script>
+            """
+            st.components.v1.html(confetti_html, height=0, width=0)
     else:
         st.info("No registrations yet")
