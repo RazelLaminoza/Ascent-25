@@ -253,32 +253,58 @@ elif st.session_state.page == "raffle":
         placeholder = st.empty()
 
         if st.button("Run Raffle"):
-            # Load the confetti library
-            st.components.v1.html("""
-            <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-            """, height=0)
+    # Pick winner
+    winner = random.choice(st.session_state.entries)
+    st.session_state.winner = winner
+    save_data()
 
-            # Name-flashing animation
-            for _ in range(30):
-                current = random.choice(st.session_state.entries)
-                placeholder.markdown(
-                    f"<h1 style='color:white;font-size:70px'>{current['name']} ({current['emp_number']})</h1>",
-                    unsafe_allow_html=True
-                )
-                # Small confetti bursts during animation
-                st.components.v1.html(f"""
-                <script>
-                confetti({{
-                    particleCount: 20,
-                    startVelocity: 30,
-                    spread: 360,
-                    origin: {{ x: Math.random(), y: Math.random() - 0.2 }},
-                    ticks: 60,
-                    zIndex: 1000
-                }});
-                </script>
-                """, height=0)
-                time.sleep(0.07)
+    # Placeholder for name animation
+    placeholder = st.empty()
+
+    # Flashing names animation (Python loop)
+    for _ in range(30):
+        current = random.choice(st.session_state.entries)
+        placeholder.markdown(
+            f"<h1 style='color:white;font-size:70px'>{current['name']} ({current['emp_number']})</h1>",
+            unsafe_allow_html=True
+        )
+        time.sleep(0.07)
+
+    # Display winner
+    placeholder.markdown(
+        f"<h1 style='color:#FFD700;text-shadow:2px 2px 4px rgba(0,0,0,0.7); font-size:80px'>{winner['name']} ({winner['emp_number']})</h1>",
+        unsafe_allow_html=True
+    )
+
+    # Run FULL-SCREEN confetti using JS once
+    st.components.v1.html("""
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+    const duration = 5 * 1000;
+    const end = Date.now() + duration;
+    const colors = ['#FF0000','#FF7F00','#FFFF00','#00FF00','#0000FF','#4B0082','#8B00FF'];
+    (function frame() {
+        confetti({
+            particleCount: 5,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0, y: 0 },
+            colors: colors
+        });
+        confetti({
+            particleCount: 5,
+            angle: 120,
+            spread: 55,
+            origin: { x: 1, y: 0 },
+            colors: colors
+        });
+        if (Date.now() < end) {
+            requestAnimationFrame(frame);
+        }
+    })();
+    </script>
+    """, height=0)
+    time.sleep(0.07)
 
             # Pick winner
             winner = random.choice(st.session_state.entries)
