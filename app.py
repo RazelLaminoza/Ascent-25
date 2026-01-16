@@ -149,8 +149,6 @@ if st.session_state.page == "landing":
         if st.button("Register", use_container_width=True):
             st.session_state.page = "register"
 
-    )
-
 # ---------------- REGISTRATION PAGE ----------------
 elif st.session_state.page == "register":
     st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
@@ -175,8 +173,6 @@ elif st.session_state.page == "register":
     if not st.session_state.admin:
         if st.button("Admin Login"):
             st.session_state.page = "admin"
-
-    )
 
 # ---------------- ADMIN LOGIN ----------------
 elif st.session_state.page == "admin":
@@ -267,8 +263,5 @@ elif st.session_state.page == "raffle":
             })();
             </script>
             """, height=0, width=0)
-
-
-        )
     else:
         st.info("No registrations yet")
