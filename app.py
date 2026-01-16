@@ -110,14 +110,6 @@ if st.session_state.page == "landing":
 
     st.markdown("<br><br>", unsafe_allow_html=True)
 
-    # EVENT DETAILS
-    st.markdown("""
-    <div class="card">
-        <p><strong>Venue:</strong> Okada Manila Ballroom 1–3</p>
-        <p><strong>Date:</strong> January 25, 2026</p>
-        <p><strong>Time:</strong> 5:00 PM</p>
-    </div>
-    """, unsafe_allow_html=True)
 
 # ---------------- REGISTRATION PAGE ----------------
 elif st.session_state.page == "register":
