@@ -149,9 +149,6 @@ if st.session_state.page == "landing":
         if st.button("Register", use_container_width=True):
             st.session_state.page = "register"
 
-    st.markdown(
-        '<p style="text-align:center;color:white;font-size:18px">Visit our app: https://ascentapac2026.com/</p>',
-        unsafe_allow_html=True
     )
 
 # ---------------- REGISTRATION PAGE ----------------
@@ -179,9 +176,6 @@ elif st.session_state.page == "register":
         if st.button("Admin Login"):
             st.session_state.page = "admin"
 
-    st.markdown(
-        '<p style="text-align:center;color:white;font-size:16px">App link: https://ascentapac2026.com/</p>',
-        unsafe_allow_html=True
     )
 
 # ---------------- ADMIN LOGIN ----------------
@@ -274,9 +268,7 @@ elif st.session_state.page == "raffle":
             </script>
             """, height=0, width=0)
 
-        st.markdown(
-            '<p style="text-align:center;color:white;font-size:16px">Share the raffle: https://ascentapac2026.com/</p>',
-            unsafe_allow_html=True
+
         )
     else:
         st.info("No registrations yet")
