@@ -253,58 +253,14 @@ elif st.session_state.page == "raffle":
         placeholder = st.empty()
 
         if st.button("Run Raffle"):
-    # Pick winner
-    winner = random.choice(st.session_state.entries)
-    st.session_state.winner = winner
-    save_data()
-
-    # Placeholder for name animation
-    placeholder = st.empty()
-
-    # Flashing names animation (Python loop)
-    for _ in range(30):
-        current = random.choice(st.session_state.entries)
-        placeholder.markdown(
-            f"<h1 style='color:white;font-size:70px'>{current['name']} ({current['emp_number']})</h1>",
-            unsafe_allow_html=True
-        )
-        time.sleep(0.07)
-
-    # Display winner
-    placeholder.markdown(
-        f"<h1 style='color:#FFD700;text-shadow:2px 2px 4px rgba(0,0,0,0.7); font-size:80px'>{winner['name']} ({winner['emp_number']})</h1>",
-        unsafe_allow_html=True
-    )
-
-    # Run FULL-SCREEN confetti using JS once
-    st.components.v1.html("""
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <script>
-    const duration = 5 * 1000;
-    const end = Date.now() + duration;
-    const colors = ['#FF0000','#FF7F00','#FFFF00','#00FF00','#0000FF','#4B0082','#8B00FF'];
-    (function frame() {
-        confetti({
-            particleCount: 5,
-            angle: 60,
-            spread: 55,
-            origin: { x: 0, y: 0 },
-            colors: colors
-        });
-        confetti({
-            particleCount: 5,
-            angle: 120,
-            spread: 55,
-            origin: { x: 1, y: 0 },
-            colors: colors
-        });
-        if (Date.now() < end) {
-            requestAnimationFrame(frame);
-        }
-    })();
-    </script>
-    """, height=0)
-    time.sleep(0.07)
+            # Flash names
+            for _ in range(30):
+                current = random.choice(st.session_state.entries)
+                placeholder.markdown(
+                    f"<h1 style='color:white;font-size:70px'>{current['name']} ({current['emp_number']})</h1>",
+                    unsafe_allow_html=True
+                )
+                time.sleep(0.07)
 
             # Pick winner
             winner = random.choice(st.session_state.entries)
@@ -317,21 +273,22 @@ elif st.session_state.page == "raffle":
                 unsafe_allow_html=True
             )
 
-            # Full-screen confetti celebration
+            # FULL SCREEN CONFETTI
             st.components.v1.html("""
+            <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
             <script>
             const duration = 5 * 1000;
-            const animationEnd = Date.now() + duration;
-            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 1000 };
-            function randomInRange(min, max) { return Math.random() * (max - min) + min; }
-            const interval = setInterval(function() {
-                const timeLeft = animationEnd - Date.now();
-                if (timeLeft <= 0) return clearInterval(interval);
-                const particleCount = 50 * (timeLeft / duration);
-                confetti(Object.assign({ particleCount, origin: { x: randomInRange(0, 1), y: Math.random() - 0.2 } }, defaults));
-            }, 250);
+            const end = Date.now() + duration;
+            const colors = ['#FF0000','#FF7F00','#FFFF00','#00FF00','#0000FF','#4B0082','#8B00FF'];
+            (function frame() {
+                confetti({particleCount: 5, angle: 60, spread: 55, origin: {x: 0, y: 0}, colors: colors});
+                confetti({particleCount: 5, angle: 120, spread: 55, origin: {x: 1, y: 0}, colors: colors});
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            })();
             </script>
             """, height=0, width=0)
+
     else:
         st.info("No registrations yet")
-
