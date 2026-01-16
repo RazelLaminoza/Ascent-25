@@ -96,7 +96,7 @@ def set_bg_local(image_file):
         margin: 0 !important;
     }}
     [data-testid="block-container"] {{
-        padding: 0.5rem 0.5rem 0.5rem 0.5rem !important;
+        padding: 0.5rem !important;
         max-width: 100% !important;
     }}
 
@@ -112,6 +112,11 @@ def set_bg_local(image_file):
     * {{
         scrollbar-width: none;
     }}
+
+    /* ---------- HIDE STREAMLIT MENU / HEADER / FOOTER ---------- */
+    #MainMenu {{visibility: hidden;}}
+    header {{visibility: hidden;}}
+    footer {{visibility: hidden;}}
 
     /* ---------- MOBILE RESPONSIVE ---------- */
     @media (max-width: 768px) {{
@@ -189,25 +194,37 @@ elif st.session_state.page == "register":
             else:
                 st.error("Please fill both Name and Employee ID")
     st.markdown("</div>", unsafe_allow_html=True)
-    if st.button("Admin Login"):
-        st.session_state.page = "admin"
+    
+    # Only show admin login button if not logged in
+    if not st.session_state.admin:
+        if st.button("Admin Login"):
+            st.session_state.page = "admin"
 
 # ---------------- ADMIN LOGIN ----------------
 elif st.session_state.page == "admin":
     st.markdown("<h2>Admin Login</h2>", unsafe_allow_html=True)
     user = st.text_input("Username")
     pwd = st.text_input("Password", type="password")
-    if st.button("⬅ Back"):
-        st.session_state.page = "register"
-    if st.button("Login"):
-        if user == st.secrets["ADMIN_USER"] and pwd == st.secrets["ADMIN_PASS"]:
-            st.session_state.admin = True
-            st.session_state.page = "raffle"
-        else:
-            st.error("Invalid credentials")
+    col1, col2 = st.columns([1,1])
+    with col1:
+        if st.button("⬅ Back"):
+            st.session_state.page = "register"
+    with col2:
+        if st.button("Login"):
+            if user == st.secrets["ADMIN_USER"] and pwd == st.secrets["ADMIN_PASS"]:
+                st.session_state.admin = True
+                st.session_state.page = "raffle"
+            else:
+                st.error("Invalid credentials")
 
 # ---------------- RAFFLE PAGE ----------------
 elif st.session_state.page == "raffle":
+    if not st.session_state.admin:
+        st.warning("You must be an admin to access this page")
+        if st.button("⬅ Back to Register"):
+            st.session_state.page = "register"
+        st.stop()
+
     st.markdown("<h1>Raffle Draw</h1>", unsafe_allow_html=True)
     nav1, nav2 = st.columns(2)
     with nav1:
