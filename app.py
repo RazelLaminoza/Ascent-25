@@ -253,40 +253,59 @@ elif st.session_state.page == "raffle":
         placeholder = st.empty()
 
         if st.button("Run Raffle"):
+            # Load the confetti library
+            st.components.v1.html("""
+            <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+            """, height=0)
+
+            # Name-flashing animation
             for _ in range(30):
                 current = random.choice(st.session_state.entries)
                 placeholder.markdown(
                     f"<h1 style='color:white;font-size:70px'>{current['name']} ({current['emp_number']})</h1>",
                     unsafe_allow_html=True
                 )
+                # Small confetti bursts during animation
+                st.components.v1.html(f"""
+                <script>
+                confetti({{
+                    particleCount: 20,
+                    startVelocity: 30,
+                    spread: 360,
+                    origin: {{ x: Math.random(), y: Math.random() - 0.2 }},
+                    ticks: 60,
+                    zIndex: 1000
+                }});
+                </script>
+                """, height=0)
                 time.sleep(0.07)
 
+            # Pick winner
             winner = random.choice(st.session_state.entries)
             st.session_state.winner = winner
             save_data()
 
+            # Display winner
             placeholder.markdown(
-                f"<div class='rainbow'>{winner['name']} ({winner['emp_number']})</div>",
+                f"<h1 style='color:#FFD700;text-shadow:2px 2px 4px rgba(0,0,0,0.7); font-size:80px'>{winner['name']} ({winner['emp_number']})</h1>",
                 unsafe_allow_html=True
             )
 
-            # Confetti effect
-            confetti_html = """
-            <div id="confetti-container"></div>
+            # Full-screen confetti celebration
+            st.components.v1.html("""
             <script>
-            const colors = ['#FF0000','#FF7F00','#FFFF00','#00FF00','#0000FF','#4B0082','#8B00FF'];
-            for(let i=0;i<100;i++){
-                let div = document.createElement('div');
-                div.className = 'confetti-piece';
-                div.style.left = Math.random() * window.innerWidth + 'px';
-                div.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
-                div.style.animationDuration = (Math.random() * 3 + 2) + 's';
-                div.style.width = div.style.height = (Math.random() * 8 + 4) + 'px';
-                document.body.appendChild(div);
-            }
-            setTimeout(()=>{document.getElementById('confetti-container').remove()}, 4000);
+            const duration = 5 * 1000;
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 1000 };
+            function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+            const interval = setInterval(function() {
+                const timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) return clearInterval(interval);
+                const particleCount = 50 * (timeLeft / duration);
+                confetti(Object.assign({ particleCount, origin: { x: randomInRange(0, 1), y: Math.random() - 0.2 } }, defaults));
+            }, 250);
             </script>
-            """
-            st.components.v1.html(confetti_html, height=0, width=0)
+            """, height=0, width=0)
     else:
         st.info("No registrations yet")
+
