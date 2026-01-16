@@ -115,9 +115,7 @@ def set_bg_local(image_file):
     </style>
     """, unsafe_allow_html=True)
 
-set_bg_local("bgna.png")  # Your background image
-
-FRIENDLY_URL_HTML = '<a href="https://ascent-25-mjulgiqllfljvmfdphzn5c.streamlit.app/" target="_blank">https://ascentapac2026.com/</a>'
+set_bg_local("bgna.png")  # Make sure your background image is in the same folder
 
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
@@ -131,16 +129,10 @@ if st.session_state.page == "landing":
         st.image("1.png", use_column_width=True)
 
     st.markdown("<br><br>", unsafe_allow_html=True)
-    
     colb1, colb2, colb3 = st.columns([2,1,2])
     with colb2:
         if st.button("Register", use_container_width=True):
             st.session_state.page = "register"
-
-    st.markdown(
-        f'<p style="text-align:center;color:white;font-size:18px">Visit our app: {FRIENDLY_URL_HTML}</p>',
-        unsafe_allow_html=True
-    )
 
 # ---------------- REGISTRATION PAGE ----------------
 elif st.session_state.page == "register":
@@ -165,15 +157,9 @@ elif st.session_state.page == "register":
             else:
                 st.error("Please fill both Name and Employee ID")
     st.markdown("</div>", unsafe_allow_html=True)
-
     if not st.session_state.admin:
         if st.button("Admin Login"):
             st.session_state.page = "admin"
-
-    st.markdown(
-        f'<p style="text-align:center;color:white;font-size:16px">App link: {FRIENDLY_URL_HTML}</p>',
-        unsafe_allow_html=True
-    )
 
 # ---------------- ADMIN LOGIN ----------------
 elif st.session_state.page == "admin":
@@ -248,7 +234,7 @@ elif st.session_state.page == "raffle":
                 unsafe_allow_html=True
             )
 
-            # Confetti
+            # Full-screen confetti
             st.components.v1.html("""
             <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
             <script>
@@ -264,11 +250,5 @@ elif st.session_state.page == "raffle":
             })();
             </script>
             """, height=0, width=0)
-
-        # Friendly link for sharing
-        st.markdown(
-            f'<p style="text-align:center;color:white;font-size:16px">Share the raffle: {FRIENDLY_URL_HTML}</p>',
-            unsafe_allow_html=True
-        )
     else:
         st.info("No registrations yet")
