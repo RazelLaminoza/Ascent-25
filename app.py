@@ -44,7 +44,6 @@ def set_bg_local(image_file):
         encoded = base64.b64encode(f.read()).decode()
     st.markdown(f"""
     <style>
-    /* ---------- BACKGROUND ---------- */
     [data-testid="stAppViewContainer"] {{
         background-image: url("data:image/png;base64,{encoded}");
         background-size: cover;
@@ -52,13 +51,11 @@ def set_bg_local(image_file):
         background-attachment: fixed;
         font-family: Helvetica, Arial, sans-serif;
     }}
-
     h1, h2, h3 {{
         color: white;
         text-align: center;
         text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
     }}
-
     .card {{
         background: rgba(255,255,255,0.2);
         padding: 25px;
@@ -67,7 +64,6 @@ def set_bg_local(image_file):
         max-width: 420px;
         margin: 20px auto;
     }}
-
     button[kind="primary"] {{
         background-color: #FFD000 !important;
         color: black !important;
@@ -77,20 +73,15 @@ def set_bg_local(image_file):
         font-weight: 700;
         border: none;
     }}
-
     button[kind="primary"]:hover {{
         background-color: #FFB700 !important;
     }}
-
-    /* ---------- FIXED LOGO TOP LEFT ---------- */
     .fixed-logo {{
         position: fixed;
         top: 20px;
         left: 20px;
         z-index: 9999;
     }}
-
-    /* ---------- FULL SCREEN ---------- */
     [data-testid="stAppViewContainer"] {{
         padding: 0 !important;
         margin: 0 !important;
@@ -99,8 +90,6 @@ def set_bg_local(image_file):
         padding: 0.5rem !important;
         max-width: 100% !important;
     }}
-
-    /* ---------- HIDE SCROLLBARS ---------- */
     html, body {{
         overflow: hidden !important;
     }}
@@ -112,60 +101,34 @@ def set_bg_local(image_file):
     * {{
         scrollbar-width: none;
     }}
-
-    /* ---------- HIDE STREAMLIT MENU / HEADER / FOOTER ---------- */
     #MainMenu {{visibility: hidden;}}
     header {{visibility: hidden;}}
     footer {{visibility: hidden;}}
-
-    /* ---------- MOBILE RESPONSIVE ---------- */
     @media (max-width: 768px) {{
-        html, body {{
-            overflow-y: auto !important;
-        }}
-        .fixed-logo {{
-            position: static;
-            margin-bottom: 16px;
-        }}
-        h1 {{
-            font-size: 32px !important;
-        }}
-        img {{
-            max-width: 100% !important;
-            height: auto !important;
-        }}
-        button {{
-            width: 100% !important;
-            font-size: 16px !important;
-            height: 50px !important;
-        }}
-        .card {{
-            max-width: 90% !important;
-            padding: 18px !important;
-        }}
+        html, body {{ overflow-y: auto !important; }}
+        .fixed-logo {{ position: static; margin-bottom: 16px; }}
+        h1 {{ font-size: 32px !important; }}
+        img {{ max-width: 100% !important; height: auto !important; }}
+        button {{ width: 100% !important; font-size: 16px !important; height: 50px !important; }}
+        .card {{ max-width: 90% !important; padding: 18px !important; }}
     }}
     </style>
     """, unsafe_allow_html=True)
 
-set_bg_local("bgna.png")
+set_bg_local("bgna.png")  # Make sure your background image is in the same folder
 
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
-    # FIXED LOGO TOP LEFT
     st.markdown('<div class="fixed-logo">', unsafe_allow_html=True)
     st.image("2.png", width=160)
     st.markdown('</div>', unsafe_allow_html=True)
-
     st.markdown("<br><br>", unsafe_allow_html=True)
 
-    # MAIN HERO IMAGE CENTERED
     col1, col2, col3 = st.columns([1,3,1])
     with col2:
         st.image("1.png", use_column_width=True)
 
     st.markdown("<br><br>", unsafe_allow_html=True)
-
-    # REGISTER BUTTON
     colb1, colb2, colb3 = st.columns([2,1,2])
     with colb2:
         if st.button("Register", use_container_width=True):
@@ -194,8 +157,6 @@ elif st.session_state.page == "register":
             else:
                 st.error("Please fill both Name and Employee ID")
     st.markdown("</div>", unsafe_allow_html=True)
-    
-    # Only show admin login button if not logged in
     if not st.session_state.admin:
         if st.button("Admin Login"):
             st.session_state.page = "admin"
@@ -253,7 +214,7 @@ elif st.session_state.page == "raffle":
         placeholder = st.empty()
 
         if st.button("Run Raffle"):
-            # Flash names
+            # Flashing names
             for _ in range(30):
                 current = random.choice(st.session_state.entries)
                 placeholder.markdown(
@@ -267,13 +228,13 @@ elif st.session_state.page == "raffle":
             st.session_state.winner = winner
             save_data()
 
-            # Display winner
+            # Show winner
             placeholder.markdown(
                 f"<h1 style='color:#FFD700;text-shadow:2px 2px 4px rgba(0,0,0,0.7); font-size:80px'>{winner['name']} ({winner['emp_number']})</h1>",
                 unsafe_allow_html=True
             )
 
-            # FULL SCREEN CONFETTI
+            # Full-screen confetti
             st.components.v1.html("""
             <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
             <script>
@@ -289,6 +250,5 @@ elif st.session_state.page == "raffle":
             })();
             </script>
             """, height=0, width=0)
-
     else:
         st.info("No registrations yet")
