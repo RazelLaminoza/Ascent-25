@@ -4,39 +4,29 @@ import qrcode
 import io
 import pandas as pd
 import base64
+import time
 import json
 import os
 
-# ---------------- PAGE CONFIG ----------------
-st.set_page_config(
-    page_title="ASCENT APAC 2025",
-    layout="wide",
-    initial_sidebar_state="collapsed"
-)
-
-# ---------------- STORAGE ----------------
+# ---------------- STORAGE FILE ----------------
 DATA_FILE = "raffle_data.json"
 
-# ---------------- SESSION STATE ----------------
-if "page" not in st.session_state:
-    st.session_state.page = "landing"
-if "admin" not in st.session_state:
-    st.session_state.admin = False
-if "entries" not in st.session_state:
-    st.session_state.entries = []
-if "winner" not in st.session_state:
-    st.session_state.winner = None
-if "show_form" not in st.session_state:
-    st.session_state.show_form = False  # Controls overlay form
-
-# Load saved data
+# Load entries from file
 if os.path.exists(DATA_FILE):
     with open(DATA_FILE, "r") as f:
         data = json.load(f)
         st.session_state.entries = data.get("entries", [])
         st.session_state.winner = data.get("winner", None)
+else:
+    st.session_state.entries = []
+    st.session_state.winner = None
 
-# ---------------- HELPERS ----------------
+if "page" not in st.session_state:
+    st.session_state.page = "landing"
+if "admin" not in st.session_state:
+    st.session_state.admin = False
+
+# ---------------- FUNCTIONS ----------------
 def save_data():
     with open(DATA_FILE, "w") as f:
         json.dump({
@@ -50,201 +40,201 @@ def generate_qr(data):
     qr.make(fit=True)
     return qr.make_image(fill_color="black", back_color="white")
 
-def landing_css(bg):
-    with open(bg, "rb") as f:
+def set_bg_local(image_file):
+    with open(image_file, "rb") as f:
         encoded = base64.b64encode(f.read()).decode()
-
     st.markdown(f"""
     <style>
-    .block-container {{
-        padding: 0 !important;
-        margin: 0 !important;
-        max-width: 100vw !important;
-    }}
-
-    header, footer {{
-        display: none !important;
-    }}
-
-    .hero {{
-        width: 100vw;
-        height: 100vh;
-        background:
-            linear-gradient(rgba(0,0,0,.65), rgba(0,0,0,.65)),
-            url("data:image/png;base64,{encoded}");
+    [data-testid="stAppViewContainer"] {{
+        background-image: url("data:image/png;base64,{encoded}");
         background-size: cover;
         background-position: center;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        flex-direction: column;
-        position: relative;
+        background-attachment: fixed;
+        font-family: Helvetica, Arial, sans-serif;
     }}
-
-    .hero-content {{
+    h1, h2, h3 {{
         color: white;
-        max-width: 900px;
-        padding: 30px;
-        z-index: 1;
-    }}
-
-    .hero-title {{
-        font-size: clamp(2.8rem, 6vw, 5rem);
-        font-weight: 900;
-        letter-spacing: 3px;
-    }}
-
-    .hero-sub {{
-        font-size: clamp(1.1rem, 2vw, 1.6rem);
-        margin-top: 12px;
-    }}
-
-    .event {{
-        margin-top: 26px;
-        font-size: clamp(1rem, 1.5vw, 1.25rem);
-        font-weight: 700;
-        color: #FFD400;
-        line-height: 1.6;
-    }}
-
-    /* Overlay registration button on hero */
-    .pre-register-btn {{
-        position: absolute;
-        bottom: 40px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 10;
-    }}
-
-    div.stButton > button {{
-        background-color: #FFD400;
-        color: black;
-        font-weight: 800;
-        padding: 14px 42px;
-        border-radius: 40px;
-        border: none;
-        font-size: 18px;
-    }}
-
-    /* Overlay registration form modal */
-    .overlay {{
-        position: fixed;
-        top:0;
-        left:0;
-        width:100%;
-        height:100%;
-        background: rgba(0,0,0,0.7);
-        display:flex;
-        justify-content:center;
-        align-items:center;
-        z-index: 999;
-    }}
-
-    .overlay-content {{
-        background: rgba(255,255,255,0.95);
-        padding: 30px;
-        border-radius: 20px;
-        width: 90%;
-        max-width: 400px;
         text-align: center;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
     }}
-
+    .card {{
+        background: rgba(255,255,255,0.2);
+        padding: 25px;
+        border-radius: 18px;
+        backdrop-filter: blur(8px);
+        max-width: 400px;
+        margin: 20px auto;
+        box-shadow: none;
+    }}
+    .rainbow {{
+        animation: rainbow 2s linear infinite;
+        font-size: 90px;
+        font-weight: bold;
+        text-align:center;
+    }}
+    @keyframes rainbow {{
+        0%{{color:#FF0000;}}
+        14%{{color:#FF7F00;}}
+        28%{{color:#FFFF00;}}
+        42%{{color:#00FF00;}}
+        57%{{color:#0000FF;}}
+        71%{{color:#4B0082;}}
+        85%{{color:#8B00FF;}}
+        100%{{color:#FF0000;}}
+    }}
+    /* ---------- FLAT INPUT FIELDS ---------- */
+    div.stTextInput > label {{
+        color: white !important;
+        font-weight: 600;
+    }}
+    div.stTextInput > div > input,
+    div.stTextInput > div > div > input,
+    div.stTextInput > div > textarea {{
+        color: black !important; /* typed text black */
+        background: transparent !important;
+        border: none !important;
+        border-radius: 0px !important;
+        padding: 4px 2px !important;
+        font-size: 16px;
+        font-family: Helvetica, Arial, sans-serif;
+    }}
+    div.stTextInput > div > input:focus,
+    div.stTextInput > div > div > input:focus,
+    div.stTextInput > div > textarea:focus {{
+        outline: none;
+        border: none;
+        background: transparent;
+    }}
     </style>
     """, unsafe_allow_html=True)
 
-# ---------------- LANDING ----------------
-if st.session_state.page == "landing":
-    landing_css("bgna.png")
+set_bg_local("bgna.png")
 
-    # Hero section with overlay button
-    st.markdown(f"""
-    <div class="hero">
-        <div class="hero-content">
-            <div class="hero-title">ASCENT APAC 2025</div>
-            <div class="hero-sub">Pre-register now and take part in the raffle</div>
-            <div class="event">
-                November 09, 2025<br>
-                Okada Manila – Grand Ballroom<br>
-                Entertainment City, Parañaque
-            </div>
-        </div>
+# ---------------- LANDING PAGE ----------------
+if st.session_state.page == "landing":
+    st.markdown("<h1>Welcome</h1>", unsafe_allow_html=True)
+    st.image("welcome_photo.png", use_column_width=True)
+    st.markdown("""
+    <div class="card">
+        <p><strong>Venue:</strong> Okada Manila Ballroom 1–3</p>
+        <p><strong>Date:</strong> January 25, 2026</p>
+        <p><strong>Time:</strong> 5:00 PM</p>
     </div>
     """, unsafe_allow_html=True)
+    if st.button("Register Here"):
+        st.session_state.page = "register"
 
-    # Centered overlay button
-    center = st.columns([1,2,1])
-    with center[1]:
-        if st.button("Pre-Register"):
-            st.session_state.show_form = True
-
-    # ---------------- OVERLAY REGISTRATION FORM ----------------
-    if st.session_state.show_form:
-        st.markdown("""
-        <div class="overlay">
-            <div class="overlay-content">
-                <h3>Register Now</h3>
-        """, unsafe_allow_html=True)
-
-        with st.form("register_form"):
-            name = st.text_input("Full Name")
-            emp = st.text_input("Employee ID")
-            submit = st.form_submit_button("Submit")
-
-            if submit:
-                if not name or not emp:
-                    st.error("Please complete all fields")
-                elif any(e["emp_number"] == emp for e in st.session_state.entries):
-                    st.warning("Employee already registered")
+# ---------------- REGISTRATION PAGE ----------------
+elif st.session_state.page == "register":
+    st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    with st.form("register_form"):
+        name = st.text_input("Full Name")
+        emp_number = st.text_input("Employee ID")
+        submit = st.form_submit_button("Submit")
+        if submit:
+            if name and emp_number:
+                if any(e["emp_number"] == emp_number for e in st.session_state.entries):
+                    st.warning("Employee ID already registered")
                 else:
-                    st.session_state.entries.append({"name": name, "emp_number": emp})
+                    st.session_state.entries.append({"name": name, "emp_number": emp_number})
                     save_data()
                     st.success("Registration successful!")
-                    qr = generate_qr(f"{name} | {emp}")
+                    qr = generate_qr(f"Name: {name}\nEmployee ID: {emp_number}")
                     buf = io.BytesIO()
                     qr.save(buf, format="PNG")
                     st.image(buf.getvalue(), caption="Your QR Code")
-
-        st.markdown("</div></div>", unsafe_allow_html=True)
-
-    # ---------------- ADMIN LOGIN ----------------
+            else:
+                st.error("Please fill both Name and Employee ID")
+    st.markdown("</div>", unsafe_allow_html=True)
     if st.button("Admin Login"):
         st.session_state.page = "admin"
 
 # ---------------- ADMIN LOGIN ----------------
 elif st.session_state.page == "admin":
-    st.title("Admin Login")
-    u = st.text_input("Username")
-    p = st.text_input("Password", type="password")
-
+    st.markdown("<h2>Admin Login</h2>", unsafe_allow_html=True)
+    user = st.text_input("Username")
+    pwd = st.text_input("Password", type="password")
+    if st.button("⬅ Back to Register"):
+        st.session_state.page = "register"
     if st.button("Login"):
-        if u == st.secrets["ADMIN_USER"] and p == st.secrets["ADMIN_PASS"]:
+        if user == st.secrets["ADMIN_USER"] and pwd == st.secrets["ADMIN_PASS"]:
             st.session_state.admin = True
             st.session_state.page = "raffle"
         else:
             st.error("Invalid credentials")
 
-# ---------------- RAFFLE ----------------
+# ---------------- RAFFLE PAGE ----------------
 elif st.session_state.page == "raffle":
-    st.title("🎉 Raffle Draw")
+    st.markdown("<h1>Raffle Draw</h1>", unsafe_allow_html=True)
+    nav1, nav2 = st.columns(2)
+    with nav1:
+        if st.button("⬅ Register"):
+            st.session_state.page = "register"
+    with nav2:
+        if st.button("🚪 Logout Admin"):
+            st.session_state.admin = False
+            st.session_state.page = "landing"
 
-    if st.button("Logout"):
-        st.session_state.admin = False
-        st.session_state.page = "landing"
-
-    if st.session_state.entries:
-        df = pd.DataFrame(st.session_state.entries)
-        edited = st.data_editor(df, num_rows="dynamic")
-
-        if st.button("Save Changes"):
-            st.session_state.entries = edited.to_dict("records")
+    entries = st.session_state.entries
+    if entries:
+        st.subheader("Registered Employees (Editable)")
+        df = pd.DataFrame(entries)
+        
+        # Editable table
+        edited_df = st.data_editor(df, num_rows="dynamic")
+        
+        # Save edits back
+        if st.button("Save Table Changes"):
+            st.session_state.entries = edited_df.to_dict("records")
             save_data()
+            st.success("Table changes saved!")
 
+        # Excel download
+        excel = io.BytesIO()
+        edited_df.to_excel(excel, index=False)
+        excel.seek(0)
+        st.download_button("Download Excel", excel, "registered_employees.xlsx")
+
+        placeholder = st.empty()
+
+        # Random winner button
         if st.button("Run Raffle"):
+            for _ in range(30):
+                current = random.choice(st.session_state.entries)
+                placeholder.markdown(
+                    f"<h1 style='color:white;font-size:70px'>{current['name']} ({current['emp_number']})</h1>",
+                    unsafe_allow_html=True
+                )
+                time.sleep(0.07)
+
             winner = random.choice(st.session_state.entries)
             st.session_state.winner = winner
             save_data()
-            st.success(f"🎊 Winner: {winner['name']} ({winner['emp_number']})")
+
+            placeholder.markdown(
+                f"<div class='rainbow'>{winner['name']} ({winner['emp_number']})</div>",
+                unsafe_allow_html=True
+            )
+
+            # Dynamic confetti
+            confetti_html = """
+            <div id="confetti-container"></div>
+            <script>
+            const colors = ['#FF0000','#FF7F00','#FFFF00','#00FF00','#0000FF','#4B0082','#8B00FF'];
+            for(let i=0;i<100;i++){
+                let div = document.createElement('div');
+                div.className = 'confetti-piece';
+                div.style.left = Math.random() * window.innerWidth + 'px';
+                div.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
+                div.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                div.style.width = div.style.height = (Math.random() * 8 + 4) + 'px';
+                document.body.appendChild(div);
+            }
+            setTimeout(()=>{document.getElementById('confetti-container').remove()}, 4000);
+            </script>
+            """
+            st.components.v1.html(confetti_html, height=0, width=0)
+
     else:
-        st.info("No entries yet")
+        st.info("No registrations yet")
