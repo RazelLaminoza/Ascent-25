@@ -125,7 +125,7 @@ if st.session_state.page == "landing":
     )
 
     # Register button centered neatly below text
-    col1, col2, col3 = st.columns([2,1,2])
+    col1, col2, col3 = st.columns([4,1,4])
     with col2:
         if st.button("Register"):
             st.session_state.page = "register"
