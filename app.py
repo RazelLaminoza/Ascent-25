@@ -236,7 +236,8 @@ elif st.session_state.page == "admin":
         else:
             df_emp = pd.read_excel(uploaded_file)
 
-        st.session_state.valid_employees = df_emp.set_index("EmployeeID")["FullName"].to_dict()
+        # IMPORTANT: Use exact column names from your file
+        st.session_state.valid_employees = df_emp.set_index("EMP ID")["Full Name"].to_dict()
         st.success("Employee list loaded!")
 
     st.text_input("Username", key="user")
