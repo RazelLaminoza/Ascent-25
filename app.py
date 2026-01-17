@@ -7,12 +7,14 @@ import base64
 import json
 import os
 
+# ---------------- PAGE CONFIG ----------------
 st.set_page_config(
     page_title="ASCENT APAC 2026",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
+# ---------------- STORAGE ----------------
 DATA_FILE = "raffle_data.json"
 
 if os.path.exists(DATA_FILE):
@@ -27,18 +29,16 @@ if "page" not in st.session_state:
 if "admin" not in st.session_state:
     st.session_state.admin = False
 
-
+# ---------------- FUNCTIONS ----------------
 def save_data():
     with open(DATA_FILE, "w") as f:
         json.dump({"entries": st.session_state.entries}, f)
-
 
 def generate_qr(data):
     qr = qrcode.QRCode(box_size=10, border=4)
     qr.add_data(data)
     qr.make(fit=True)
     return qr.make_image(fill_color="black", back_color="white")
-
 
 def set_bg(image):
     with open(image, "rb") as f:
@@ -50,6 +50,7 @@ def set_bg(image):
         background-image: url("data:image/png;base64,{encoded}");
         background-size: cover;
         background-position: center;
+        background-attachment: fixed;
     }}
 
     html, body {{
@@ -61,13 +62,17 @@ def set_bg(image):
     }}
 
     #MainMenu, header, footer {{
-        visibility: hidden;
+        visibility: hidden !important;
+        height: 0px !important;
     }}
 
-    /* Make Streamlit crown almost invisible */
-    [data-testid="stToolbar"] {{
-        opacity: 0.04 !important;
-        pointer-events: none !important;
+    [data-testid="stToolbar"],
+    [data-testid="stStatusWidget"],
+    [data-testid="stDecoration"],
+    svg[aria-label="Streamlit"] {{
+        display: none !important;
+        visibility: hidden !important;
+        height: 0px !important;
     }}
 
     h1, p {{
@@ -94,19 +99,14 @@ def set_bg(image):
     </style>
     """, unsafe_allow_html=True)
 
-
 set_bg("bgna.png")
 
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
-
-    st.write("")  # spacing
-
+    st.write("")
     col1, col2, col3 = st.columns([1, 3, 1])
     with col2:
-        # IMAGE 1 (MAIN)
         st.image("1.png", use_column_width=True)
-
         st.markdown("""
         <p style="font-size:20px;font-weight:600;">
         PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
@@ -115,23 +115,17 @@ if st.session_state.page == "landing":
         </span>
         </p>
         """, unsafe_allow_html=True)
-
-        st.write("")  # spacing
-
-        # IMAGE 2 (NORMAL, CENTERED, NO FLOAT)
+        st.write("")
         st.image("2.png", width=160)
 
     st.write("")
-
     colb1, colb2, colb3 = st.columns([2,1,2])
     with colb2:
         if st.button("Register", use_container_width=True):
             st.session_state.page = "register"
 
-
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
-
     st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
 
     with st.form("form"):
@@ -157,10 +151,8 @@ elif st.session_state.page == "register":
     if st.button("Admin Login"):
         st.session_state.page = "admin"
 
-
 # ---------------- ADMIN ----------------
 elif st.session_state.page == "admin":
-
     user = st.text_input("Username")
     pwd = st.text_input("Password", type="password")
 
@@ -171,10 +163,8 @@ elif st.session_state.page == "admin":
         else:
             st.error("Invalid login")
 
-
 # ---------------- RAFFLE ----------------
 elif st.session_state.page == "raffle":
-
     if not st.session_state.admin:
         st.stop()
 
@@ -190,3 +180,5 @@ elif st.session_state.page == "raffle":
                 f"<h1 style='color:gold;font-size:80px'>{winner['name']}</h1>",
                 unsafe_allow_html=True
             )
+    else:
+        st.info("No registrations yet")
