@@ -166,22 +166,18 @@ elif st.session_state.page == "register":
     st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
 
     with st.form("form"):
-        name = st.text_input("Full Name")
-        emp = st.text_input("Employee ID (6 digits only)")
+        emp = st.text_input("Employee ID")
         submit = st.form_submit_button("Submit")
 
         if submit:
-            if name and emp:
-                # Validate numeric + 6 digits
-                if not emp.isdigit() or len(emp) != 6:
-                    st.error("Employee ID must be 6 digits only.")
-                elif any(e["emp"] == emp for e in st.session_state.entries):
+            if emp:
+                if any(e["emp"] == emp for e in st.session_state.entries):
                     st.warning("Employee ID already registered")
                 else:
-                    st.session_state.entries.append({"name": name, "emp": emp})
+                    st.session_state.entries.append({"emp": emp})
                     save_data()
                     st.success("Registered!")
-                    qr = generate_qr(f"{name} | {emp}")
+                    qr = generate_qr(f"{emp}")
                     buf = io.BytesIO()
                     qr.save(buf, format="PNG")
                     st.image(buf.getvalue())
@@ -217,7 +213,7 @@ elif st.session_state.page == "raffle":
 
         if st.session_state.winner:
             st.markdown(
-                f"<h1 style='color:gold;font-size:80px'>{st.session_state.winner['name']}</h1>",
+                f"<h1 style='color:gold;font-size:80px'>{st.session_state.winner['emp']}</h1>",
                 unsafe_allow_html=True
             )
 
