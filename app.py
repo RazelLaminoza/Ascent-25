@@ -92,12 +92,13 @@ def set_bg(image):
         caret-color: red !important;
     }}
 
-    button[kind="primary"] {{
+    div.stButton > button:first-child {{
         background: white !important;
         color: black !important;
         border-radius: 30px;
         height: 55px;
         font-weight: 700;
+        padding: 0 40px;   /* neat pill shape */
     }}
     </style>
     """, unsafe_allow_html=True)
@@ -111,7 +112,7 @@ if st.session_state.page == "landing":
         <div style='height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;'>
             <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' width='160' style='margin-bottom:20px;'/>
             <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' style='width:70%; max-width:900px; margin-bottom:20px;'/>
-            <p style="font-size:20px;font-weight:600; color:white; text-shadow:1px 1px 4px rgba(0,0,0,.7); margin-bottom:20px;">
+            <p style="font-size:20px;font-weight:600; color:white; text-shadow:1px 1px 4px rgba(0,0,0,.7); margin-bottom:40px;">
                 PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
                 <span style="font-size:16px;">
                 January 25, 2026 | OKADA BALLROOM 1–3
@@ -123,7 +124,19 @@ if st.session_state.page == "landing":
     )
 
     # Register button fixed at bottom center
-    if st.button("Register", use_container_width=True):
+    st.markdown(
+        """
+        <div style='position:fixed; bottom:30px; left:50%; transform:translateX(-50%);'>
+            <form action='#' method='post'>
+                <button type='submit' style='background:white; color:black; border-radius:30px; height:55px; font-weight:700; padding:0 40px; cursor:pointer;'>
+                    Register
+                </button>
+            </form>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    if st.button("Register"):
         st.session_state.page = "register"
 
 # ---------------- REGISTER ----------------
