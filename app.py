@@ -112,23 +112,47 @@ if st.session_state.page == "landing":
         f"""
         <div style='height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;'>
             <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' width='160' style='margin-bottom:20px;'/>
-            <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' style='width:70%; max-width:900px; margin-bottom:20px;'/>
+            
+            <!-- IMAGE 2 -->
+            <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' 
+                 style='width:70%; max-width:900px; margin-bottom:20px;'/>
+            
             <p style="font-size:20px;font-weight:600; color:white; text-shadow:1px 1px 4px rgba(0,0,0,.7); margin-bottom:30px;">
                 PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
                 <span style="font-size:16px;">
                 January 25, 2026 | OKADA BALLROOM 1–3
                 </span>
             </p>
+
+            <!-- REGISTER BUTTON CENTERED UNDER IMAGE 2 -->
+            <div style="display:flex; justify-content:center; width:70%; max-width:900px;">
+                <button id="register-btn" style="
+                    background:white;
+                    color:black;
+                    border-radius:30px;
+                    height:55px;
+                    width:240px;
+                    font-weight:700;
+                    font-size:18px;
+                    border:none;
+                    cursor:pointer;
+                ">Register</button>
+            </div>
         </div>
+
+        <script>
+            const btn = window.parent.document.querySelector("#register-btn");
+            btn.addEventListener("click", () => {
+                window.parent.document.querySelector("[data-testid='stButton']").click();
+            });
+        </script>
         """,
         unsafe_allow_html=True
     )
 
-    # Centered Register button
-    col1, col2, col3 = st.columns([2,1,2])
-    with col2:
-        if st.button("Register"):
-            st.session_state.page = "register"
+    if st.button("Register"):
+        st.session_state.page = "register"
+
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
