@@ -32,7 +32,7 @@ if "admin" not in st.session_state:
 if "winner" not in st.session_state:
     st.session_state.winner = None
 if "valid_employees" not in st.session_state:
-    st.session_state.valid_employees = []
+    st.session_state.valid_employees = {}  # now dict
 
 # ---------------- FUNCTIONS ----------------
 def save_data():
@@ -45,7 +45,7 @@ def generate_qr(data):
     qr.make(fit=True)
     return qr.make_image(fill_color="black", back_color="white")
 
-def create_pass_image(emp, qr_img):
+def create_pass_image(name, emp, qr_img):
     img = Image.new("RGB", (900, 500), "#ff4b5c")
     draw = ImageDraw.Draw(img)
 
@@ -56,11 +56,14 @@ def create_pass_image(emp, qr_img):
         font_big = font_small = ImageFont.load_default()
 
     draw.text((40, 40), "ASCENT APAC 2026", fill="white", font=font_big)
-    draw.text((40, 150), "EMPLOYEE NO:", fill="white", font=font_small)
-    draw.text((40, 190), emp, fill="white", font=font_big)
+    draw.text((40, 120), "FULL NAME:", fill="white", font=font_small)
+    draw.text((40, 160), name, fill="white", font=font_big)
+
+    draw.text((40, 260), "EMPLOYEE NO:", fill="white", font=font_small)
+    draw.text((40, 300), emp, fill="white", font=font_big)
 
     draw.text(
-        (40, 270),
+        (40, 380),
         "Present this pre-registration pass\nat the check-in counter",
         fill="white",
         font=font_small
@@ -177,11 +180,13 @@ elif st.session_state.page == "register":
             if st.session_state.valid_employees and emp not in st.session_state.valid_employees:
                 st.error("Employee ID NOT VERIFIED ❌")
             else:
-                st.session_state.entries.append({"emp": emp})
+                name = st.session_state.valid_employees.get(emp, "Unknown")
+
+                st.session_state.entries.append({"emp": emp, "name": name})
                 save_data()
 
-                qr_img = generate_qr(emp)
-                pass_img = create_pass_image(emp, qr_img)
+                qr_img = generate_qr(f"{name} | {emp}")
+                pass_img = create_pass_image(name, emp, qr_img)
 
                 buf = io.BytesIO()
                 pass_img.save(buf, format="PNG")
@@ -237,7 +242,7 @@ elif st.session_state.page == "admin":
         uploaded_file = st.file_uploader("Upload Employee Excel", type=["xlsx"])
         if uploaded_file:
             df_emp = pd.read_excel(uploaded_file)
-            st.session_state.valid_employees = df_emp["EmployeeID"].astype(str).tolist()
+            st.session_state.valid_employees = df_emp.set_index("EmployeeID")["FullName"].to_dict()
             st.success("Employee Database Loaded!")
             st.write(df_emp)
 
@@ -261,7 +266,7 @@ elif st.session_state.page == "raffle":
                 <div style="text-align:center;margin-top:40px;">
                     <h2 style="color:white;">🎉 WINNER 🎉</h2>
                     <h1 style="color:gold;font-size:80px;">
-                        {st.session_state.winner['emp']}
+                        {st.session_state.winner['name']}
                     </h1>
                 </div>
                 """,
