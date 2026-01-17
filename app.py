@@ -106,26 +106,26 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
-    # Event details text
-    st.markdown("""
-    <p style="font-size:20px;font-weight:600;">
-    PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
-    <span style="font-size:16px;">
-    January 25, 2026 | OKADA BALLROOM 1–3
-    </span>
-    </p>
-    """, unsafe_allow_html=True)
-
-    # IMAGE 1 (main banner) below event text
+    # IMAGE 1 (main banner) below logo
     st.markdown(
         f"""
-        <div style='text-align:center; margin-top:10px; margin-bottom:20px;'>
+        <div style='text-align:center; margin-top:10px; margin-bottom:10px;'>
             <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' 
                  style='width:70%; max-width:900px;'/>
         </div>
         """,
         unsafe_allow_html=True
     )
+
+    # Event details text directly below IMAGE 1
+    st.markdown("""
+    <p style="font-size:20px;font-weight:600; text-align:center;">
+    PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
+    <span style="font-size:16px;">
+    January 25, 2026 | OKADA BALLROOM 1–3
+    </span>
+    </p>
+    """, unsafe_allow_html=True)
 
     # Register button centered
     colb1, colb2, colb3 = st.columns([2,1,2])
