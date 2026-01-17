@@ -31,6 +31,8 @@ if "admin" not in st.session_state:
     st.session_state.admin = False
 if "winner" not in st.session_state:
     st.session_state.winner = None
+if "valid_employees" not in st.session_state:
+    st.session_state.valid_employees = []
 
 # ---------------- FUNCTIONS ----------------
 def save_data():
@@ -171,46 +173,49 @@ elif st.session_state.page == "register":
         elif any(e["emp"] == emp for e in st.session_state.entries):
             st.warning("Employee ID already registered")
         else:
-            st.session_state.entries.append({"emp": emp})
-            save_data()
+            # VERIFY
+            if st.session_state.valid_employees and emp not in st.session_state.valid_employees:
+                st.error("Employee ID NOT VERIFIED ❌")
+            else:
+                st.session_state.entries.append({"emp": emp})
+                save_data()
 
-            qr_img = generate_qr(emp)
-            pass_img = create_pass_image(emp, qr_img)
+                qr_img = generate_qr(emp)
+                pass_img = create_pass_image(emp, qr_img)
 
-            buf = io.BytesIO()
-            pass_img.save(buf, format="PNG")
-            pass_bytes = buf.getvalue()
+                buf = io.BytesIO()
+                pass_img.save(buf, format="PNG")
+                pass_bytes = buf.getvalue()
 
-            st.success("Registered!")
+                st.success("Registered and VERIFIED ✔️")
+                st.image(pass_bytes, use_container_width=True)
 
-            st.image(pass_bytes, use_container_width=True)
-
-            col1, col2 = st.columns(2)
-            with col1:
-                st.download_button(
-                    "📥 Download Pass (PNG)",
-                    pass_bytes,
-                    file_name=f"{emp}_event_pass.png",
-                    mime="image/png"
-                )
-            with col2:
-                st.markdown(
-                    """
-                    <button onclick="window.print()"
-                    style="
-                        width:100%;
-                        height:48px;
-                        border-radius:24px;
-                        border:none;
-                        background:black;
-                        color:white;
-                        font-size:16px;
-                        cursor:pointer;">
-                        🖨 Print Pass
-                    </button>
-                    """,
-                    unsafe_allow_html=True
-                )
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.download_button(
+                        "📥 Download Pass (PNG)",
+                        pass_bytes,
+                        file_name=f"{emp}_event_pass.png",
+                        mime="image/png"
+                    )
+                with col2:
+                    st.markdown(
+                        """
+                        <button onclick="window.print()"
+                        style="
+                            width:100%;
+                            height:48px;
+                            border-radius:24px;
+                            border:none;
+                            background:black;
+                            color:white;
+                            font-size:16px;
+                            cursor:pointer;">
+                            🖨 Print Pass
+                        </button>
+                        """,
+                        unsafe_allow_html=True
+                    )
 
     st.button("Admin Login", on_click=go_to, args=("admin",))
 
@@ -225,6 +230,16 @@ elif st.session_state.page == "admin":
     if st.session_state.get("login_error", False):
         st.error("Invalid login")
         st.session_state.login_error = False
+
+    if st.session_state.admin:
+        st.success("Admin Logged In")
+
+        uploaded_file = st.file_uploader("Upload Employee Excel", type=["xlsx"])
+        if uploaded_file:
+            df_emp = pd.read_excel(uploaded_file)
+            st.session_state.valid_employees = df_emp["EmployeeID"].astype(str).tolist()
+            st.success("Employee Database Loaded!")
+            st.write(df_emp)
 
 # ---------------- RAFFLE ----------------
 elif st.session_state.page == "raffle":
