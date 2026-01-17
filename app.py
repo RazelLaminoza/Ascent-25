@@ -95,7 +95,7 @@ set_bg("bgna.png")
 
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
-    # IMAGE 1 (main banner) above IMAGE 2
+    # IMAGE 1 (main banner) at the very top
     st.markdown(
         f"""
         <div style='text-align:center; margin-top:10px; margin-bottom:20px;'>
@@ -119,7 +119,7 @@ if st.session_state.page == "landing":
     # IMAGE 2 (secondary logo) below IMAGE 1
     st.markdown(
         f"""
-        <div style='text-align:center; margin-top:10px;'>
+        <div style='text-align:center; margin-top:10px; margin-bottom:20px;'>
             <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' 
                  width='160'/>
         </div>
@@ -132,7 +132,6 @@ if st.session_state.page == "landing":
     with colb2:
         if st.button("Register", use_container_width=True):
             st.session_state.page = "register"
-
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
     st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
