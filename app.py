@@ -190,7 +190,16 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
+    # CENTERED REGISTER BUTTON
+    st.markdown(
+        "<div style='display:flex; justify-content:center;'>"
+        "<div style='width:100%; max-width:360px;'>",
+        unsafe_allow_html=True
+    )
+
     st.button("Register", on_click=go_to, args=("register",), type="primary")
+
+    st.markdown("</div></div>", unsafe_allow_html=True)
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
