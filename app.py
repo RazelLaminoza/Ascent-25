@@ -51,18 +51,18 @@ def set_bg(image):
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
-        height: 100vh;                 /* Fill viewport */
-        overflow: hidden !important;   /* Disable scroll */
+        height: 100vh;
+        overflow: hidden !important;
     }}
 
     html, body {{
         height: 100vh;
-        overflow: hidden !important;   /* Remove scrollbars */
+        overflow: hidden !important;
         margin: 0;
     }}
 
     ::-webkit-scrollbar {{
-        display: none !important;      /* Hide scrollbar completely */
+        display: none !important;
     }}
 
     #MainMenu, header, footer {{
@@ -99,7 +99,7 @@ def set_bg(image):
         border-radius: 30px;
         height: 55px;
         font-weight: 700;
-        padding: 0 40px;   /* neat pill shape */
+        padding: 0 40px;
     }}
     </style>
     """, unsafe_allow_html=True)
@@ -124,7 +124,7 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
-    # Register button centered neatly below text
+    # Centered Register button
     col1, col2, col3 = st.columns([2,1,2])
     with col2:
         if st.button("Register"):
