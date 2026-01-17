@@ -166,20 +166,6 @@ if st.session_state.page == "landing":
 elif st.session_state.page == "register":
     st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
 
-    # Upload Excel/CSV for verification
-    uploaded_file = st.file_uploader("Upload Employee List (Excel/CSV)", type=["xlsx", "csv"])
-
-    if uploaded_file:
-        if uploaded_file.name.endswith(".csv"):
-            df_emp = pd.read_csv(uploaded_file)
-        else:
-            df_emp = pd.read_excel(uploaded_file)
-
-        # Convert to dict for verification
-        st.session_state.valid_employees = df_emp.set_index("EmployeeID")["FullName"].to_dict()
-
-        st.success("Employee list loaded!")
-
     with st.form("form"):
         emp = st.text_input("Employee ID")
         submit = st.form_submit_button("Submit")
@@ -190,7 +176,7 @@ elif st.session_state.page == "register":
         elif any(e["emp"] == emp for e in st.session_state.entries):
             st.warning("Employee ID already registered")
         else:
-            # Verify ID
+            # Verify ID using admin uploaded list
             if emp not in st.session_state.valid_employees:
                 st.error("Employee ID NOT VERIFIED ❌")
             else:
@@ -239,6 +225,20 @@ elif st.session_state.page == "register":
 
 # ---------------- ADMIN ----------------
 elif st.session_state.page == "admin":
+    st.markdown("<h1>Admin Panel</h1>", unsafe_allow_html=True)
+
+    # Upload Employee List here (ONLY in admin)
+    uploaded_file = st.file_uploader("Upload Employee List (Excel/CSV)", type=["xlsx", "csv"])
+
+    if uploaded_file:
+        if uploaded_file.name.endswith(".csv"):
+            df_emp = pd.read_csv(uploaded_file)
+        else:
+            df_emp = pd.read_excel(uploaded_file)
+
+        st.session_state.valid_employees = df_emp.set_index("EmployeeID")["FullName"].to_dict()
+        st.success("Employee list loaded!")
+
     st.text_input("Username", key="user")
     st.text_input("Password", type="password", key="pwd")
 
