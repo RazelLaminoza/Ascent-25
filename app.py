@@ -28,6 +28,8 @@ if "page" not in st.session_state:
     st.session_state.page = "landing"
 if "admin" not in st.session_state:
     st.session_state.admin = False
+if "winner" not in st.session_state:
+    st.session_state.winner = None
 
 # ---------------- FUNCTIONS ----------------
 def save_data():
@@ -106,6 +108,10 @@ def set_bg(image):
 
 set_bg("bgna.png")
 
+# ---------------- NAVIGATION FUNCTIONS ----------------
+def go_to(page_name):
+    st.session_state.page = page_name
+
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
     st.markdown(
@@ -126,8 +132,7 @@ if st.session_state.page == "landing":
 
     col1, col2, col3 = st.columns([5,1,5])
     with col2:
-        if st.button("Register"):
-            st.session_state.page = "register"
+        st.button("Register", on_click=go_to, args=("register",))
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
@@ -153,8 +158,7 @@ elif st.session_state.page == "register":
             else:
                 st.error("Complete all fields")
 
-    if st.button("Admin Login"):
-        st.session_state.page = "admin"
+    st.button("Admin Login", on_click=go_to, args=("admin",))
 
 # ---------------- ADMIN ----------------
 elif st.session_state.page == "admin":
@@ -180,10 +184,31 @@ elif st.session_state.page == "raffle":
         st.data_editor(df)
 
         if st.button("Run Raffle"):
-            winner = random.choice(st.session_state.entries)
+            st.session_state.winner = random.choice(st.session_state.entries)
+
+        if st.session_state.winner:
             st.markdown(
-                f"<h1 style='color:gold;font-size:80px'>{winner['name']}</h1>",
+                f"<h1 style='color:gold;font-size:80px'>{st.session_state.winner['name']}</h1>",
                 unsafe_allow_html=True
             )
+
+        # Admin tools
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            if st.button("Logout"):
+                st.session_state.admin = False
+                st.session_state.page = "landing"
+                st.session_state.winner = None
+
+        with col2:
+            if st.button("Delete All Entries"):
+                st.session_state.entries = []
+                save_data()
+                st.session_state.winner = None
+
+        with col3:
+            if st.button("Export CSV"):
+                df.to_csv("entries.csv", index=False)
+                st.success("CSV exported as entries.csv")
     else:
         st.info("No registrations yet")
