@@ -112,6 +112,33 @@ set_bg("bgna.png")
 def go_to(page_name):
     st.session_state.page = page_name
 
+def login_admin():
+    user = st.session_state["user"]
+    pwd = st.session_state["pwd"]
+    if user == st.secrets["ADMIN_USER"] and pwd == st.secrets["ADMIN_PASS"]:
+        st.session_state.admin = True
+        st.session_state.page = "raffle"
+    else:
+        st.session_state.login_error = True
+
+def run_raffle():
+    st.session_state.winner = random.choice(st.session_state.entries)
+
+def logout():
+    st.session_state.admin = False
+    st.session_state.page = "landing"
+    st.session_state.winner = None
+
+def delete_all():
+    st.session_state.entries = []
+    save_data()
+    st.session_state.winner = None
+
+def export_csv():
+    df = pd.DataFrame(st.session_state.entries)
+    df.to_csv("entries.csv", index=False)
+    st.session_state.exported = True
+
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
     st.markdown(
@@ -162,15 +189,15 @@ elif st.session_state.page == "register":
 
 # ---------------- ADMIN ----------------
 elif st.session_state.page == "admin":
-    user = st.text_input("Username")
-    pwd = st.text_input("Password", type="password")
+    st.text_input("Username", key="user")
+    st.text_input("Password", type="password", key="pwd")
 
-    if st.button("Login"):
-        if user == st.secrets["ADMIN_USER"] and pwd == st.secrets["ADMIN_PASS"]:
-            st.session_state.admin = True
-            st.session_state.page = "raffle"
-        else:
-            st.error("Invalid login")
+    if st.button("Login", on_click=login_admin):
+        pass
+
+    if st.session_state.get("login_error", False):
+        st.error("Invalid login")
+        st.session_state.login_error = False
 
 # ---------------- RAFFLE ----------------
 elif st.session_state.page == "raffle":
@@ -183,8 +210,7 @@ elif st.session_state.page == "raffle":
         df = pd.DataFrame(st.session_state.entries)
         st.data_editor(df)
 
-        if st.button("Run Raffle"):
-            st.session_state.winner = random.choice(st.session_state.entries)
+        st.button("Run Raffle", on_click=run_raffle)
 
         if st.session_state.winner:
             st.markdown(
@@ -192,23 +218,17 @@ elif st.session_state.page == "raffle":
                 unsafe_allow_html=True
             )
 
-        # Admin tools
         col1, col2, col3 = st.columns(3)
         with col1:
-            if st.button("Logout"):
-                st.session_state.admin = False
-                st.session_state.page = "landing"
-                st.session_state.winner = None
-
+            st.button("Logout", on_click=logout)
         with col2:
-            if st.button("Delete All Entries"):
-                st.session_state.entries = []
-                save_data()
-                st.session_state.winner = None
-
+            st.button("Delete All Entries", on_click=delete_all)
         with col3:
-            if st.button("Export CSV"):
-                df.to_csv("entries.csv", index=False)
-                st.success("CSV exported as entries.csv")
+            st.button("Export CSV", on_click=export_csv)
+
+        if st.session_state.get("exported", False):
+            st.success("CSV exported as entries.csv")
+            st.session_state.exported = False
+
     else:
         st.info("No registrations yet")
