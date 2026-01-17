@@ -99,7 +99,18 @@ def set_bg(image):
     </style>
     """, unsafe_allow_html=True)
 
+def show_top_logo(image_path):
+    with open(image_path, "rb") as f:
+        encoded_logo = base64.b64encode(f.read()).decode()
+    st.markdown(f"""
+    <div style='position:relative; text-align:center; margin-top:-30px; margin-bottom:10px;'>
+        <img src='data:image/png;base64,{encoded_logo}' width='180'/>
+    </div>
+    """, unsafe_allow_html=True)
+
+# ---------------- INIT ----------------
 set_bg("bgna.png")
+show_top_logo("ascendion_logo.png")  # Replace with your actual logo filename
 
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
