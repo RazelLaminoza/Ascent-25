@@ -92,7 +92,6 @@ def set_bg(image):
         background-image: url("data:image/png;base64,{encoded}");
         background-size: cover;
         background-position: center;
-        background-attachment: fixed;
     }}
 
     html, body {{
@@ -116,6 +115,25 @@ def set_bg(image):
     button {{
         min-height: 48px;
         font-size: 18px;
+        max-width: 360px;
+        width: 100%;
+        margin: 8px auto;
+        display: block;
+        border-radius: 24px;
+        border: none;
+        cursor: pointer;
+    }}
+
+    button[kind="primary"] {{
+        background-color: #FFD400 !important;
+        color: black !important;
+        font-weight: 700;
+    }}
+
+    button[kind="secondary"] {{
+        background-color: #000000 !important;
+        color: white !important;
+        font-weight: 500;
     }}
     </style>
     """, unsafe_allow_html=True)
@@ -172,7 +190,7 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
-    st.button("Register", on_click=go_to, args=("register",), use_container_width=True)
+    st.button("Register", on_click=go_to, args=("register",), type="primary")
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
@@ -180,7 +198,7 @@ elif st.session_state.page == "register":
 
     with st.form("form"):
         emp = st.text_input("Employee ID")
-        submit = st.form_submit_button("Submit")
+        submit = st.form_submit_button("Submit", type="primary")
 
     if submit:
         if not emp:
@@ -209,11 +227,11 @@ elif st.session_state.page == "register":
                 pass_bytes,
                 file_name=f"{emp}_event_pass.png",
                 mime="image/png",
-                use_container_width=True
+                type="primary"
             )
 
-    st.button("⬅ Back to Landing", on_click=go_to, args=("landing",), use_container_width=True)
-    st.button("🔐 Admin Login", on_click=go_to, args=("admin",), use_container_width=True)
+    st.button("⬅ Back to Landing", on_click=go_to, args=("landing",), type="secondary")
+    st.button("🔐 Admin Login", on_click=go_to, args=("admin",), type="secondary")
 
 # ---------------- ADMIN ----------------
 elif st.session_state.page == "admin":
@@ -229,13 +247,13 @@ elif st.session_state.page == "admin":
     st.text_input("Username", key="user")
     st.text_input("Password", type="password", key="pwd")
 
-    st.button("Login", on_click=login_admin, use_container_width=True)
+    st.button("Login", on_click=login_admin, type="primary")
 
     if st.session_state.get("login_error"):
         st.error("Invalid login")
         st.session_state.login_error = False
 
-    st.button("⬅ Back to Landing", on_click=go_to, args=("landing",), use_container_width=True)
+    st.button("⬅ Back to Landing", on_click=go_to, args=("landing",), type="secondary")
 
 # ---------------- RAFFLE ----------------
 elif st.session_state.page == "raffle":
@@ -247,7 +265,7 @@ elif st.session_state.page == "raffle":
     if st.session_state.entries:
         st.dataframe(pd.DataFrame(st.session_state.entries), use_container_width=True)
 
-        st.button("🎰 Run Raffle", on_click=run_raffle, use_container_width=True)
+        st.button("🎰 Run Raffle", on_click=run_raffle, type="primary")
 
         if st.session_state.winner:
             st.markdown(
@@ -255,10 +273,10 @@ elif st.session_state.page == "raffle":
                 unsafe_allow_html=True
             )
 
-        st.button("🗑 Delete All", on_click=delete_all, use_container_width=True)
-        st.button("📤 Export CSV", on_click=export_csv, use_container_width=True)
-        st.button("🚪 Logout", on_click=logout, use_container_width=True)
+        st.button("🗑 Delete All", on_click=delete_all, type="secondary")
+        st.button("📤 Export CSV", on_click=export_csv, type="secondary")
+        st.button("🚪 Logout", on_click=logout, type="secondary")
     else:
         st.info("No registrations yet")
 
-    st.button("⬅ Back to Landing", on_click=go_to, args=("landing",), use_container_width=True)
+    st.button("⬅ Back to Landing", on_click=go_to, args=("landing",), type="secondary")
