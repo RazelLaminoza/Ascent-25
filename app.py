@@ -99,6 +99,12 @@ def set_bg(image):
 
     st.markdown(f"""
     <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+    * {{
+        font-family: 'Roboto', sans-serif !important;
+    }}
+
     [data-testid="stAppViewContainer"] {{
         background-image: url("data:image/png;base64,{encoded}");
         background-size: cover;
