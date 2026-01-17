@@ -32,7 +32,7 @@ if "admin" not in st.session_state:
 if "winner" not in st.session_state:
     st.session_state.winner = None
 if "valid_employees" not in st.session_state:
-    st.session_state.valid_employees = {}  # now dict
+    st.session_state.valid_employees = {}
 
 # ---------------- FUNCTIONS ----------------
 def save_data():
@@ -176,7 +176,7 @@ elif st.session_state.page == "register":
         elif any(e["emp"] == emp for e in st.session_state.entries):
             st.warning("Employee ID already registered")
         else:
-            # VERIFY
+            # VERIFY ONLY
             if st.session_state.valid_employees and emp not in st.session_state.valid_employees:
                 st.error("Employee ID NOT VERIFIED ❌")
             else:
