@@ -119,7 +119,8 @@ def login_admin():
         st.session_state.login_error = True
 
 def run_raffle():
-    st.session_state.winner = random.choice(st.session_state.entries)
+    if st.session_state.entries:
+        st.session_state.winner = random.choice(st.session_state.entries)
 
 def logout():
     st.session_state.admin = False
@@ -234,13 +235,21 @@ elif st.session_state.page == "raffle":
 
     if st.session_state.entries:
         df = pd.DataFrame(st.session_state.entries)
-        st.data_editor(df)
 
-        st.button("Run Raffle", on_click=run_raffle)
+        st.data_editor(df, key="raffle_editor")
 
-        if st.session_state.winner:
+        st.button("🎰 Run Raffle", on_click=run_raffle, key="run_raffle_btn")
+
+        if st.session_state.winner is not None:
             st.markdown(
-                f"<h1 style='color:gold;font-size:80px'>{st.session_state.winner['emp']}</h1>",
+                f"""
+                <div style="text-align:center;margin-top:40px;">
+                    <h2 style="color:white;">🎉 WINNER 🎉</h2>
+                    <h1 style="color:gold;font-size:80px;">
+                        {st.session_state.winner['emp']}
+                    </h1>
+                </div>
+                """,
                 unsafe_allow_html=True
             )
 
