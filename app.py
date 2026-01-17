@@ -57,33 +57,41 @@ def generate_qr(data):
     return qr.make_image(fill_color="black", back_color="white")
 
 def create_pass_image(name, emp, qr_img):
-    img = Image.new("RGB", (900, 500), "#ff4b5c")
+    # Load background image
+    bg = Image.open("bgna.png").convert("RGBA")
+    bg = bg.resize((900, 500))
+
+    img = Image.new("RGBA", (900, 500))
+    img.paste(bg, (0, 0))
+
     draw = ImageDraw.Draw(img)
 
     try:
-        font_big = ImageFont.truetype("arial.ttf", 42)
-        font_small = ImageFont.truetype("arial.ttf", 26)
+        font_big = ImageFont.truetype("Roboto-Regular.ttf", 42)
+        font_small = ImageFont.truetype("Roboto-Regular.ttf", 26)
     except:
         font_big = font_small = ImageFont.load_default()
 
-    draw.text((40, 40), "ASCENT APAC 2026", fill="white", font=font_big)
-    draw.text((40, 120), "FULL NAME:", fill="white", font=font_small)
-    draw.text((40, 160), name, fill="white", font=font_big)
+    text_color = (255, 255, 255, 255)
 
-    draw.text((40, 260), "EMPLOYEE NO:", fill="white", font=font_small)
-    draw.text((40, 300), emp, fill="white", font=font_big)
+    draw.text((40, 40), "ASCENT APAC 2026", fill=text_color, font=font_big)
+    draw.text((40, 120), "FULL NAME:", fill=text_color, font=font_small)
+    draw.text((40, 160), name, fill=text_color, font=font_big)
+
+    draw.text((40, 260), "EMPLOYEE NO:", fill=text_color, font=font_small)
+    draw.text((40, 300), emp, fill=text_color, font=font_big)
 
     draw.text(
         (40, 380),
         "Present this pre-registration pass\nat the check-in counter",
-        fill="white",
+        fill=text_color,
         font=font_small
     )
 
     qr_img = qr_img.resize((220, 220))
-    img.paste(qr_img, (620, 140))
+    img.paste(qr_img, (620, 140), qr_img.convert("RGBA"))
 
-    return img
+    return img.convert("RGB")
 
 def set_bg(image):
     with open(image, "rb") as f:
