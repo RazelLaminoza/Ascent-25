@@ -95,12 +95,12 @@ set_bg("bgna.png")
 
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
-    # IMAGE 1 (main banner) at the very top
+    # IMAGE 2 (logo) at the very top
     st.markdown(
         f"""
         <div style='text-align:center; margin-top:10px; margin-bottom:20px;'>
-            <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' 
-                 style='width:70%; max-width:900px;'/>
+            <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' 
+                 width='160'/>
         </div>
         """,
         unsafe_allow_html=True
@@ -116,12 +116,12 @@ if st.session_state.page == "landing":
     </p>
     """, unsafe_allow_html=True)
 
-    # IMAGE 2 (secondary logo) below IMAGE 1
+    # IMAGE 1 (main banner) below event text
     st.markdown(
         f"""
         <div style='text-align:center; margin-top:10px; margin-bottom:20px;'>
-            <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' 
-                 width='160'/>
+            <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' 
+                 style='width:70%; max-width:900px;'/>
         </div>
         """,
         unsafe_allow_html=True
