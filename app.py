@@ -70,7 +70,6 @@ def set_bg_local(image_file):
         text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
     }}
 
-    /* FORM CONTAINER */
     .stForm {{
         background: rgba(255,255,255,0.06) !important;
         padding: 25px !important;
@@ -78,39 +77,32 @@ def set_bg_local(image_file):
         backdrop-filter: blur(8px);
     }}
 
-    /* INPUT BOX (NO COLOR CHANGE) */
-    .stTextInput > div > div > input,
-    .stTextInput > div > div > textarea {{
+    /* INPUT BOX */
+    .stTextInput > div > div > input {{
         background: rgba(255,255,255,0.12) !important;
         border-radius: 12px !important;
         border: none !important;
         padding: 12px !important;
     }}
 
-    /* 🔴 TYPED TEXT COLOR */
-    .stTextInput input,
-    .stTextInput textarea {{
+    /* 🔴 RED TYPING TEXT */
+    .stTextInput input {{
         color: #FF2D2D !important;
         caret-color: #FF2D2D !important;
     }}
 
-    /* 🔴 WHEN TYPING / FOCUS */
-    .stTextInput input:focus,
-    .stTextInput textarea:focus {{
+    .stTextInput input:focus {{
         color: #FF2D2D !important;
         caret-color: #FF2D2D !important;
         outline: none !important;
     }}
 
-    /* 🔴 AUTOFILL TEXT */
-    input:-webkit-autofill,
-    input:-webkit-autofill:hover,
-    input:-webkit-autofill:focus {{
+    input:-webkit-autofill {{
         -webkit-text-fill-color: #FF2D2D !important;
         caret-color: #FF2D2D !important;
     }}
 
-    /* BUTTONS */
+    /* DEFAULT BUTTONS (OTHER PAGES) */
     button[kind="primary"] {{
         background-color: #FFD000 !important;
         color: black !important;
@@ -123,6 +115,20 @@ def set_bg_local(image_file):
 
     button[kind="primary"]:hover {{
         background-color: #FFB700 !important;
+    }}
+
+    /* 🤍 LANDING PAGE WHITE BUTTON */
+    .landing-btn button {{
+        background: white !important;
+        color: black !important;
+        border-radius: 40px !important;
+        height: 58px !important;
+        font-size: 18px !important;
+        font-weight: 700 !important;
+    }}
+
+    .landing-btn button:hover {{
+        background: #f2f2f2 !important;
     }}
 
     .fixed-logo {{
@@ -147,14 +153,22 @@ if st.session_state.page == "landing":
     st.image("2.png", width=160)
     st.markdown('</div>', unsafe_allow_html=True)
 
-    col1, col2, col3 = st.columns([1,3,1])
+    st.markdown("<br><br>", unsafe_allow_html=True)
+
+    # BIG HERO IMAGE
+    col1, col2, col3 = st.columns([1,5,1])
     with col2:
         st.image("1.png", use_column_width=True)
 
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # WHITE BUTTON
     colb1, colb2, colb3 = st.columns([2,1,2])
     with colb2:
-        if st.button("Register", use_container_width=True):
+        st.markdown('<div class="landing-btn">', unsafe_allow_html=True)
+        if st.button("Pre Register", use_container_width=True):
             st.session_state.page = "register"
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # ---------------- REGISTRATION PAGE ----------------
 elif st.session_state.page == "register":
