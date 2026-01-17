@@ -52,13 +52,21 @@ def set_bg(image):
         background-position: center;
     }}
 
-    html, body {{ overflow: hidden !important; }}
-    ::-webkit-scrollbar {{ display: none; }}
-    #MainMenu, header, footer {{ visibility: hidden; }}
+    html, body {{
+        overflow-x: hidden !important;
+    }}
 
-    /* Fade Streamlit owner/crown */
+    ::-webkit-scrollbar {{
+        display: none;
+    }}
+
+    #MainMenu, header, footer {{
+        visibility: hidden;
+    }}
+
+    /* Make Streamlit crown almost invisible */
     [data-testid="stToolbar"] {{
-        opacity: 0.05 !important;
+        opacity: 0.04 !important;
         pointer-events: none !important;
     }}
 
@@ -66,12 +74,6 @@ def set_bg(image):
         color: white;
         text-align: center;
         text-shadow: 1px 1px 4px rgba(0,0,0,.7);
-    }}
-
-    .top-center {{
-        display: flex;
-        justify-content: center;
-        margin-top: 20px;
     }}
 
     .stTextInput input {{
@@ -95,18 +97,14 @@ def set_bg(image):
 
 set_bg("bgna.png")
 
-# ---------------- LANDING ----------------
+# ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
-
-    # TOP MIDDLE IMAGE 2 (ONLY ONE)
-    st.markdown('<div class="top-center">', unsafe_allow_html=True)
-    st.image("2.png", width=160)
-    st.markdown('</div>', unsafe_allow_html=True)
 
     st.write("")  # spacing
 
     col1, col2, col3 = st.columns([1, 3, 1])
     with col2:
+        # IMAGE 1 (MAIN)
         st.image("1.png", use_column_width=True)
 
         st.markdown("""
@@ -117,6 +115,13 @@ if st.session_state.page == "landing":
         </span>
         </p>
         """, unsafe_allow_html=True)
+
+        st.write("")  # spacing
+
+        # IMAGE 2 (NORMAL, CENTERED, NO FLOAT)
+        st.image("2.png", width=160)
+
+    st.write("")
 
     colb1, colb2, colb3 = st.columns([2,1,2])
     with colb2:
