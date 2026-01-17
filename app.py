@@ -53,14 +53,6 @@ def set_bg(image):
         background-attachment: fixed;
     }}
 
-    html, body {{
-        overflow-x: hidden !important;
-    }}
-
-    ::-webkit-scrollbar {{
-        display: none;
-    }}
-
     #MainMenu, header, footer {{
         visibility: hidden !important;
         height: 0px !important;
@@ -99,37 +91,43 @@ def set_bg(image):
     </style>
     """, unsafe_allow_html=True)
 
-def show_top_logo(image_path):
-    with open(image_path, "rb") as f:
-        encoded_logo = base64.b64encode(f.read()).decode()
-    st.markdown(f"""
-    <div style='position:relative; text-align:center; margin-top:-30px; margin-bottom:10px;'>
-        <img src='data:image/png;base64,{encoded_logo}' width='180'/>
-    </div>
-    """, unsafe_allow_html=True)
-
-# ---------------- INIT ----------------
 set_bg("bgna.png")
-show_top_logo("ascendion_logo.png")  # Replace with your actual logo filename
 
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
-    st.write("")
-    col1, col2, col3 = st.columns([1, 3, 1])
-    with col2:
-        st.image("1.png", use_column_width=True)
-        st.markdown("""
-        <p style="font-size:20px;font-weight:600;">
-        PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
-        <span style="font-size:16px;">
-        January 25, 2026 | OKADA BALLROOM 1–3
-        </span>
-        </p>
-        """, unsafe_allow_html=True)
-        st.write("")
-        st.image("2.png", width=160)
+    # Top-center main banner (1.png)
+    st.markdown(
+        f"""
+        <div style='text-align:center; margin-top:10px; margin-bottom:20px;'>
+            <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' 
+                 style='width:70%; max-width:900px;'/>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-    st.write("")
+    # Event details text
+    st.markdown("""
+    <p style="font-size:20px;font-weight:600;">
+    PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
+    <span style="font-size:16px;">
+    January 25, 2026 | OKADA BALLROOM 1–3
+    </span>
+    </p>
+    """, unsafe_allow_html=True)
+
+    # Secondary logo (2.png) centered
+    st.markdown(
+        f"""
+        <div style='text-align:center; margin-top:10px;'>
+            <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' 
+                 width='160'/>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # Register button centered
     colb1, colb2, colb3 = st.columns([2,1,2])
     with colb2:
         if st.button("Register", use_container_width=True):
