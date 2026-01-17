@@ -111,8 +111,15 @@ if st.session_state.page == "landing":
     st.markdown(
         f"""
         <div style='height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;'>
-            <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' width='160' style='margin-bottom:20px;'/>
-            <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' style='width:70%; max-width:900px; margin-bottom:20px;'/>
+            <!-- Logo -->
+            <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' 
+                 width='160' style='margin-bottom:20px;'/>
+            
+            <!-- Banner -->
+            <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' 
+                 style='width:70%; max-width:900px; margin-bottom:20px;'/>
+            
+            <!-- Event text -->
             <p style="font-size:20px;font-weight:600; color:white; text-shadow:1px 1px 4px rgba(0,0,0,.7); margin-bottom:30px;">
                 PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
                 <span style="font-size:16px;">
@@ -124,12 +131,20 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
-    # Register button centered neatly below text
-    col1, col2, col3 = st.columns([2,1,2])
-    with col2:
-        if st.button("Register"):
-            st.session_state.page = "register"
+    # Bigger Register button directly under images/text
+    st.markdown(
+        """
+        <div style='text-align:center; margin-top:10px;'>
+            <button style='background:white; color:black; border-radius:40px; height:65px; font-size:20px; font-weight:700; padding:0 60px; cursor:pointer;'>
+                Register
+            </button>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
+    if st.button("Register"):
+        st.session_state.page = "register"
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
     st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
