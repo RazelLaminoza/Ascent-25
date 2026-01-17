@@ -262,7 +262,11 @@ elif st.session_state.page == "admin":
         st.error("Invalid login")
         st.session_state.login_error = False
 
-    st.button("Back to Landing", on_click=go_to, args=("landing",))
+    # ===== LOGOUT BUTTON (NEW) =====
+    if st.button("Back to Landing (Logout)"):
+        st.session_state.admin = False
+        st.session_state.page = "landing"
+        st.session_state.winner = None
 
 # ---------------- RAFFLE ----------------
 elif st.session_state.page == "raffle":
