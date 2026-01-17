@@ -51,6 +51,17 @@ def set_bg(image):
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
+        overflow: hidden !important;   /* Prevent scrolling */
+        height: 100vh;                 /* Fit to viewport height */
+    }}
+
+    html, body {{
+        overflow: hidden !important;
+        height: 100vh;
+    }}
+
+    ::-webkit-scrollbar {{
+        display: none;
     }}
 
     #MainMenu, header, footer {{
@@ -95,43 +106,28 @@ set_bg("bgna.png")
 
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
-    # IMAGE 2 (logo) at the very top
     st.markdown(
         f"""
-        <div style='text-align:center; margin-top:10px; margin-bottom:20px;'>
-            <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' 
-                 width='160'/>
+        <div style='text-align:center; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center;'>
+            <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' width='160' style='margin-bottom:20px;'/>
+            <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' style='width:70%; max-width:900px; margin-bottom:20px;'/>
+            <p style="font-size:20px;font-weight:600; color:white; text-shadow:1px 1px 4px rgba(0,0,0,.7);">
+                PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
+                <span style="font-size:16px;">
+                January 25, 2026 | OKADA BALLROOM 1–3
+                </span>
+            </p>
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    # IMAGE 1 (main banner) below logo
-    st.markdown(
-        f"""
-        <div style='text-align:center; margin-top:10px; margin-bottom:10px;'>
-            <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' 
-                 style='width:70%; max-width:900px;'/>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-    # Event details text directly below IMAGE 1
-    st.markdown("""
-    <p style="font-size:20px;font-weight:600; text-align:center;">
-    PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
-    <span style="font-size:16px;">
-    January 25, 2026 | OKADA BALLROOM 1–3
-    </span>
-    </p>
-    """, unsafe_allow_html=True)
-
-    # Register button centered
+    # Register button centered at bottom
     colb1, colb2, colb3 = st.columns([2,1,2])
     with colb2:
         if st.button("Register", use_container_width=True):
             st.session_state.page = "register"
+
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
     st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
