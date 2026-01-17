@@ -142,9 +142,9 @@ if st.session_state.page == "landing":
 
         <script>
             const btn = window.parent.document.querySelector("#register-btn");
-            btn.addEventListener("click", () => {
+            btn.addEventListener("click", () => {{
                 window.parent.document.querySelector("[data-testid='stButton']").click();
-            });
+            }});
         </script>
         """,
         unsafe_allow_html=True
@@ -152,6 +152,7 @@ if st.session_state.page == "landing":
 
     if st.button("Register"):
         st.session_state.page = "register"
+
 
 
 # ---------------- REGISTER ----------------
