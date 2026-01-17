@@ -112,12 +112,14 @@ def set_bg(image):
         text-shadow: 1px 1px 4px rgba(0,0,0,.7);
     }}
 
+    /* BUTTON STYLE */
     button {{
         min-height: 48px;
         font-size: 18px;
-        max-width: 360px;
-        width: 100%;
+        max-width: 260px;   /* minimal size */
+        width: auto;        /* not full width */
         margin: 8px auto;
+        padding: 12px 24px;
         display: block;
         border-radius: 24px;
         border: none;
@@ -134,6 +136,17 @@ def set_bg(image):
         background-color: #000000 !important;
         color: white !important;
         font-weight: 500;
+    }}
+
+    /* INPUT STYLE (optional, but looks like login UI) */
+    .stTextInput > div > input {{
+        max-width: 320px;
+        margin: 0 auto;
+    }}
+
+    .stForm {{
+        max-width: 360px;
+        margin: 0 auto;
     }}
     </style>
     """, unsafe_allow_html=True)
