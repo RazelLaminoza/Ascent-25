@@ -7,24 +7,20 @@ import base64
 import json
 import os
 
-# ---------------- PAGE CONFIG ----------------
 st.set_page_config(
     page_title="ASCENT APAC 2026",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# ---------------- STORAGE ----------------
 DATA_FILE = "raffle_data.json"
 
 if os.path.exists(DATA_FILE):
     with open(DATA_FILE, "r") as f:
         data = json.load(f)
         st.session_state.entries = data.get("entries", [])
-        st.session_state.winner = data.get("winner", None)
 else:
     st.session_state.entries = []
-    st.session_state.winner = None
 
 if "page" not in st.session_state:
     st.session_state.page = "landing"
@@ -32,13 +28,9 @@ if "admin" not in st.session_state:
     st.session_state.admin = False
 
 
-# ---------------- FUNCTIONS ----------------
 def save_data():
     with open(DATA_FILE, "w") as f:
-        json.dump({
-            "entries": st.session_state.entries,
-            "winner": st.session_state.winner
-        }, f)
+        json.dump({"entries": st.session_state.entries}, f)
 
 
 def generate_qr(data):
@@ -48,8 +40,8 @@ def generate_qr(data):
     return qr.make_image(fill_color="black", back_color="white")
 
 
-def set_bg_local(image_file):
-    with open(image_file, "rb") as f:
+def set_bg(image):
+    with open(image, "rb") as f:
         encoded = base64.b64encode(f.read()).decode()
 
     st.markdown(f"""
@@ -58,102 +50,61 @@ def set_bg_local(image_file):
         background-image: url("data:image/png;base64,{encoded}");
         background-size: cover;
         background-position: center;
-        background-attachment: fixed;
     }}
 
-    html, body {{
-        overflow: hidden !important;
-    }}
+    html, body {{ overflow: hidden !important; }}
+    ::-webkit-scrollbar {{ display: none; }}
+    #MainMenu, header, footer {{ visibility: hidden; }}
 
-    ::-webkit-scrollbar {{
-        display: none;
-    }}
-
-    #MainMenu, header, footer {{
-        visibility: hidden;
-    }}
-
-    /* 🔴 HIDE / FADE STREAMLIT OWNER + CROWN */
+    /* Fade Streamlit owner/crown */
     [data-testid="stToolbar"] {{
         opacity: 0.05 !important;
         pointer-events: none !important;
     }}
 
-    [data-testid="stStatusWidget"],
-    [data-testid="stDecoration"] {{
-        display: none !important;
-    }}
-
-    svg[aria-label="Streamlit"] {{
-        opacity: 0.03 !important;
-    }}
-
-    h1, h2, h3, p {{
+    h1, p {{
         color: white;
         text-align: center;
-        text-shadow: 1px 1px 4px rgba(0,0,0,0.7);
+        text-shadow: 1px 1px 4px rgba(0,0,0,.7);
     }}
 
-    /* FORM */
-    .stForm {{
-        background: rgba(255,255,255,0.06) !important;
-        padding: 25px !important;
-        border-radius: 18px !important;
-        backdrop-filter: blur(8px);
+    .top-center {{
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
     }}
 
-    /* INPUT BOX */
     .stTextInput input {{
         background: rgba(255,255,255,0.12) !important;
-        border-radius: 12px !important;
-        border: none !important;
-        padding: 12px !important;
-        color: #FF2D2D !important;
-        caret-color: #FF2D2D !important;
-    }}
-
-    /* BUTTON */
-    button[kind="primary"] {{
-        background-color: #FFFFFF !important;
-        color: black !important;
-        border-radius: 30px !important;
-        height: 55px;
-        font-size: 18px;
-        font-weight: 700;
+        border-radius: 12px;
         border: none;
+        color: red !important;
+        caret-color: red !important;
     }}
 
-    button[kind="primary"]:hover {{
-        background-color: #EDEDED !important;
-    }}
-
-    /* LOGO */
-    .fixed-logo {{
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        z-index: 9999;
-    }}
-
-    @media (max-width: 768px) {{
-        html, body {{ overflow-y: auto !important; }}
-        button {{ width: 100% !important; }}
+    button[kind="primary"] {{
+        background: white !important;
+        color: black !important;
+        border-radius: 30px;
+        height: 55px;
+        font-weight: 700;
     }}
     </style>
     """, unsafe_allow_html=True)
 
 
-set_bg_local("bgna.png")
+set_bg("bgna.png")
 
 # ---------------- LANDING ----------------
 if st.session_state.page == "landing":
 
-    # Top-left logo
-    st.markdown('<div class="fixed-logo">', unsafe_allow_html=True)
-    st.image("2.png", width=150)
+    # TOP MIDDLE IMAGE 2 (ONLY ONE)
+    st.markdown('<div class="top-center">', unsafe_allow_html=True)
+    st.image("2.png", width=160)
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # Center images
+    st.write("")  # spacing
+
     col1, col2, col3 = st.columns([1, 3, 1])
     with col2:
         st.image("1.png", use_column_width=True)
@@ -167,10 +118,7 @@ if st.session_state.page == "landing":
         </p>
         """, unsafe_allow_html=True)
 
-        st.image("2.png", width=220)
-
-    # Button
-    colb1, colb2, colb3 = st.columns([2, 1, 2])
+    colb1, colb2, colb3 = st.columns([2,1,2])
     with colb2:
         if st.button("Register", use_container_width=True):
             st.session_state.page = "register"
@@ -181,28 +129,25 @@ elif st.session_state.page == "register":
 
     st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
 
-    with st.form("register_form"):
+    with st.form("form"):
         name = st.text_input("Full Name")
         emp = st.text_input("Employee ID")
         submit = st.form_submit_button("Submit")
 
         if submit:
             if name and emp:
-                if any(e["emp_number"] == emp for e in st.session_state.entries):
+                if any(e["emp"] == emp for e in st.session_state.entries):
                     st.warning("Employee ID already registered")
                 else:
-                    st.session_state.entries.append({
-                        "name": name,
-                        "emp_number": emp
-                    })
+                    st.session_state.entries.append({"name": name, "emp": emp})
                     save_data()
-                    st.success("Registration successful!")
+                    st.success("Registered!")
                     qr = generate_qr(f"{name} | {emp}")
                     buf = io.BytesIO()
                     qr.save(buf, format="PNG")
-                    st.image(buf.getvalue(), caption="Your QR Code")
+                    st.image(buf.getvalue())
             else:
-                st.error("Please complete all fields")
+                st.error("Complete all fields")
 
     if st.button("Admin Login"):
         st.session_state.page = "admin"
@@ -211,21 +156,15 @@ elif st.session_state.page == "register":
 # ---------------- ADMIN ----------------
 elif st.session_state.page == "admin":
 
-    st.markdown("<h2>Admin Login</h2>", unsafe_allow_html=True)
     user = st.text_input("Username")
     pwd = st.text_input("Password", type="password")
 
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("⬅ Back"):
-            st.session_state.page = "register"
-    with col2:
-        if st.button("Login"):
-            if user == st.secrets["ADMIN_USER"] and pwd == st.secrets["ADMIN_PASS"]:
-                st.session_state.admin = True
-                st.session_state.page = "raffle"
-            else:
-                st.error("Invalid credentials")
+    if st.button("Login"):
+        if user == st.secrets["ADMIN_USER"] and pwd == st.secrets["ADMIN_PASS"]:
+            st.session_state.admin = True
+            st.session_state.page = "raffle"
+        else:
+            st.error("Invalid login")
 
 
 # ---------------- RAFFLE ----------------
@@ -236,24 +175,13 @@ elif st.session_state.page == "raffle":
 
     st.markdown("<h1>Raffle Draw</h1>", unsafe_allow_html=True)
 
-    if st.button("🚪 Logout Admin"):
-        st.session_state.admin = False
-        st.session_state.page = "landing"
-
     if st.session_state.entries:
         df = pd.DataFrame(st.session_state.entries)
-        edited_df = st.data_editor(df, num_rows="dynamic")
-
-        if st.button("Save Table Changes"):
-            st.session_state.entries = edited_df.to_dict("records")
-            save_data()
-            st.success("Saved!")
+        st.data_editor(df)
 
         if st.button("Run Raffle"):
             winner = random.choice(st.session_state.entries)
             st.markdown(
-                f"<h1 style='color:#FFD700;font-size:80px'>{winner['name']} ({winner['emp_number']})</h1>",
+                f"<h1 style='color:gold;font-size:80px'>{winner['name']}</h1>",
                 unsafe_allow_html=True
             )
-    else:
-        st.info("No registrations yet")
