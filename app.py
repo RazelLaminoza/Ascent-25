@@ -95,7 +95,7 @@ set_bg("bgna.png")
 
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
-    # Top-center main banner (1.png)
+    # IMAGE 1 (main banner) above IMAGE 2
     st.markdown(
         f"""
         <div style='text-align:center; margin-top:10px; margin-bottom:20px;'>
@@ -116,7 +116,7 @@ if st.session_state.page == "landing":
     </p>
     """, unsafe_allow_html=True)
 
-    # Secondary logo (2.png) centered
+    # IMAGE 2 (secondary logo) below IMAGE 1
     st.markdown(
         f"""
         <div style='text-align:center; margin-top:10px;'>
