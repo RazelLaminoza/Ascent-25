@@ -72,42 +72,42 @@ def set_bg_local(image_file):
 
     /* FORM CONTAINER */
     .stForm {{
-        background: rgba(0, 0, 0, 0.25) !important;
+        background: rgba(255,255,255,0.06) !important;
         padding: 25px !important;
         border-radius: 18px !important;
         backdrop-filter: blur(8px);
     }}
 
-    /* 🔴 RED INPUTS (NORMAL) */
+    /* INPUT BOX (NO COLOR CHANGE) */
     .stTextInput > div > div > input,
     .stTextInput > div > div > textarea {{
-        background: rgba(255, 0, 0, 0.25) !important;
-        color: white !important;
+        background: rgba(255,255,255,0.12) !important;
         border-radius: 12px !important;
         border: none !important;
         padding: 12px !important;
     }}
 
-    /* 🔴 RED INPUTS (FOCUS / TYPING) */
-    .stTextInput input:focus,
-    .stTextInput textarea:focus {{
-        background: rgba(255, 0, 0, 0.4) !important;
-        outline: none !important;
-        color: white !important;
+    /* 🔴 TYPED TEXT COLOR */
+    .stTextInput input,
+    .stTextInput textarea {{
+        color: #FF2D2D !important;
+        caret-color: #FF2D2D !important;
     }}
 
-    /* 🔴 CHROME AUTOFILL FIX */
+    /* 🔴 WHEN TYPING / FOCUS */
+    .stTextInput input:focus,
+    .stTextInput textarea:focus {{
+        color: #FF2D2D !important;
+        caret-color: #FF2D2D !important;
+        outline: none !important;
+    }}
+
+    /* 🔴 AUTOFILL TEXT */
     input:-webkit-autofill,
     input:-webkit-autofill:hover,
     input:-webkit-autofill:focus {{
-        -webkit-box-shadow: 0 0 0 1000px rgba(255, 0, 0, 0.4) inset !important;
-        -webkit-text-fill-color: white !important;
-    }}
-
-    /* 🔴 ADMIN INPUT FIX */
-    div[data-testid="stTextInput"] > div > input {{
-        background: rgba(255, 0, 0, 0.25) !important;
-        color: white !important;
+        -webkit-text-fill-color: #FF2D2D !important;
+        caret-color: #FF2D2D !important;
     }}
 
     /* BUTTONS */
