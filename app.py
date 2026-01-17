@@ -12,8 +12,9 @@ from PIL import Image, ImageDraw, ImageFont
 st.set_page_config(
     page_title="ASCENT APAC 2026",
     layout="wide",
-    initial_sidebar_state="="collapsed"
+    initial_sidebar_state="collapsed"
 )
+
 
 # ---------------- STORAGE ----------------
 DATA_FILE = "raffle_data.json"
