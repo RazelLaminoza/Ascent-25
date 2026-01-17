@@ -232,7 +232,12 @@ elif st.session_state.page == "register":
                         unsafe_allow_html=True
                     )
 
-    st.button("Admin Login", on_click=go_to, args=("admin",))
+    # NAVIGATION BUTTONS
+    col1, col2 = st.columns(2)
+    with col1:
+        st.button("Back to Landing", on_click=go_to, args=("landing",))
+    with col2:
+        st.button("Admin Login", on_click=go_to, args=("admin",))
 
 # ---------------- ADMIN ----------------
 elif st.session_state.page == "admin":
@@ -243,10 +248,8 @@ elif st.session_state.page == "admin":
 
     if uploaded_file:
         df_emp = pd.read_excel(uploaded_file)
-
-        # IMPORTANT: Use exact column names from your file
         st.session_state.valid_employees = df_emp.set_index("EMP ID")["Full Name"].to_dict()
-        save_employees()  # <-- SAVE PERMANENTLY
+        save_employees()
         st.success("Employee list loaded and saved!")
 
     st.text_input("Username", key="user")
@@ -259,6 +262,8 @@ elif st.session_state.page == "admin":
         st.error("Invalid login")
         st.session_state.login_error = False
 
+    st.button("Back to Landing", on_click=go_to, args=("landing",))
+
 # ---------------- RAFFLE ----------------
 elif st.session_state.page == "raffle":
     if not st.session_state.admin:
@@ -268,7 +273,6 @@ elif st.session_state.page == "raffle":
 
     if st.session_state.entries:
         df = pd.DataFrame(st.session_state.entries)
-
         st.data_editor(df, key="raffle_editor")
 
         st.button("🎰 Run Raffle", on_click=run_raffle, key="run_raffle_btn")
