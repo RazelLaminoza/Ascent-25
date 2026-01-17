@@ -129,6 +129,7 @@ if st.session_state.page == "landing":
     with col2:
         if st.button("Register"):
             st.session_state.page = "register"
+            st.experimental_rerun()
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
@@ -151,11 +152,13 @@ elif st.session_state.page == "register":
                     buf = io.BytesIO()
                     qr.save(buf, format="PNG")
                     st.image(buf.getvalue())
+                    st.experimental_rerun()
             else:
                 st.error("Complete all fields")
 
     if st.button("Admin Login"):
         st.session_state.page = "admin"
+        st.experimental_rerun()
 
 # ---------------- ADMIN ----------------
 elif st.session_state.page == "admin":
@@ -166,6 +169,7 @@ elif st.session_state.page == "admin":
         if user == st.secrets["ADMIN_USER"] and pwd == st.secrets["ADMIN_PASS"]:
             st.session_state.admin = True
             st.session_state.page = "raffle"
+            st.experimental_rerun()
         else:
             st.error("Invalid login")
 
