@@ -51,18 +51,18 @@ def set_bg(image):
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
-        height: 100vh;                 /* Fill viewport */
-        overflow: hidden !important;   /* Disable scroll */
+        height: 100vh;
+        overflow: hidden !important;
     }}
 
     html, body {{
         height: 100vh;
-        overflow: hidden !important;   /* Remove scrollbars */
+        overflow: hidden !important;
         margin: 0;
     }}
 
     ::-webkit-scrollbar {{
-        display: none !important;      /* Hide scrollbar completely */
+        display: none !important;
     }}
 
     #MainMenu, header, footer {{
@@ -99,7 +99,7 @@ def set_bg(image):
         border-radius: 30px;
         height: 55px;
         font-weight: 700;
-        padding: 0 40px;   /* neat pill shape */
+        padding: 0 40px;
     }}
     </style>
     """, unsafe_allow_html=True)
@@ -124,12 +124,10 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
-    # Register button centered neatly below text
     col1, col2, col3 = st.columns([5,1,5])
     with col2:
         if st.button("Register"):
             st.session_state.page = "register"
-            st.experimental_rerun()
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
@@ -152,13 +150,11 @@ elif st.session_state.page == "register":
                     buf = io.BytesIO()
                     qr.save(buf, format="PNG")
                     st.image(buf.getvalue())
-                    st.experimental_rerun()
             else:
                 st.error("Complete all fields")
 
     if st.button("Admin Login"):
         st.session_state.page = "admin"
-        st.experimental_rerun()
 
 # ---------------- ADMIN ----------------
 elif st.session_state.page == "admin":
@@ -169,7 +165,6 @@ elif st.session_state.page == "admin":
         if user == st.secrets["ADMIN_USER"] and pwd == st.secrets["ADMIN_PASS"]:
             st.session_state.admin = True
             st.session_state.page = "raffle"
-            st.experimental_rerun()
         else:
             st.error("Invalid login")
 
