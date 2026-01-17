@@ -42,42 +42,75 @@ def generate_qr(data):
 def set_bg_local(image_file):
     with open(image_file, "rb") as f:
         encoded = base64.b64encode(f.read()).decode()
+
     st.markdown(f"""
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
     [data-testid="stAppViewContainer"] {{
         background-image: url("data:image/png;base64,{encoded}");
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
-        font-family: 'Roboto', sans-serif;
     }}
+
+    html, body {{
+        overflow: hidden !important;
+    }}
+
+    ::-webkit-scrollbar {{
+        display: none;
+    }}
+
+    #MainMenu, header, footer {{
+        visibility: hidden;
+    }}
+
     h1, h2, h3 {{
         color: white;
         text-align: center;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-        font-family: 'Roboto', sans-serif;
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
     }}
+
+    /* FORM CONTAINER */
     .stForm {{
-        background: rgba(255, 255, 255, 0.05) !important;
-        padding: 20px 25px !important;
-        border-radius: 15px !important;
+        background: rgba(0, 0, 0, 0.25) !important;
+        padding: 25px !important;
+        border-radius: 18px !important;
         backdrop-filter: blur(8px);
-        font-family: 'Roboto', sans-serif !important;
-        box-shadow: none !important;
-        border: none !important;
     }}
-    .stTextInput>div>div>input, .stTextInput>div>div>textarea {{
-        background: rgba(255, 255, 255, 0.1) !important;
-        border: none !important;
-        border-radius: 10px !important;
-        padding: 12px !important;
+
+    /* 🔴 RED INPUTS (NORMAL) */
+    .stTextInput > div > div > input,
+    .stTextInput > div > div > textarea {{
+        background: rgba(255, 0, 0, 0.25) !important;
         color: white !important;
-        font-family: 'Roboto', sans-serif !important;
+        border-radius: 12px !important;
+        border: none !important;
+        padding: 12px !important;
     }}
-    .stTextInput>div>div>input::placeholder {{
-        color: rgba(255,255,255,0.6) !important;
+
+    /* 🔴 RED INPUTS (FOCUS / TYPING) */
+    .stTextInput input:focus,
+    .stTextInput textarea:focus {{
+        background: rgba(255, 0, 0, 0.4) !important;
+        outline: none !important;
+        color: white !important;
     }}
+
+    /* 🔴 CHROME AUTOFILL FIX */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus {{
+        -webkit-box-shadow: 0 0 0 1000px rgba(255, 0, 0, 0.4) inset !important;
+        -webkit-text-fill-color: white !important;
+    }}
+
+    /* 🔴 ADMIN INPUT FIX */
+    div[data-testid="stTextInput"] > div > input {{
+        background: rgba(255, 0, 0, 0.25) !important;
+        color: white !important;
+    }}
+
+    /* BUTTONS */
     button[kind="primary"] {{
         background-color: #FFD000 !important;
         color: black !important;
@@ -86,46 +119,22 @@ def set_bg_local(image_file):
         font-size: 18px;
         font-weight: 700;
         border: none;
-        font-family: 'Roboto', sans-serif !important;
     }}
+
     button[kind="primary"]:hover {{
         background-color: #FFB700 !important;
     }}
+
     .fixed-logo {{
         position: fixed;
         top: 20px;
         left: 20px;
         z-index: 9999;
     }}
-    [data-testid="stAppViewContainer"] {{
-        padding: 0 !important;
-        margin: 0 !important;
-    }}
-    [data-testid="block-container"] {{
-        padding: 0.5rem !important;
-        max-width: 100% !important;
-    }}
-    html, body {{
-        overflow: hidden !important;
-    }}
-    ::-webkit-scrollbar {{
-        width: 0px;
-        height: 0px;
-        display: none;
-    }}
-    * {{
-        scrollbar-width: none;
-    }}
-    #MainMenu {{visibility: hidden;}}
-    header {{visibility: hidden;}}
-    footer {{visibility: hidden;}}
+
     @media (max-width: 768px) {{
         html, body {{ overflow-y: auto !important; }}
-        .fixed-logo {{ position: static; margin-bottom: 16px; }}
-        h1 {{ font-size: 32px !important; }}
-        img {{ max-width: 100% !important; height: auto !important; }}
-        button {{ width: 100% !important; font-size: 16px !important; height: 50px !important; }}
-        .stForm {{ max-width: 90% !important; padding: 18px !important; }}
+        button {{ width: 100% !important; }}
     }}
     </style>
     """, unsafe_allow_html=True)
@@ -137,13 +146,11 @@ if st.session_state.page == "landing":
     st.markdown('<div class="fixed-logo">', unsafe_allow_html=True)
     st.image("2.png", width=160)
     st.markdown('</div>', unsafe_allow_html=True)
-    st.markdown("<br><br>", unsafe_allow_html=True)
 
     col1, col2, col3 = st.columns([1,3,1])
     with col2:
         st.image("1.png", use_column_width=True)
 
-    st.markdown("<br><br>", unsafe_allow_html=True)
     colb1, colb2, colb3 = st.columns([2,1,2])
     with colb2:
         if st.button("Register", use_container_width=True):
@@ -152,10 +159,12 @@ if st.session_state.page == "landing":
 # ---------------- REGISTRATION PAGE ----------------
 elif st.session_state.page == "register":
     st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
+
     with st.form("register_form"):
         name = st.text_input("Full Name")
         emp_number = st.text_input("Employee ID")
         submit = st.form_submit_button("Submit")
+
         if submit:
             if name and emp_number:
                 if any(e["emp_number"] == emp_number for e in st.session_state.entries):
@@ -164,12 +173,13 @@ elif st.session_state.page == "register":
                     st.session_state.entries.append({"name": name, "emp_number": emp_number})
                     save_data()
                     st.success("Registration successful!")
-                    qr = generate_qr(f"Name: {name}\nEmployee ID: {emp_number}")
+                    qr = generate_qr(f"{name} | {emp_number}")
                     buf = io.BytesIO()
                     qr.save(buf, format="PNG")
                     st.image(buf.getvalue(), caption="Your QR Code")
             else:
-                st.error("Please fill both Name and Employee ID")
+                st.error("Please complete all fields")
+
     if not st.session_state.admin:
         if st.button("Admin Login"):
             st.session_state.page = "admin"
@@ -179,7 +189,8 @@ elif st.session_state.page == "admin":
     st.markdown("<h2>Admin Login</h2>", unsafe_allow_html=True)
     user = st.text_input("Username")
     pwd = st.text_input("Password", type="password")
-    col1, col2 = st.columns([1,1])
+
+    col1, col2 = st.columns(2)
     with col1:
         if st.button("⬅ Back"):
             st.session_state.page = "register"
@@ -194,75 +205,28 @@ elif st.session_state.page == "admin":
 # ---------------- RAFFLE PAGE ----------------
 elif st.session_state.page == "raffle":
     if not st.session_state.admin:
-        st.warning("You must be an admin to access this page")
-        if st.button("⬅ Back to Register"):
-            st.session_state.page = "register"
         st.stop()
 
     st.markdown("<h1>Raffle Draw</h1>", unsafe_allow_html=True)
-    nav1, nav2 = st.columns(2)
-    with nav1:
-        if st.button("⬅ Register"):
-            st.session_state.page = "register"
-    with nav2:
-        if st.button("🚪 Logout Admin"):
-            st.session_state.admin = False
-            st.session_state.page = "landing"
 
-    entries = st.session_state.entries
-    if entries:
-        st.subheader("Registered Employees (Editable)")
-        df = pd.DataFrame(entries)
+    if st.button("🚪 Logout Admin"):
+        st.session_state.admin = False
+        st.session_state.page = "landing"
+
+    if st.session_state.entries:
+        df = pd.DataFrame(st.session_state.entries)
         edited_df = st.data_editor(df, num_rows="dynamic")
+
         if st.button("Save Table Changes"):
             st.session_state.entries = edited_df.to_dict("records")
             save_data()
-            st.success("Table changes saved!")
-
-        excel = io.BytesIO()
-        edited_df.to_excel(excel, index=False)
-        excel.seek(0)
-        st.download_button("Download Excel", excel, "registered_employees.xlsx")
-
-        placeholder = st.empty()
+            st.success("Saved!")
 
         if st.button("Run Raffle"):
-            # Flashing names
-            for _ in range(30):
-                current = random.choice(st.session_state.entries)
-                placeholder.markdown(
-                    f"<h1 style='color:white;font-size:70px'>{current['name']} ({current['emp_number']})</h1>",
-                    unsafe_allow_html=True
-                )
-                time.sleep(0.07)
-
-            # Pick winner
             winner = random.choice(st.session_state.entries)
-            st.session_state.winner = winner
-            save_data()
-
-            # Show winner
-            placeholder.markdown(
-                f"<h1 style='color:#FFD700;text-shadow:2px 2px 4px rgba(0,0,0,0.7); font-size:80px'>{winner['name']} ({winner['emp_number']})</h1>",
+            st.markdown(
+                f"<h1 style='color:#FFD700;font-size:80px'>{winner['name']} ({winner['emp_number']})</h1>",
                 unsafe_allow_html=True
             )
-
-            # Full-screen confetti
-            st.components.v1.html("""
-            <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-            <script>
-            const duration = 5 * 1000;
-            const end = Date.now() + duration;
-            const colors = ['#FF0000','#FF7F00','#FFFF00','#00FF00','#0000FF','#4B0082','#8B00FF'];
-            (function frame() {
-                confetti({particleCount: 5, angle: 60, spread: 55, origin: {x: 0, y: 0}, colors: colors});
-                confetti({particleCount: 5, angle: 120, spread: 55, origin: {x: 1, y: 0}, colors: colors});
-                if (Date.now() < end) {
-                    requestAnimationFrame(frame);
-                }
-            })();
-            </script>
-            """, height=0, width=0)
     else:
         st.info("No registrations yet")
-        
