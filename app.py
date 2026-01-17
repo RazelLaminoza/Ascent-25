@@ -51,13 +51,13 @@ def set_bg(image):
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
-        overflow: hidden !important;   /* Prevent scrolling */
-        height: 100vh;                 /* Fit to viewport height */
+        height: 100vh;                 /* Fill viewport */
+        overflow: hidden !important;   /* Disable scroll */
     }}
 
     html, body {{
-        overflow: hidden !important;
         height: 100vh;
+        overflow: hidden !important;   /* No scrollbars */
     }}
 
     ::-webkit-scrollbar {{
@@ -108,10 +108,10 @@ set_bg("bgna.png")
 if st.session_state.page == "landing":
     st.markdown(
         f"""
-        <div style='text-align:center; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center;'>
+        <div style='height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;'>
             <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' width='160' style='margin-bottom:20px;'/>
             <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' style='width:70%; max-width:900px; margin-bottom:20px;'/>
-            <p style="font-size:20px;font-weight:600; color:white; text-shadow:1px 1px 4px rgba(0,0,0,.7);">
+            <p style="font-size:20px;font-weight:600; color:white; text-shadow:1px 1px 4px rgba(0,0,0,.7); margin-bottom:20px;">
                 PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
                 <span style="font-size:16px;">
                 January 25, 2026 | OKADA BALLROOM 1–3
@@ -122,11 +122,9 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
-    # Register button centered at bottom
-    colb1, colb2, colb3 = st.columns([2,1,2])
-    with colb2:
-        if st.button("Register", use_container_width=True):
-            st.session_state.page = "register"
+    # Register button fixed at bottom center
+    if st.button("Register", use_container_width=True):
+        st.session_state.page = "register"
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
