@@ -4,11 +4,17 @@ import qrcode
 import io
 import pandas as pd
 import base64
-import time
 import json
 import os
 
-# ---------------- STORAGE FILE ----------------
+# ---------------- PAGE CONFIG ----------------
+st.set_page_config(
+    page_title="ASCENT APAC 2026",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
+# ---------------- STORAGE ----------------
 DATA_FILE = "raffle_data.json"
 
 if os.path.exists(DATA_FILE):
@@ -25,6 +31,7 @@ if "page" not in st.session_state:
 if "admin" not in st.session_state:
     st.session_state.admin = False
 
+
 # ---------------- FUNCTIONS ----------------
 def save_data():
     with open(DATA_FILE, "w") as f:
@@ -33,11 +40,13 @@ def save_data():
             "winner": st.session_state.winner
         }, f)
 
+
 def generate_qr(data):
     qr = qrcode.QRCode(box_size=10, border=4)
     qr.add_data(data)
     qr.make(fit=True)
     return qr.make_image(fill_color="black", back_color="white")
+
 
 def set_bg_local(image_file):
     with open(image_file, "rb") as f:
@@ -64,12 +73,28 @@ def set_bg_local(image_file):
         visibility: hidden;
     }}
 
-    h1, h2, h3 {{
-        color: white;
-        text-align: center;
-        text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
+    /* 🔴 HIDE / FADE STREAMLIT OWNER + CROWN */
+    [data-testid="stToolbar"] {{
+        opacity: 0.05 !important;
+        pointer-events: none !important;
     }}
 
+    [data-testid="stStatusWidget"],
+    [data-testid="stDecoration"] {{
+        display: none !important;
+    }}
+
+    svg[aria-label="Streamlit"] {{
+        opacity: 0.03 !important;
+    }}
+
+    h1, h2, h3, p {{
+        color: white;
+        text-align: center;
+        text-shadow: 1px 1px 4px rgba(0,0,0,0.7);
+    }}
+
+    /* FORM */
     .stForm {{
         background: rgba(255,255,255,0.06) !important;
         padding: 25px !important;
@@ -78,33 +103,18 @@ def set_bg_local(image_file):
     }}
 
     /* INPUT BOX */
-    .stTextInput > div > div > input {{
+    .stTextInput input {{
         background: rgba(255,255,255,0.12) !important;
         border-radius: 12px !important;
         border: none !important;
         padding: 12px !important;
-    }}
-
-    /* 🔴 RED TYPING TEXT */
-    .stTextInput input {{
         color: #FF2D2D !important;
         caret-color: #FF2D2D !important;
     }}
 
-    .stTextInput input:focus {{
-        color: #FF2D2D !important;
-        caret-color: #FF2D2D !important;
-        outline: none !important;
-    }}
-
-    input:-webkit-autofill {{
-        -webkit-text-fill-color: #FF2D2D !important;
-        caret-color: #FF2D2D !important;
-    }}
-
-    /* DEFAULT BUTTONS (OTHER PAGES) */
+    /* BUTTON */
     button[kind="primary"] {{
-        background-color: #FFD000 !important;
+        background-color: #FFFFFF !important;
         color: black !important;
         border-radius: 30px !important;
         height: 55px;
@@ -114,23 +124,10 @@ def set_bg_local(image_file):
     }}
 
     button[kind="primary"]:hover {{
-        background-color: #FFB700 !important;
+        background-color: #EDEDED !important;
     }}
 
-    /* 🤍 LANDING PAGE WHITE BUTTON */
-    .landing-btn button {{
-        background: white !important;
-        color: black !important;
-        border-radius: 40px !important;
-        height: 58px !important;
-        font-size: 18px !important;
-        font-weight: 700 !important;
-    }}
-
-    .landing-btn button:hover {{
-        background: #f2f2f2 !important;
-    }}
-
+    /* LOGO */
     .fixed-logo {{
         position: fixed;
         top: 20px;
@@ -145,61 +142,75 @@ def set_bg_local(image_file):
     </style>
     """, unsafe_allow_html=True)
 
+
 set_bg_local("bgna.png")
 
-# ---------------- LANDING PAGE ----------------
+# ---------------- LANDING ----------------
 if st.session_state.page == "landing":
+
+    # Top-left logo
     st.markdown('<div class="fixed-logo">', unsafe_allow_html=True)
-    st.image("2.png", width=160)
+    st.image("2.png", width=150)
     st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown("<br><br>", unsafe_allow_html=True)
-
-    # BIG HERO IMAGE
-    col1, col2, col3 = st.columns([1,5,1])
+    # Center images
+    col1, col2, col3 = st.columns([1, 3, 1])
     with col2:
         st.image("1.png", use_column_width=True)
 
-    st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("""
+        <p style="font-size:20px;font-weight:600;">
+        PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
+        <span style="font-size:16px;">
+        January 25, 2026 | OKADA BALLROOM 1–3
+        </span>
+        </p>
+        """, unsafe_allow_html=True)
 
-    # WHITE BUTTON
-    colb1, colb2, colb3 = st.columns([2,1,2])
+        st.image("2.png", width=220)
+
+    # Button
+    colb1, colb2, colb3 = st.columns([2, 1, 2])
     with colb2:
-        st.markdown('<div class="landing-btn">', unsafe_allow_html=True)
-        if st.button("Pre Register", use_container_width=True):
+        if st.button("Register", use_container_width=True):
             st.session_state.page = "register"
-        st.markdown('</div>', unsafe_allow_html=True)
 
-# ---------------- REGISTRATION PAGE ----------------
+
+# ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
+
     st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
 
     with st.form("register_form"):
         name = st.text_input("Full Name")
-        emp_number = st.text_input("Employee ID")
+        emp = st.text_input("Employee ID")
         submit = st.form_submit_button("Submit")
 
         if submit:
-            if name and emp_number:
-                if any(e["emp_number"] == emp_number for e in st.session_state.entries):
+            if name and emp:
+                if any(e["emp_number"] == emp for e in st.session_state.entries):
                     st.warning("Employee ID already registered")
                 else:
-                    st.session_state.entries.append({"name": name, "emp_number": emp_number})
+                    st.session_state.entries.append({
+                        "name": name,
+                        "emp_number": emp
+                    })
                     save_data()
                     st.success("Registration successful!")
-                    qr = generate_qr(f"{name} | {emp_number}")
+                    qr = generate_qr(f"{name} | {emp}")
                     buf = io.BytesIO()
                     qr.save(buf, format="PNG")
                     st.image(buf.getvalue(), caption="Your QR Code")
             else:
                 st.error("Please complete all fields")
 
-    if not st.session_state.admin:
-        if st.button("Admin Login"):
-            st.session_state.page = "admin"
+    if st.button("Admin Login"):
+        st.session_state.page = "admin"
 
-# ---------------- ADMIN LOGIN ----------------
+
+# ---------------- ADMIN ----------------
 elif st.session_state.page == "admin":
+
     st.markdown("<h2>Admin Login</h2>", unsafe_allow_html=True)
     user = st.text_input("Username")
     pwd = st.text_input("Password", type="password")
@@ -216,8 +227,10 @@ elif st.session_state.page == "admin":
             else:
                 st.error("Invalid credentials")
 
-# ---------------- RAFFLE PAGE ----------------
+
+# ---------------- RAFFLE ----------------
 elif st.session_state.page == "raffle":
+
     if not st.session_state.admin:
         st.stop()
 
