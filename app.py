@@ -57,11 +57,12 @@ def set_bg(image):
 
     html, body {{
         height: 100vh;
-        overflow: hidden !important;   /* No scrollbars */
+        overflow: hidden !important;   /* Remove scrollbars */
+        margin: 0;
     }}
 
     ::-webkit-scrollbar {{
-        display: none;
+        display: none !important;      /* Hide scrollbar completely */
     }}
 
     #MainMenu, header, footer {{
@@ -112,7 +113,7 @@ if st.session_state.page == "landing":
         <div style='height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;'>
             <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' width='160' style='margin-bottom:20px;'/>
             <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' style='width:70%; max-width:900px; margin-bottom:20px;'/>
-            <p style="font-size:20px;font-weight:600; color:white; text-shadow:1px 1px 4px rgba(0,0,0,.7); margin-bottom:40px;">
+            <p style="font-size:20px;font-weight:600; color:white; text-shadow:1px 1px 4px rgba(0,0,0,.7); margin-bottom:30px;">
                 PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
                 <span style="font-size:16px;">
                 January 25, 2026 | OKADA BALLROOM 1–3
@@ -123,21 +124,11 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
-    # Register button fixed at bottom center
-    st.markdown(
-        """
-        <div style='position:fixed; bottom:30px; left:50%; transform:translateX(-50%);'>
-            <form action='#' method='post'>
-                <button type='submit' style='background:white; color:black; border-radius:30px; height:55px; font-weight:700; padding:0 40px; cursor:pointer;'>
-                    Register
-                </button>
-            </form>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-    if st.button("Register"):
-        st.session_state.page = "register"
+    # Register button centered neatly below text
+    col1, col2, col3 = st.columns([2,1,2])
+    with col2:
+        if st.button("Register"):
+            st.session_state.page = "register"
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
