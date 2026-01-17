@@ -298,11 +298,12 @@ elif st.session_state.page == "raffle":
         with col3:
             st.button("Export CSV", on_click=export_csv)
 
-        # NEW: Back to Landing
-        st.button("Back to Landing", on_click=go_to, args=("landing",))
-
         if st.session_state.get("exported", False):
             st.success("CSV exported as entries.csv")
-            st.session_state.exported = False
+
     else:
         st.info("No registrations yet")
+
+    # <-- This is outside the if block so it always shows
+    st.button("Back to Landing", on_click=go_to, args=("landing",))
+
