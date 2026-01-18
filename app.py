@@ -86,10 +86,10 @@ def create_pass_image(name, emp, qr_img):
 
     draw = ImageDraw.Draw(img)
 
-    # Start with regular font sizes
+    # Load fonts (regular)
     try:
-        font_big = ImageFont.truetype("Roboto-Regular.ttf", 42)
-        font_small = ImageFont.truetype("Roboto-Regular.ttf", 26)
+        font_big = ImageFont.truetype("CourierPrime-Bold.ttf", 42)
+        font_small = ImageFont.truetype("CourierPrime-Bold.ttf", 26)
     except:
         font_big = font_small = ImageFont.load_default()
 
@@ -108,30 +108,7 @@ def create_pass_image(name, emp, qr_img):
     # Text
     draw.text((40, 40), "ASCENT APAC 2026", fill=text_color, font=font_big)
     draw.text((40, 120), "FULL NAME:", fill=text_color, font=font_small)
-
-    # Adjust font size if name is too long
-    max_width = 720
-    name_font_size = 42
-
-    while True:
-        try:
-            name_font = ImageFont.truetype("Roboto-Regular.ttf", name_font_size)
-        except:
-            name_font = ImageFont.load_default()
-
-        # measure width using bbox
-        try:
-            width = name_font.getbbox(name)[2]
-        except:
-            temp_img = Image.new("RGB", (1, 1))
-            temp_draw = ImageDraw.Draw(temp_img)
-            width = temp_draw.textbbox((0, 0), name, font=name_font)[2]
-
-        if width <= max_width or name_font_size <= 18:
-            break
-        name_font_size -= 2
-
-    draw.text((40, 160), name, fill=text_color, font=name_font)
+    draw.text((40, 160), name, fill=text_color, font=font_big)
 
     draw.text((40, 260), "EMPLOYEE NO:", fill=text_color, font=font_small)
     draw.text((40, 300), emp, fill=text_color, font=font_big)
