@@ -356,6 +356,10 @@ if st.session_state.page == "landing":
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
+
+    # Apply Landing CSS
+    st.markdown(landing_css, unsafe_allow_html=True)
+
     st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
 
     with st.form("form"):
@@ -419,8 +423,10 @@ elif st.session_state.page == "register":
                     type="primary"
                 )
 
-    st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
-    st.button("Admin Login", on_click=go_to, args=("admin",), type="secondary")
+    # BUTTONS (styled same as landing)
+    st.button("Back to Landing", on_click=go_to, args=("landing",), type="primary")
+    st.button("Admin Login", on_click=go_to, args=("admin",), type="primary")
+
 
 # ---------------- ADMIN ----------------
 elif st.session_state.page == "admin":
