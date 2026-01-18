@@ -357,7 +357,7 @@ if st.session_state.page == "landing":
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
 
-    # Apply Landing CSS
+    # APPLY LANDING CSS
     st.markdown(landing_css, unsafe_allow_html=True)
 
     st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
@@ -392,11 +392,7 @@ elif st.session_state.page == "register":
 
                 st.markdown(
                     f"""
-                    <div style="
-                        display:flex;
-                        justify-content:center;
-                        margin-top: 20px;
-                    ">
+                    <div style="display:flex; justify-content:center; margin-top: 20px;">
                         <div style="
                             background: rgba(255, 255, 255, 0.12);
                             border: 1px solid rgba(255, 255, 255, 0.25);
@@ -424,8 +420,9 @@ elif st.session_state.page == "register":
                 )
 
     # BUTTONS (styled same as landing)
-    st.button("Back to Landing", on_click=go_to, args=("landing",), type="primary")
-    st.button("Admin Login", on_click=go_to, args=("admin",), type="primary")
+    st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
+    st.button("Admin Login", on_click=go_to, args=("admin",), type="secondary")
+
 
 
 # ---------------- ADMIN ----------------
