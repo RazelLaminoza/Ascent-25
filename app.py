@@ -302,6 +302,19 @@ if st.session_state.page == "landing":
                     color: black !important;
                 }
             }
+
+            /* NEW: Text block styling (instead of inline HTML) */
+            .landing-text {
+                font-size: 18px;
+                text-align: center;
+                margin-top: 20px;
+                line-height: 1.3;
+            }
+
+            .landing-text span {
+                font-size: 16px;
+            }
+
         </style>
     """, unsafe_allow_html=True)
 
@@ -310,13 +323,12 @@ if st.session_state.page == "landing":
         <div class="landing">
             <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' width='160'/>
             <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' style='width:70%; max-width:900px; margin-top:20px;'/>
-
-           <p style="font-size:18px; text-align:center; margin-top:20px; line-height:1.3;">
-    PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
-    <span style="font-size:16px;">
-        January 25, 2026 | OKADA BALLROOM 1–3
-    </span>
-</p>
+            
+            <!-- REPLACED HTML text with CSS class -->
+            <div class="landing-text">
+                PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
+                <span>January 25, 2026 | OKADA BALLROOM 1–3</span>
+            </div>
         </div>
         """,
         unsafe_allow_html=True
