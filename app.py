@@ -236,15 +236,35 @@ def export_csv():
     st.session_state.exported = True
 
 # ---------------- LANDING PAGE ----------------
+# ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
 
     st.markdown("""
         <style>
-            /* Make the main content container full width */
+            /* Make container full width */
             .block-container {
                 max-width: 100% !important;
                 padding-left: 0px !important;
                 padding-right: 0px !important;
+            }
+
+            /* Responsive button style */
+            div[data-testid="stButton"] > button {
+                width: 90%;
+                max-width: 420px;
+                height: 60px;
+                font-size: 22px;
+                font-weight: 800;
+            }
+
+            /* Mobile view */
+            @media (max-width: 600px) {
+                div[data-testid="stButton"] > button {
+                    width: 95%;
+                    max-width: 320px;
+                    height: 55px;
+                    font-size: 20px;
+                }
             }
         </style>
     """, unsafe_allow_html=True)
@@ -268,17 +288,6 @@ if st.session_state.page == "landing":
     col1, col2, col3 = st.columns([5.5, 5, 1])
 
     with col2:
-        st.markdown("""
-            <style>
-                div[data-testid="stButton"] > button {
-                    width: 100%;
-                    height: 60px;
-                    font-size: 22px;
-                    font-weight: 800;
-                }
-            </style>
-        """, unsafe_allow_html=True)
-
         st.button(
             "Register Here",
             on_click=go_to,
