@@ -358,39 +358,26 @@ if st.session_state.page == "landing":
 elif st.session_state.page == "register":
     st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
 
-    # ---------- SLIGHTLY SMALLER SUBMIT BUTTON ----------
+    # ---------- MATCH BACK BUTTON SIZE ----------
     st.markdown(
         """
         <style>
         div[data-testid="stFormSubmitButton"] > button {
-            width: 90% !important;           /* slightly smaller */
-            max-width: 480px !important;     /* controls max width */
-            font-size: 22px !important;
-            font-weight: 800 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            height: 55px !important;
+            font-size: 16px !important;
+            font-weight: 700 !important;
             background-color: #FFD700 !important;
             color: black !important;
             border: none !important;
-            border-radius: 12px !important;
-            margin: 0 auto !important;       /* center the button */
-            padding: 18px 0 !important;
-            white-space: nowrap !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
+            border-radius: 8px !important;
+            padding: 0 !important;
         }
 
         div[data-testid="stFormSubmitButton"] > button span,
         div[data-testid="stFormSubmitButton"] > button span * {
             color: black !important;
-        }
-
-        @media (max-width: 600px) {
-            div[data-testid="stFormSubmitButton"] > button {
-                width: 95% !important;
-                max-width: 420px !important;
-                font-size: 20px !important;
-                padding: 16px 0 !important;
-            }
         }
         </style>
         """,
@@ -464,6 +451,7 @@ elif st.session_state.page == "register":
 
     with col2:
         st.button("Admin Login", on_click=go_to, args=("admin",), type="secondary")
+
 
 
 # ---------------- ADMIN ----------------
