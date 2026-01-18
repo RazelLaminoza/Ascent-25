@@ -212,11 +212,11 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
-    # 10px spacing
-    col1, col2, col3 = st.columns([5.5, 5, 1])
+  # Align button exactly like the text 
+st.markdown("<br>", unsafe_allow_html=True)
+col1, col2, col3 = st.columns([5.5, 5, 1]) with 
 
-    with col2:
-        if st.button("Register Here"): go_to("register")
+col2: if st.button("Register Here"): go_to("register") 
 
 
 
