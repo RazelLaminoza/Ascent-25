@@ -279,7 +279,8 @@ if st.session_state.page == "landing":
             }
 
             /* Force text color to black */
-            div[data-testid="stButton"] > button span {
+            div[data-testid="stButton"] > button span,
+            div[data-testid="stButton"] > button span * {
                 color: black !important;
             }
 
@@ -296,26 +297,14 @@ if st.session_state.page == "landing":
                     margin-top: -20px !important;
                 }
 
-                div[data-testid="stButton"] > button span {
+                div[data-testid="stButton"] > button span,
+                div[data-testid="stButton"] > button span * {
                     color: black !important;
                 }
             }
         </style>
     """, unsafe_allow_html=True)
-    
-    st.markdown(
-        f"""
-        <div class="landing">
-            <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' width='160'/>
-            <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' style='width:70%; max-width:900px; margin-top:20px;'/>
-            <p style="font-size:23px;">
-                PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
-                <span style="font-size:23px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
-            </p>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+
 
     # ---------- COLUMNS (RESTORED) ----------
     col1, col2, col3 = st.columns([5.5, 5, 1])
