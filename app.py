@@ -66,14 +66,26 @@ def create_pass_image(name, emp, qr_img):
 
     draw = ImageDraw.Draw(img)
 
+    # Load fonts (regular)
     try:
-        font_big = ImageFont.truetype("Roboto-Regular.ttf", 42)
-        font_small = ImageFont.truetype("Roboto-Regular.ttf", 26)
+        font_big = ImageFont.truetype("CourierPrime-Bold.ttf", 42)
+        font_small = ImageFont.truetype("CourierPrime-Bold.ttf", 26)
     except:
         font_big = font_small = ImageFont.load_default()
 
     text_color = (255, 255, 255, 255)
 
+    # Add 1.png and 2.png at the top-right
+    logo1 = Image.open("1.png").convert("RGBA")
+    logo2 = Image.open("2.png").convert("RGBA")
+
+    logo1 = logo1.resize((120, 120))
+    logo2 = logo2.resize((120, 120))
+
+    img.paste(logo1, (620, 30), logo1)
+    img.paste(logo2, (760, 30), logo2)
+
+    # Text
     draw.text((40, 40), "ASCENT APAC 2026", fill=text_color, font=font_big)
     draw.text((40, 120), "FULL NAME:", fill=text_color, font=font_small)
     draw.text((40, 160), name, fill=text_color, font=font_big)
