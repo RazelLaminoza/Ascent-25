@@ -305,8 +305,21 @@ if st.session_state.page == "landing":
         </style>
     """, unsafe_allow_html=True)
 
+    st.markdown(
+        f"""
+        <div class="landing">
+            <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' width='160'/>
+            <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' style='width:70%; max-width:900px; margin-top:20px;'/>
 
-    # ---------- COLUMNS (RESTORED) ----------
+            <p style="font-size:18px;">
+                PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
+                <span style="font-size:16px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
     col1, col2, col3 = st.columns([5.5, 5, 1])
 
     with col2:
@@ -315,8 +328,9 @@ if st.session_state.page == "landing":
             on_click=go_to,
             args=("register",),
             type="primary",
-            key="landing_register_1"   # <-- unique key
+            key="landing_register_1"
         )
+
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
