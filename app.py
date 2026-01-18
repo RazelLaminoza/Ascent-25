@@ -358,13 +358,14 @@ if st.session_state.page == "landing":
 elif st.session_state.page == "register":
     st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
 
-    # ---------- ONLY SUBMIT BUTTON STYLE ----------
+    # ---------- EDGE-TO-EDGE SUBMIT BUTTON STYLE ----------
     st.markdown(
         """
         <style>
+        /* Submit button edge-to-edge */
         div[data-testid="stFormSubmitButton"] > button {
             width: 100% !important;
-            max-width: 520px !important;
+            max-width: none !important;
             height: 70px !important;
             font-size: 22px !important;
             font-weight: 800 !important;
@@ -372,8 +373,9 @@ elif st.session_state.page == "register":
             color: black !important;
             border: none !important;
             border-radius: 0px !important;
+            margin: 0 !important;
+            padding: 0 !important;
             white-space: nowrap !important;
-            margin-top: -25px !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
@@ -386,11 +388,8 @@ elif st.session_state.page == "register":
 
         @media (max-width: 600px) {
             div[data-testid="stFormSubmitButton"] > button {
-                width: 95% !important;
-                max-width: 420px !important;
                 height: 60px !important;
                 font-size: 20px !important;
-                margin-top: -20px !important;
             }
         }
         </style>
@@ -465,7 +464,6 @@ elif st.session_state.page == "register":
 
     with col2:
         st.button("Admin Login", on_click=go_to, args=("admin",), type="secondary")
-
 
 # ---------------- ADMIN ----------------
 elif st.session_state.page == "admin":
