@@ -349,7 +349,7 @@ elif st.session_state.page == "admin":
                 save_employees()
                 st.success("Employee list loaded and saved!")
 
-            # Then validate login
+            # Validate login only once
             login_admin()
 
     if st.session_state.get("login_error", False):
@@ -357,8 +357,6 @@ elif st.session_state.page == "admin":
         st.session_state.login_error = False
 
     st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
-
-
 
 # ---------------- RAFFLE ----------------
 elif st.session_state.page == "raffle":
