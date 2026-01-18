@@ -333,25 +333,39 @@ elif st.session_state.page == "register":
 elif st.session_state.page == "admin":
     st.markdown("<h1>Admin Panel</h1>", unsafe_allow_html=True)
 
-    st.markdown("<br>", unsafe_allow_html=True)
+    # --- Same centered form style like register page ---
+    st.markdown(
+        """
+        <div style='display:flex; justify-content:center; margin-top:20px;'>
+            <div style='max-width:360px; width:100%;'>
+        """,
+        unsafe_allow_html=True
+    )
 
-    # Upload employee list
-    uploaded_file = st.file_uploader("Upload Employee List (Excel)", type=["xlsx"])
+    with st.form("admin_form"):
+        uploaded_file = st.file_uploader("Upload Employee List (Excel)", type=["xlsx"])
 
-    st.text_input("Username", key="user")
-    st.text_input("Password", type="password", key="pwd")
+        st.text_input("Username", key="user")
+        st.text_input("Password", type="password", key="pwd")
 
-    # Login button (only one)
-    if st.button("Login", type="primary"):
-        # Upload employee list first (if file selected)
-        if uploaded_file:
-            df_emp = pd.read_excel(uploaded_file)
-            st.session_state.valid_employees = df_emp.set_index("EMP ID")["Full Name"].to_dict()
-            save_employees()
-            st.success("Employee list loaded and saved!")
+        submit_admin = st.form_submit_button("Login", type="primary")
 
-        # Validate login
-        login_admin()
+        if submit_admin:
+            if uploaded_file:
+                df_emp = pd.read_excel(uploaded_file)
+                st.session_state.valid_employees = df_emp.set_index("EMP ID")["Full Name"].to_dict()
+                save_employees()
+                st.success("Employee list loaded and saved!")
+
+            login_admin()
+
+    st.markdown(
+        """
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
     if st.session_state.get("login_error", False):
         st.error("Invalid login")
