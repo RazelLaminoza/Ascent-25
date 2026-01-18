@@ -240,15 +240,7 @@ if st.session_state.page == "landing":
 
     st.markdown(
         f"""
-        <div style='
-            height:100vh;
-            display:flex;
-            flex-direction:column;
-            justify-content:center;
-            align-items:center;
-            text-align:center;
-            margin-top: -120px;   /* <-- MOVE UP */
-        '>
+        <div style='height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;'>
             <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' width='160'/>
             <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' style='width:70%; max-width:900px; margin-top:20px;'/>
             <p style="font-size:18px;">
@@ -260,11 +252,22 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
-    # NO extra <br> needed
+    st.markdown("<br>", unsafe_allow_html=True)
 
     col1, col2, col3 = st.columns([5.5, 5, 1])
 
     with col2:
+        st.markdown("""
+            <style>
+                div[data-testid="stButton"] > button {
+                    width: 100%;
+                    height: 60px;          /* BUTTON HEIGHT */
+                    font-size: 22px;
+                    font-weight: 800;
+                }
+            </style>
+        """, unsafe_allow_html=True)
+
         st.button(
             "Register Here",
             on_click=go_to,
