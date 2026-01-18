@@ -222,11 +222,10 @@ if st.session_state.page == "landing":
     col1, col2, col3 = st.columns([5.5, 5, 1])
 
     with col2:
-        with st.form(key="landing_form"):
-            submit = st.form_submit_button("Register Here")
+        if st.button("Register Here", key="landing_register"):
+            st.session_state.page = "register"
+            st.experimental_rerun()
 
-            if submit:
-                st.session_state.page = "register"
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
