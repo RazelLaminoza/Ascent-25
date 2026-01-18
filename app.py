@@ -67,9 +67,9 @@ def create_pass_image(name, emp, qr_img):
     draw = ImageDraw.Draw(img)
 
     try:
-        # Use Courier Prime font (typewriter)
-        font_big = ImageFont.truetype("CourierPrime-Regular.ttf", 42)
-        font_small = ImageFont.truetype("CourierPrime-Regular.ttf", 26)
+        # Use Courier Prime Bold font (typewriter)
+        font_big = ImageFont.truetype("CourierPrime-Bold.ttf", 42)
+        font_small = ImageFont.truetype("CourierPrime-Bold.ttf", 26)
     except:
         font_big = font_small = ImageFont.load_default()
 
