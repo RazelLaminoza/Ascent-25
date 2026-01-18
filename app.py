@@ -260,33 +260,36 @@ if st.session_state.page == "landing":
                 justify-content: center;
                 align-items: center;
                 text-align: center;
-                margin-top: -70px;   /* <-- move everything higher */
+                margin-top: -70px;
             }
 
             /* Button styling */
             div[data-testid="stButton"] > button {
-                width: 90%;
-                max-width: 420px;
+                width: 100%;
+                max-width: 520px;
                 height: 60px;
                 font-size: 22px;
                 font-weight: 800;
-                background-color: black !important;   /* <-- black */
-                color: white !important;               /* <-- white text */
+                background-color: black !important;
+                color: white !important;
                 border: none !important;
+                white-space: nowrap;  /* prevent word split */
             }
 
             @media (max-width: 600px) {
                 div[data-testid="stButton"] > button {
-                    width: 95%;
-                    max-width: 320px;
+                    width: 100%;
+                    max-width: 420px;
                     height: 55px;
                     font-size: 20px;
-                    background-color: black !important; /* <-- black */
-                    color: white !important;             /* <-- white text */
+                    background-color: black !important;
+                    color: white !important;
+                    white-space: nowrap; /* prevent word split */
                 }
             }
         </style>
     """, unsafe_allow_html=True)
+
 
     st.markdown(
         f"""
