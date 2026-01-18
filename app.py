@@ -227,10 +227,10 @@ def login_admin():
         st.session_state.login_error = True
 
 def run_raffle():
-    entries = st.session_state.entries
+    entries = st.session_state.get("entries", [])
 
     if not entries:
-        st.warning("No entries to raffle.")
+        st.warning("No entries to raffle. Upload Excel or add entries first.")
         return
 
     placeholder = st.empty()
