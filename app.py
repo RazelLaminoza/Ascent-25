@@ -295,13 +295,14 @@ elif st.session_state.page == "register":
     st.button("Admin Login", on_click=go_to, args=("admin",), type="secondary")
 
 # ---------------- ADMIN ----------------
+# ---------------- ADMIN ----------------
 elif st.session_state.page == "admin":
     st.markdown("<h1>Admin Panel</h1>", unsafe_allow_html=True)
 
     st.markdown(
         """
         <div style="display:flex; justify-content:center;">
-            <div style="width:100%; max-width:360px;">
+            <div style="width:100%; max-width:280px;">
         """,
         unsafe_allow_html=True
     )
@@ -329,6 +330,7 @@ elif st.session_state.page == "admin":
     st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
 
     st.markdown("</div></div>", unsafe_allow_html=True)
+
 
 # ---------------- RAFFLE ----------------
 elif st.session_state.page == "raffle":
