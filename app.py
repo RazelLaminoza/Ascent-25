@@ -358,7 +358,7 @@ if st.session_state.page == "landing":
 elif st.session_state.page == "register":
 
     # APPLY LANDING CSS
-    st.markdown(landing_css, unsafe_allow_html=True)
+    elif st.session_state.page == "register":
 
     st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
 
@@ -392,18 +392,8 @@ elif st.session_state.page == "register":
 
                 st.markdown(
                     f"""
-                    <div style="display:flex; justify-content:center; margin-top: 20px;">
-                        <div style="
-                            background: rgba(255, 255, 255, 0.12);
-                            border: 1px solid rgba(255, 255, 255, 0.25);
-                            border-radius: 18px;
-                            padding: 16px;
-                            backdrop-filter: blur(8px);
-                            -webkit-backdrop-filter: blur(8px);
-                            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-                            max-width: 520px;
-                            width: 100%;
-                        ">
+                    <div style=" display:flex; justify-content:center; margin-top: 20px; ">
+                        <div style=" background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 18px; padding: 16px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: 0 10px 30px rgba(0,0,0,0.25); max-width: 520px; width: 100%; ">
                             <img src="data:image/png;base64,{img_b64}" style="width:100%; border-radius: 12px;" />
                         </div>
                     </div>
@@ -419,7 +409,6 @@ elif st.session_state.page == "register":
                     type="primary"
                 )
 
-    # BUTTONS (styled same as landing)
     st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
     st.button("Admin Login", on_click=go_to, args=("admin",), type="secondary")
 
