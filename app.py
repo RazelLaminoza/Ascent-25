@@ -230,16 +230,30 @@ def run_raffle():
     if not st.session_state.entries:
         return
 
-    st.session_state.shuffling = True
     st.session_state.winner = None
 
-    # Shuffle for 10 seconds
-    for _ in range(100):   # 100 loops * 0.1 sec = 10 seconds
-        st.session_state.current = random.choice(st.session_state.entries)
-        time.sleep(0.1)
+    placeholder = st.empty()
 
+    # Shuffle for 10 seconds
+    start_time = time.time()
+    while time.time() - start_time < 10:
+        current = random.choice(st.session_state.entries)
+        placeholder.markdown(
+            f"""
+            <div style="text-align:center; margin-top:30px;">
+                <h2 style="color:white;">Shuffling...</h2>
+                <h1 style="color:gold; font-size:60px;">
+                    {current['name']}
+                </h1>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+        time.sleep(0.05)
+
+    # Final winner
     st.session_state.winner = random.choice(st.session_state.entries)
-    st.session_state.shuffling = False
+    placeholder.empty()
 
 def logout():
     st.session_state.admin = False
@@ -577,22 +591,8 @@ elif st.session_state.page == "raffle":
             key="download_csv_btn"
         )
 
-        # SHOW SHUFFLE EFFECT
-        if st.session_state.get("shuffling", False):
-            st.markdown(
-                f"""
-                <div style="text-align:center; margin-top:30px;">
-                    <h2 style="color:white;">Shuffling...</h2>
-                    <h1 style="color:gold; font-size:60px;">
-                        {st.session_state.current['name']}
-                    </h1>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-
         # SHOW WINNER
-        if st.session_state.winner is not None and not st.session_state.get("shuffling", False):
+        if st.session_state.winner is not None:
             st.markdown(
                 f"""
                 <div style="text-align:center;margin-top:40px;">
