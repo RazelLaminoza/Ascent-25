@@ -238,15 +238,6 @@ def export_csv():
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
 
-    # --- SCROLL LOCK ONLY ---
-    st.markdown("""
-        <style>
-            html, body {
-                overflow: hidden;
-            }
-        </style>
-    """, unsafe_allow_html=True)
-
     st.markdown(
         f"""
         <div style='height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;'>
@@ -267,7 +258,6 @@ if st.session_state.page == "landing":
 
     with col2:
         st.button("Register Here", on_click=go_to, args=("register",), type="primary", key="landing_register")
-
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
