@@ -9,10 +9,6 @@ import os
 from PIL import Image, ImageDraw, ImageFont
 
 
-def resize_keep_aspect(img, max_size):
-    img = img.convert("RGBA")
-    img.thumbnail(max_size, Image.ANTIALIAS)
-    return img
 
 # ---------------- PAGE CONFIG ----------------
 st.set_page_config(
@@ -81,6 +77,11 @@ def wrap_text(text, font, max_width):
 
     return lines
 # -------------------------------
+
+def resize_keep_aspect(img, max_size):
+    img = img.convert("RGBA")
+    img.thumbnail(max_size, Image.Resampling.LANCZOS)
+    return img
 
 def create_pass_image(name, emp, qr_img):
     # Load background image
