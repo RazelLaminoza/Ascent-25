@@ -234,16 +234,14 @@ if st.session_state.page == "landing":
                 PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
                 <span class="landing-sub">January 25, 2026 | OKADA BALLROOM 1–3</span>
             </p>
+
+            <!-- BUTTON INSIDE THE CENTERED DIV -->
+            <div style="margin-top: 20px;">
+                <button onclick="window.location.reload()">Register Here</button>
+            </div>
         </div>
         """,
         unsafe_allow_html=True
-    )
-
-    # Button aligned like your example (centered)
-    if st.button("Register Here"):
-        go_to("register")
-
-
 
 
 
