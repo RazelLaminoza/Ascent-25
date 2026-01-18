@@ -270,6 +270,9 @@ if st.session_state.page == "landing":
                 height: 60px;
                 font-size: 22px;
                 font-weight: 800;
+                background-color: black !important;   /* <-- black */
+                color: white !important;               /* <-- white text */
+                border: none !important;
             }
 
             @media (max-width: 600px) {
@@ -278,6 +281,8 @@ if st.session_state.page == "landing":
                     max-width: 320px;
                     height: 55px;
                     font-size: 20px;
+                    background-color: black !important; /* <-- black */
+                    color: white !important;             /* <-- white text */
                 }
             }
         </style>
@@ -287,7 +292,7 @@ if st.session_state.page == "landing":
         f"""
         <div class="landing">
             <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' width='160'/>
-            <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' style='width:70%; max-width:1200px; margin-top:20px;'/>
+            <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' style='width:70%; max-width:900px; margin-top:20px;'/>
             <p style="font-size:18px;">
                 PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
                 <span style="font-size:16px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
@@ -296,8 +301,6 @@ if st.session_state.page == "landing":
         """,
         unsafe_allow_html=True
     )
-
-    # <-- NO <br> here (REMOVED)
 
     col1, col2, col3 = st.columns([5.5, 5, 1])
 
@@ -309,7 +312,6 @@ if st.session_state.page == "landing":
             type="primary",
             key="landing_register"
         )
-
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
