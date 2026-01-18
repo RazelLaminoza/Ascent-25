@@ -358,13 +358,14 @@ if st.session_state.page == "landing":
 elif st.session_state.page == "register":
     st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
 
-    # CSS styling for the submit button
+    # ---------- BUTTON STYLE ----------
     st.markdown(
         """
         <style>
+        /* Submit button */
         div[data-testid="stFormSubmitButton"] > button {
-            width: 90% !important;
-            max-width: 480px !important;
+            width: 100% !important;
+            max-width: 520px !important;
             height: 55px !important;
             font-size: 16px !important;
             font-weight: 700 !important;
@@ -372,13 +373,23 @@ elif st.session_state.page == "register":
             color: black !important;
             border: none !important;
             border-radius: 8px !important;
-            padding: 0 !important;
             margin: 0 auto !important;
+            padding: 0 !important;
         }
 
         div[data-testid="stFormSubmitButton"] > button span,
         div[data-testid="stFormSubmitButton"] > button span * {
             color: black !important;
+        }
+
+        /* Back + Admin buttons */
+        div[data-testid="stButton"] > button {
+            width: 100% !important;
+            max-width: 520px !important;
+            height: 55px !important;
+            font-size: 16px !important;
+            font-weight: 700 !important;
+            border-radius: 8px !important;
         }
         </style>
         """,
@@ -439,7 +450,7 @@ elif st.session_state.page == "register":
                         unsafe_allow_html=True
                     )
 
-    # ------------------ DOWNLOAD BUTTON (OUTSIDE FORM) ------------------
+    # ------------------ DOWNLOAD BUTTON OUTSIDE FORM ------------------
     if "pass_bytes" in locals():
         st.download_button(
             "📥 Download Pass (PNG)",
