@@ -222,9 +222,7 @@ if st.session_state.page == "landing":
     col1, col2, col3 = st.columns([5.5, 5, 1])
 
     with col2:
-        if st.button("Register Here", key="landing_register"):
-            st.session_state.page = "register"
-            st.experimental_rerun()
+        st.button("Register Here", on_click=go_to, args=("register",), type="primary", key="landing_register")
 
 
 # ---------------- REGISTER ----------------
