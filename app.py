@@ -216,10 +216,7 @@ if st.session_state.page == "landing":
     col1, col2, col3 = st.columns([5.5, 5, 1])
 
     with col2:
-        st.markdown("<div style='height: 10px'></div>", unsafe_allow_html=True)
-        if st.button("Register Here"):
-            go_to("register")
-
+        if st.button("Register Here"): go_to("register")
 
 
 
