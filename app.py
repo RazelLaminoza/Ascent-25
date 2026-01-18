@@ -203,27 +203,46 @@ def export_csv():
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
 
-    col1, col2, col3 = st.columns([1, 2, 1])
+    st.markdown("""
+    <style>
+        .landing-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .landing-text {
+            font-size: 18px;
+            color: white;
+            margin-top: 10px;
+        }
+        .landing-sub {
+            font-size: 16px;
+            color: white;
+        }
+    </style>
+    """, unsafe_allow_html=True)
 
-    with col2:
-        st.markdown(
-            f"""
-            <div style='height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;'>
-                <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' width='160'/>
-                <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' style='width:70%; max-width:900px;'/>
-                <p style="font-size:18px;">
-                    PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
-                    <span style="font-size:16px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+    st.markdown(
+        f"""
+        <div class="landing-container">
+            <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' width='160'/>
+            <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' style='width:70%; max-width:900px; margin-top:20px;'/>
+            <p class="landing-text">
+                PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
+                <span class="landing-sub">January 25, 2026 | OKADA BALLROOM 1–3</span>
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-        # Move button to the right
-        st.markdown("<div style='display:flex; justify-content:center;'>", unsafe_allow_html=True)
-        st.button("Register", on_click=go_to, args=("register",), type="primary")
-        st.markdown("</div>", unsafe_allow_html=True)
+    # Button aligned like your example (centered)
+    if st.button("Register Here"):
+        go_to("register")
+
 
 
 
