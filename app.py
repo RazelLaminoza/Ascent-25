@@ -358,22 +358,20 @@ if st.session_state.page == "landing":
 elif st.session_state.page == "register":
     st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
 
-    # ---------- ROUNDED SUBMIT BUTTON STYLE ----------
     st.markdown(
         """
         <style>
         div[data-testid="stFormSubmitButton"] > button {
             width: 100% !important;
             max-width: none !important;
-            height: 70px !important;
             font-size: 22px !important;
             font-weight: 800 !important;
             background-color: #FFD700 !important;
             color: black !important;
             border: none !important;
-            border-radius: 12px !important;   /* Rounded edges */
+            border-radius: 12px !important;
             margin: 0 !important;
-            padding: 0 !important;
+            padding: 18px 0 !important;   /* adaptive height */
             white-space: nowrap !important;
             display: flex !important;
             align-items: center !important;
@@ -387,8 +385,8 @@ elif st.session_state.page == "register":
 
         @media (max-width: 600px) {
             div[data-testid="stFormSubmitButton"] > button {
-                height: 60px !important;
                 font-size: 20px !important;
+                padding: 16px 0 !important;
             }
         }
         </style>
@@ -463,6 +461,7 @@ elif st.session_state.page == "register":
 
     with col2:
         st.button("Admin Login", on_click=go_to, args=("admin",), type="secondary")
+
 
 # ---------------- ADMIN ----------------
 elif st.session_state.page == "admin":
