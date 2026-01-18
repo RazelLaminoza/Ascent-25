@@ -201,7 +201,6 @@ def export_csv():
     st.session_state.exported = True
 
 # ---------------- LANDING PAGE ----------------
-# ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
 
     st.markdown(
@@ -213,15 +212,16 @@ if st.session_state.page == "landing":
                 PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
                 <span style="font-size:16px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
             </p>
-
-            <!-- BUTTON INSIDE SAME CONTAINER -->
-            <div style="margin-top: 20px;">
-                <button onclick="window.location.href='?page=register'">Register Here</button>
-            </div>
         </div>
         """,
         unsafe_allow_html=True
     )
+
+    # CENTER button under image 2 (inside same center area)
+    st.markdown("<div style='text-align:center; margin-top:-40px;'>", unsafe_allow_html=True)
+    if st.button("Register Here"):
+        go_to("register")
+    st.markdown("</div>", unsafe_allow_html=True)
 
 
 # ---------------- REGISTER ----------------
