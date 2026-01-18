@@ -582,7 +582,7 @@ elif st.session_state.page == "raffle":
     # ---- EXCEL IMPORT ----
     uploaded_file = st.file_uploader("Upload Excel (.xlsx)", type=["xlsx"])
 
-    if uploaded_file:
+   if uploaded_file:
     df_excel = pd.read_excel(uploaded_file)
 
     # Rename columns to required output
