@@ -236,12 +236,13 @@ def run_raffle():
     start_time = time.time()
     while time.time() - start_time < 10:
         current = random.choice(st.session_state.entries)
+
         placeholder.markdown(
             f"""
             <div style="text-align:center; margin-top:30px;">
                 <h2 style="color:white;">Shuffling...</h2>
                 <h1 style="color:gold; font-size:60px;">
-                    {current['Full name']}
+                    {current['Full Name']}
                 </h1>
             </div>
             """,
