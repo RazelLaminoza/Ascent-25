@@ -318,7 +318,7 @@ if st.session_state.page == "landing":
         </style>
     """, unsafe_allow_html=True)
 
-    s st.markdown(
+    st.markdown(
         f"""
         <div class="landing">
             <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' width='160'/>
