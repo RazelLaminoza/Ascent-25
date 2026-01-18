@@ -206,25 +206,20 @@ if st.session_state.page == "landing":
     st.markdown(
         f"""
         <div style='height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;'>
-            <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' width='160'/>
-            <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' style='width:70%; max-width:900px; margin-top:20px;'/>
-            <p style="font-size:18px;">
-                PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
-                <span style="font-size:16px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
-            </p>
+            ...
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    # Align button exactly like the text
-    st.markdown("<br>", unsafe_allow_html=True)
-   col1, col2, col3 = st.columns([5.5, 5, 1])
+    # 10px spacing
+    col1, col2, col3 = st.columns([5.5, 5, 1])
 
-with col2:
-    st.markdown("<div style='height: 10px'></div>", unsafe_allow_html=True)
-    if st.button("Register Here"):
-        go_to("register")
+    with col2:
+        st.markdown("<div style='height: 10px'></div>", unsafe_allow_html=True)
+        if st.button("Register Here"):
+            go_to("register")
+
 
 
 
