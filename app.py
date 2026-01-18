@@ -358,13 +358,13 @@ if st.session_state.page == "landing":
 elif st.session_state.page == "register":
     st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
 
-    # ---------- MATCH BACK BUTTON SIZE ----------
+    # CSS styling for the submit button
     st.markdown(
         """
         <style>
         div[data-testid="stFormSubmitButton"] > button {
-            width: 100% !important;
-            max-width: 100% !important;
+            width: 90% !important;
+            max-width: 480px !important;
             height: 55px !important;
             font-size: 16px !important;
             font-weight: 700 !important;
@@ -373,6 +373,7 @@ elif st.session_state.page == "register":
             border: none !important;
             border-radius: 8px !important;
             padding: 0 !important;
+            margin: 0 auto !important;
         }
 
         div[data-testid="stFormSubmitButton"] > button span,
@@ -384,6 +385,7 @@ elif st.session_state.page == "register":
         unsafe_allow_html=True
     )
 
+    # ------------------ FORM ------------------
     with st.form("form"):
         emp = st.text_input("Employee ID")
         submit = st.form_submit_button("Submit", type="primary")
@@ -437,14 +439,17 @@ elif st.session_state.page == "register":
                         unsafe_allow_html=True
                     )
 
-                    st.download_button(
-                        "📥 Download Pass (PNG)",
-                        pass_bytes,
-                        file_name=f"{emp}_event_pass.png",
-                        mime="image/png",
-                        type="primary"
-                    )
+    # ------------------ DOWNLOAD BUTTON (OUTSIDE FORM) ------------------
+    if "pass_bytes" in locals():
+        st.download_button(
+            "📥 Download Pass (PNG)",
+            pass_bytes,
+            file_name=f"{emp}_event_pass.png",
+            mime="image/png",
+            type="primary"
+        )
 
+    # ------------------ BACK + ADMIN BUTTONS ------------------
     col1, col2 = st.columns(2)
     with col1:
         st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
