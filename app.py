@@ -9,25 +9,18 @@ import os
 from PIL import Image, ImageDraw, ImageFont
 
 # ---------------- PAGE CONFIG ----------------
-st.set_page_config(
-    page_title="ASCENT APAC 2026",
-    layout="wide",
-    initial_sidebar_state="collapsed"
-)
+st.set_page_config(page_title="ASCENT APAC 2026", layout="wide", initial_sidebar_state="collapsed")
 
 # ---------------- STORAGE ----------------
 DATA_FILE = "raffle_data.json"
 EMPLOYEE_FILE = "employees.json"
 
-# Load raffle entries
 if os.path.exists(DATA_FILE):
     with open(DATA_FILE, "r") as f:
-        data = json.load(f)
-        st.session_state.entries = data.get("entries", [])
+        st.session_state.entries = json.load(f).get("entries", [])
 else:
     st.session_state.entries = []
 
-# Load employee list (persisted)
 if os.path.exists(EMPLOYEE_FILE):
     with open(EMPLOYEE_FILE, "r") as f:
         st.session_state.valid_employees = json.load(f)
@@ -40,6 +33,65 @@ if "admin" not in st.session_state:
     st.session_state.admin = False
 if "winner" not in st.session_state:
     st.session_state.winner = None
+
+# ---------------- CSS ----------------
+def set_bg(image):
+    with open(image, "rb") as f:
+        encoded = base64.b64encode(f.read()).decode()
+
+    st.markdown(f"""
+    <style>
+    [data-testid="stAppViewContainer"] {{
+        background-image: url("data:image/png;base64,{encoded}");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }}
+    html, body {{
+        background: transparent;
+    }}
+    #MainMenu, header, footer {{
+        visibility: hidden;
+    }}
+
+    .card {{
+        background: rgba(0,0,0,0.45);
+        padding: 18px;
+        border-radius: 16px;
+        width: 100%;
+        max-width: 420px;
+        margin: auto;
+        box-shadow: none;
+    }}
+
+    .stButton>button {{
+        background-color: #FFD700 !important;
+        color: black !important;
+        border-radius: 12px !important;
+        height: 44px !important;
+        font-weight: 600 !important;
+    }}
+
+    .stButton>button.secondary {{
+        background-color: black !important;
+        color: white !important;
+    }}
+
+    .stTextInput>div>div>input {{
+        border-radius: 12px !important;
+        padding: 12px !important;
+        background: rgba(255,255,255,0.85) !important;
+    }}
+
+    h1, p {{
+        color: white;
+        text-align: center;
+        margin: 0;
+    }}
+    </style>
+    """, unsafe_allow_html=True)
+
+set_bg("bgna.png")
 
 # ---------------- FUNCTIONS ----------------
 def save_data():
@@ -57,117 +109,34 @@ def generate_qr(data):
     return qr.make_image(fill_color="black", back_color="white")
 
 def create_pass_image(name, emp, qr_img):
-    # Load background image
     bg = Image.open("bgna.png").convert("RGBA")
     bg = bg.resize((900, 500))
-
     img = Image.new("RGBA", (900, 500))
     img.paste(bg, (0, 0))
-
     draw = ImageDraw.Draw(img)
 
     try:
-        # Use Courier Prime Bold font (typewriter)
         font_big = ImageFont.truetype("CourierPrime-Bold.ttf", 42)
         font_small = ImageFont.truetype("CourierPrime-Bold.ttf", 26)
     except:
         font_big = font_small = ImageFont.load_default()
 
-    text_color = (255, 255, 255, 255)
-
-    draw.text((40, 40), "ASCENT APAC 2026", fill=text_color, font=font_big)
-    draw.text((40, 120), "FULL NAME:", fill=text_color, font=font_small)
-    draw.text((40, 160), name, fill=text_color, font=font_big)
-
-    draw.text((40, 260), "EMPLOYEE NO:", fill=text_color, font=font_small)
-    draw.text((40, 300), emp, fill=text_color, font=font_big)
-
-    draw.text(
-        (40, 380),
-        "Present this pre-registration pass\nat the check-in counter",
-        fill=text_color,
-        font=font_small
-    )
+    color = (255,255,255,255)
+    draw.text((40, 40), "ASCENT APAC 2026", fill=color, font=font_big)
+    draw.text((40, 120), "NAME:", fill=color, font=font_small)
+    draw.text((40, 160), name, fill=color, font=font_big)
+    draw.text((40, 260), "EMP:", fill=color, font=font_small)
+    draw.text((40, 300), emp, fill=color, font=font_big)
 
     qr_img = qr_img.resize((220, 220))
     img.paste(qr_img, (620, 140), qr_img.convert("RGBA"))
-
     return img.convert("RGB")
 
-def set_bg(image):
-    with open(image, "rb") as f:
-        encoded = base64.b64encode(f.read()).decode()
-
-    st.markdown(f"""
-    <style>
-    [data-testid="stAppViewContainer"] {{
-        background-image: url("data:image/png;base64,{encoded}");
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-        height: 100vh;
-        overflow: hidden;
-    }}
-
-    html, body {{
-        height: 100vh;
-        overflow: hidden;
-        margin: 0;
-    }}
-
-    #MainMenu, header, footer {{
-        visibility: hidden;
-        height: 0px;
-    }}
-
-    /* Buttons */
-    .stButton>button {{
-        background-color: #FFD700 !important;
-        color: black !important;
-        border-radius: 12px !important;
-        height: 44px !important;
-        font-weight: 600 !important;
-    }}
-
-    .stButton>button.secondary {{
-        background-color: black !important;
-        color: white !important;
-    }}
-
-    /* Inputs */
-    .stTextInput>div>div>input {{
-        border-radius: 12px !important;
-        padding: 12px !important;
-    }}
-
-    /* Minimal container */
-    .minimal-card {{
-        background: rgba(0,0,0,0.45);
-        padding: 24px;
-        border-radius: 18px;
-        width: 100%;
-        max-width: 420px;
-        margin: auto;
-    }}
-
-    h1, p {{
-        color: white;
-        text-align: center;
-        text-shadow: 1px 1px 4px rgba(0,0,0,.7);
-    }}
-    </style>
-    """, unsafe_allow_html=True)
-
-set_bg("bgna.png")
-
-# ---------------- NAVIGATION ----------------
-def go_to(page_name):
-    st.session_state.page = page_name
+def go_to(page):
+    st.session_state.page = page
 
 def login_admin():
-    user = st.session_state["user"]
-    pwd = st.session_state["pwd"]
-    if user == st.secrets["ADMIN_USER"] and pwd == st.secrets["ADMIN_PASS"]:
+    if st.session_state.user == st.secrets["ADMIN_USER"] and st.session_state.pwd == st.secrets["ADMIN_PASS"]:
         st.session_state.admin = True
         st.session_state.page = "raffle"
     else:
@@ -188,35 +157,23 @@ def delete_all():
     st.session_state.winner = None
 
 def export_csv():
-    df = pd.DataFrame(st.session_state.entries)
-    df.to_csv("entries.csv", index=False)
+    pd.DataFrame(st.session_state.entries).to_csv("entries.csv", index=False)
     st.session_state.exported = True
 
-# ---------------- LANDING PAGE ----------------
+# ---------------- LANDING ----------------
 if st.session_state.page == "landing":
-    st.markdown(
-        f"""
-        <div style='height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center;'>
-            <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' width='160'/>
-            <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' style='width:70%; max-width:900px;'/>
-            <p>
-                PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
-                <span style="font-size:16px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
-            </p>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.markdown("<h1>ASCENT APAC 2026</h1>", unsafe_allow_html=True)
+    st.markdown("<p>Pre-register</p>", unsafe_allow_html=True)
 
-    st.markdown("<div style='text-align:center; margin-top:-40px;'></div>", unsafe_allow_html=True)
+    if st.button("Register"):
+        go_to("register")
 
-    col1, col2, col3 = st.columns([3,2,3])
-    with col2:
-        st.button("Register", on_click=go_to, args=("register",))
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
-    st.markdown("<div class='minimal-card'>", unsafe_allow_html=True)
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
     st.markdown("<h1>Register</h1>", unsafe_allow_html=True)
 
     with st.form("form"):
@@ -225,74 +182,41 @@ elif st.session_state.page == "register":
 
     if submit:
         if not emp:
-            st.error("Please enter Employee ID")
+            st.error("Enter Employee ID")
         elif any(e["emp"] == emp for e in st.session_state.entries):
-            st.warning("Employee ID already registered")
+            st.warning("Already registered")
         else:
             if emp not in st.session_state.valid_employees:
-                st.error("Employee ID NOT VERIFIED ❌")
+                st.error("Not verified")
             else:
-                name = st.session_state.valid_employees.get(emp, "Unknown")
+                name = st.session_state.valid_employees[emp]
                 st.session_state.entries.append({"emp": emp, "name": name})
                 save_data()
 
-                qr_img = generate_qr(f"{name} | {emp}")
+                qr_img = generate_qr(f"{name}|{emp}")
                 pass_img = create_pass_image(name, emp, qr_img)
 
                 buf = io.BytesIO()
                 pass_img.save(buf, format="PNG")
-                pass_bytes = buf.getvalue()
+                st.image(buf.getvalue(), use_container_width=True)
 
-                st.success("Registered and VERIFIED ✔️")
-                st.image(pass_bytes, use_container_width=True)
-
-                col1, col2 = st.columns(2)
-                with col1:
-                    st.download_button(
-                        "📥 Download Pass (PNG)",
-                        pass_bytes,
-                        file_name=f"{emp}_event_pass.png",
-                        mime="image/png"
-                    )
-                with col2:
-                    st.markdown(
-                        """
-                        <button onclick="window.print()"
-                        style="
-                            width:100%;
-                            height:48px;
-                            border-radius:24px;
-                            border:none;
-                            background:black;
-                            color:white;
-                            font-size:16px;
-                            cursor:pointer;">
-                            🖨 Print Pass
-                        </button>
-                        """,
-                        unsafe_allow_html=True
-                    )
+                st.success("Verified & Registered")
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-    col1, col2 = st.columns(2)
-    with col1:
-        st.button("Back to Landing", on_click=go_to, args=("landing",))
-    with col2:
-        st.button("Admin Login", on_click=go_to, args=("admin",))
+    st.markdown("""
+    <div style="display:flex; justify-content:center; gap:10px; margin-top:12px;">
+        <button onclick="window.location.href='?page=landing'" class="secondary" style="padding:10px 20px; border-radius:12px;">Back</button>
+        <button onclick="window.location.href='?page=admin'" class="secondary" style="padding:10px 20px; border-radius:12px;">Admin</button>
+    </div>
+    """, unsafe_allow_html=True)
 
 # ---------------- ADMIN ----------------
 elif st.session_state.page == "admin":
-    st.markdown("<div class='minimal-card'>", unsafe_allow_html=True)
-    st.markdown("<h1>Admin Panel</h1>", unsafe_allow_html=True)
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.markdown("<h1>Admin</h1>", unsafe_allow_html=True)
 
-    uploaded_file = st.file_uploader("Upload Employee List (Excel)", type=["xlsx"])
-
-    if uploaded_file:
-        df_emp = pd.read_excel(uploaded_file)
-        st.session_state.valid_employees = df_emp.set_index("EMP ID")["Full Name"].to_dict()
-        save_employees()
-        st.success("Employee list loaded and saved!")
+    st.file_uploader("Upload Employee List", type=["xlsx"])
 
     st.text_input("Username", key="user")
     st.text_input("Password", type="password", key="pwd")
@@ -301,49 +225,40 @@ elif st.session_state.page == "admin":
         pass
 
     if st.session_state.get("login_error", False):
-        st.error("Invalid login")
-        st.session_state.login_error = False
+        st.error("Invalid")
 
-    st.button("Back to Landing", on_click=go_to, args=("landing",))
     st.markdown("</div>", unsafe_allow_html=True)
+
+    st.markdown("""
+    <div style="display:flex; justify-content:center; margin-top:12px;">
+        <button onclick="window.location.href='?page=landing'" class="secondary" style="padding:10px 20px; border-radius:12px;">Back</button>
+    </div>
+    """, unsafe_allow_html=True)
 
 # ---------------- RAFFLE ----------------
 elif st.session_state.page == "raffle":
     if not st.session_state.admin:
         st.stop()
 
-    st.markdown("<h1>Raffle Draw</h1>", unsafe_allow_html=True)
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.markdown("<h1>Raffle</h1>", unsafe_allow_html=True)
 
     if st.session_state.entries:
-        df = pd.DataFrame(st.session_state.entries)
-        st.data_editor(df, key="raffle_editor")
+        st.data_editor(pd.DataFrame(st.session_state.entries), key="editor")
 
-        st.button("🎰 Run Raffle", on_click=run_raffle, key="run_raffle_btn")
+        st.button("Run", on_click=run_raffle)
 
-        if st.session_state.winner is not None:
-            st.markdown(
-                f"""
-                <div style="text-align:center;margin-top:40px;">
-                    <h2 style="color:white;">🎉 WINNER 🎉</h2>
-                    <h1 style="color:gold;font-size:80px;">
-                        {st.session_state.winner['name']}
-                    </h1>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+        if st.session_state.winner:
+            st.success(f"Winner: {st.session_state.winner['name']}")
 
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.button("Logout", on_click=logout)
-        with col2:
-            st.button("Delete All Entries", on_click=delete_all)
-        with col3:
-            st.button("Export CSV", on_click=export_csv)
-
-        if st.session_state.get("exported", False):
-            st.success("CSV exported as entries.csv")
     else:
-        st.info("No registrations yet")
+        st.info("No entries yet")
 
-    st.button("Back to Landing", on_click=go_to, args=("landing",))
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    st.markdown("""
+    <div style="display:flex; justify-content:center; gap:10px; margin-top:12px;">
+        <button onclick="window.location.href='?page=landing'" class="secondary" style="padding:10px 20px; border-radius:12px;">Back</button>
+        <button onclick="window.location.href='?page=landing'" class="secondary" style="padding:10px 20px; border-radius:12px;">Logout</button>
+    </div>
+    """, unsafe_allow_html=True)
