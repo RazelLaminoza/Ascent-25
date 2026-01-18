@@ -203,45 +203,25 @@ def export_csv():
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
 
-    st.markdown("""
-    <style>
-        .landing-container {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-        .landing-text {
-            font-size: 18px;
-            color: white;
-            margin-top: 10px;
-        }
-        .landing-sub {
-            font-size: 16px;
-            color: white;
-        }
-    </style>
-    """, unsafe_allow_html=True)
-
     st.markdown(
         f"""
-        <div class="landing-container">
+        <div style='height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;'>
             <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' width='160'/>
             <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' style='width:70%; max-width:900px; margin-top:20px;'/>
-            <p class="landing-text">
+            <p style="font-size:18px;">
                 PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
-                <span class="landing-sub">January 25, 2026 | OKADA BALLROOM 1–3</span>
+                <span style="font-size:16px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
             </p>
-
-            <!-- BUTTON INSIDE THE CENTERED DIV -->
-            <div style="margin-top: 20px;">
-                <button onclick="window.location.reload()">Register Here</button>
-            </div>
         </div>
         """,
-        unsafe_allow_html=True)
+        unsafe_allow_html=True
+    )
+
+    # CENTER button without using <div>
+    col1, col2, col3 = st.columns([1, 1.5, 1])
+    with col2:
+        if st.button("Register Here"):
+            go_to("register")
 
 
 
