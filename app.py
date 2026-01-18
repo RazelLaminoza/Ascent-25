@@ -240,19 +240,16 @@ if st.session_state.page == "landing":
 
     st.markdown("""
         <style>
-            /* Remove default padding */
             .block-container {
                 padding: 0 !important;
                 max-width: 100% !important;
             }
 
-            /* Hide scrollbar + disable scrolling */
             html, body {
                 overflow: hidden !important;
                 height: 100% !important;
             }
 
-            /* Move content higher (no gap) */
             .landing {
                 height: 100vh;
                 display: flex;
@@ -265,33 +262,47 @@ if st.session_state.page == "landing":
 
             /* Button styling */
             div[data-testid="stButton"] > button {
-                width: 90%;
-                max-width: 520px;
-                height: 70px;
-                font-size: 22px;
-                font-weight: 800;
+                width: 100% !important;
+                max-width: 520px !important;
+                height: 70px !important;
+                font-size: 22px !important;
+                font-weight: 800 !important;
                 background-color: #FFD700 !important;  /* yellow */
                 color: black !important;                /* black text */
                 border: none !important;
-                white-space: nowrap;
-                margin-top: -25px;
+                border-radius: 0px !important;
+                white-space: nowrap !important;
+                margin-top: -25px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+            }
+
+            /* Force text color to black */
+            div[data-testid="stButton"] > button span {
+                color: black !important;
             }
 
             @media (max-width: 600px) {
                 div[data-testid="stButton"] > button {
-                    width: 95%;
-                    max-width: 420px;
-                    height: 60px;
-                    font-size: 20px;
-                    background-color: #FFD700 !important; /* yellow */
-                    color: black !important;               /* black text */
-                    white-space: nowrap;
-                    margin-top: -20px;
+                    width: 95% !important;
+                    max-width: 420px !important;
+                    height: 60px !important;
+                    font-size: 20px !important;
+                    background-color: #FFD700 !important;
+                    color: black !important;
+                    border-radius: 0px !important;
+                    white-space: nowrap !important;
+                    margin-top: -20px !important;
+                }
+
+                div[data-testid="stButton"] > button span {
+                    color: black !important;
                 }
             }
         </style>
     """, unsafe_allow_html=True)
-
+    
     st.markdown(
         f"""
         <div class="landing">
