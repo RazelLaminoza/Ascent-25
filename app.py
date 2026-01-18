@@ -1,4 +1,4 @@
-import streamlit as st
+ import streamlit as st
 import random
 import qrcode
 import io
@@ -99,11 +99,9 @@ def create_pass_image(name, emp, qr_img):
     logo1 = Image.open("1.png").convert("RGBA")
     logo2 = Image.open("2.png").convert("RGBA")
 
-    # Resize while maintaining aspect ratio
     logo1 = resize_keep_aspect(logo1, (120, 120))
     logo2 = resize_keep_aspect(logo2, (120, 120))
 
-    # Paste logos centered in their frames
     img.paste(logo1, (620, 30), logo1)
     img.paste(logo2, (760, 30), logo2)
 
@@ -126,6 +124,7 @@ def create_pass_image(name, emp, qr_img):
     img.paste(qr_img, (620, 140), qr_img.convert("RGBA"))
 
     return img.convert("RGB")
+
 
 
 
