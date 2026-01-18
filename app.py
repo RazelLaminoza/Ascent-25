@@ -222,8 +222,13 @@ if st.session_state.page == "landing":
 
     col1, col2, col3 = st.columns([5.5, 5, 1])
 
-    with col2:
-        if st.button("Register Here", key="landing_register"):
+     with col2:
+        if "clicked" not in st.session_state:
+            st.session_state.clicked = False
+
+        # disable after first click
+        if st.button("Register Here", key="landing_register", disabled=st.session_state.clicked):
+            st.session_state.clicked = True
             go_to("register")
 
 
