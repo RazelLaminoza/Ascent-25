@@ -238,28 +238,71 @@ def export_csv():
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
 
+    # ---- SCROLL LOCK + BUTTON STYLING ----
+    st.markdown("""
+        <style>
+        /* Lock scrolling */
+        html, body {
+            overflow: hidden;
+            height: 100%;
+        }
+
+        /* Center Streamlit content */
+        .block-container {
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+
+        /* Bigger Register button */
+        div[data-testid="stButton"] > button {
+            width: 100%;
+            padding: 18px 0;
+            font-size: 22px;
+            font-weight: 700;
+            color: black !important;
+            border-radius: 12px;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
+    # ---- LANDING CONTENT ----
     st.markdown(
         f"""
-        <div style='height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;'>
+        <div style="
+            height:100vh;
+            display:flex;
+            flex-direction:column;
+            justify-content:center;
+            align-items:center;
+            text-align:center;
+        ">
             <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' width='160'/>
-            <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' style='width:70%; max-width:900px; margin-top:20px;'/>
-            <p style="font-size:18px;">
+
+            <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}'
+                 style='width:70%; max-width:900px; margin-top:20px;'/>
+
+            <p style="font-size:18px; margin-top:20px;">
                 PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
-                <span style="font-size:16px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
+                <span style="font-size:16px;">
+                    January 25, 2026 | OKADA BALLROOM 1–3
+                </span>
             </p>
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    col1, col2, col3 = st.columns([5.5, 5, 1])
+    # ---- CENTERED REGISTER BUTTON ----
+    col1, col2, col3 = st.columns([4, 4, 4])
 
     with col2:
-        st.button("Register Here", on_click=go_to, args=("register",), type="primary", key="landing_register")
-
-
+        st.button(
+            "Register Here",
+            on_click=go_to,
+            args=("register",),
+            type="primary",
+            key="landing_register"
+        )
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
