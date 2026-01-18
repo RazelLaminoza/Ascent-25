@@ -233,7 +233,6 @@ def run_raffle():
     st.session_state.winner = None
     placeholder = st.empty()
 
-    # Shuffle for 10 seconds
     start_time = time.time()
     while time.time() - start_time < 10:
         current = random.choice(st.session_state.entries)
@@ -250,7 +249,6 @@ def run_raffle():
         )
         time.sleep(0.05)
 
-    # Final winner
     st.session_state.winner = random.choice(st.session_state.entries)
     placeholder.empty()
 
