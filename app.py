@@ -226,8 +226,19 @@ def login_admin():
         st.session_state.login_error = True
 
 def run_raffle():
-    if st.session_state.entries:
-        st.session_state.winner = random.choice(st.session_state.entries)
+    if not st.session_state.entries:
+        return
+
+    st.session_state.shuffling = True
+    st.session_state.winner = None
+
+    # Shuffle for 10 seconds
+    for _ in range(100):   # 100 loops * 0.1 sec = 10 seconds
+        st.session_state.current = random.choice(st.session_state.entries)
+        time.sleep(0.1)
+
+    st.session_state.winner = random.choice(st.session_state.entries)
+    st.session_state.shuffling = False
 
 def logout():
     st.session_state.admin = False
@@ -555,7 +566,32 @@ elif st.session_state.page == "raffle":
 
         st.button("🎰 Run Raffle", on_click=run_raffle, key="run_raffle_btn", type="primary")
 
-        if st.session_state.winner is not None:
+        # DOWNLOAD BUTTON
+        csv_bytes = df.to_csv(index=False).encode("utf-8")
+        st.download_button(
+            label="⬇️ Download CSV",
+            data=csv_bytes,
+            file_name="entries.csv",
+            mime="text/csv",
+            key="download_csv_btn"
+        )
+
+        # SHOW SHUFFLE EFFECT
+        if st.session_state.get("shuffling", False):
+            st.markdown(
+                f"""
+                <div style="text-align:center; margin-top:30px;">
+                    <h2 style="color:white;">Shuffling...</h2>
+                    <h1 style="color:gold; font-size:60px;">
+                        {st.session_state.current['name']}
+                    </h1>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+        # SHOW WINNER
+        if st.session_state.winner is not None and not st.session_state.get("shuffling", False):
             st.markdown(
                 f"""
                 <div style="text-align:center;margin-top:40px;">
@@ -570,11 +606,8 @@ elif st.session_state.page == "raffle":
 
         st.button("Logout", on_click=logout, type="secondary")
         st.button("Delete All Entries", on_click=delete_all, type="secondary")
-        st.button("Export CSV", on_click=export_csv, type="secondary")
 
-        if st.session_state.get("exported", False):
-            st.success("CSV exported as entries.csv")
     else:
         st.info("No registrations yet")
 
-    st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary") 
+    st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
