@@ -218,7 +218,7 @@ if st.session_state.page == "landing":
     )
 
     # CENTER button without using <div>
-    col1, col2, col3 = st.columns([1, 1.5, 1])
+    col1, col2, col3 = st.columns([1, 2.5, 1])
     with col2:
         if st.button("Register Here"):
             go_to("register")
