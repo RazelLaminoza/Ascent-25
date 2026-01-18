@@ -215,15 +215,20 @@ if st.session_state.page == "landing":
                     PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
                     <span style="font-size:16px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
                 </p>
+
+                <!-- DOUBLE CENTERED BUTTON -->
+                <div style="width:100%; display:flex; justify-content:center;">
+                    <div style="display:flex; justify-content:center;">
+                        <button onclick="window.location.reload()" style="background:#FFD700; padding:12px 25px; border:none; border-radius:10px; font-weight:bold;">
+                            Register
+                        </button>
+                    </div>
+                </div>
             </div>
             """,
             unsafe_allow_html=True
         )
 
-        # Center Streamlit button
-        st.markdown("<div style='display:flex; justify-content:center;'>", unsafe_allow_html=True)
-        st.button("Register", on_click=go_to, args=("register",), type="primary")
-        st.markdown("</div>", unsafe_allow_html=True)
 
 
 # ---------------- REGISTER ----------------
