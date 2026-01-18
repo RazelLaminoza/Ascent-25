@@ -618,14 +618,12 @@ elif st.session_state.page == "raffle":
 
         st.session_state.winner = None
 
-
     # ---- SHOW TABLE ----
     if st.session_state.entries:
         df = pd.DataFrame(st.session_state.entries)
 
         st.data_editor(df, key="raffle_editor")
 
-        # 🔥 IMPORTANT FIX:
         # Update entries from data editor so shuffle uses the correct data
         st.session_state.entries = st.session_state.raffle_editor
 
@@ -643,21 +641,20 @@ elif st.session_state.page == "raffle":
         )
 
         # ---- WINNER DISPLAY ----
-       if st.session_state.winner is not None:
-    winner_name = st.session_state.winner.get("Full Name", "Unknown")
+        if st.session_state.winner is not None:
+            winner_name = st.session_state.winner.get("Full Name", "Unknown")
 
-    st.markdown(
-        f"""
-        <div style="text-align:center;margin-top:40px;">
-            <h2 style="color:white;">🎉 WINNER 🎉</h2>
-            <h1 style="color:gold;font-size:80px;">
-                {winner_name}
-            </h1>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
+            st.markdown(
+                f"""
+                <div style="text-align:center;margin-top:40px;">
+                    <h2 style="color:white;">🎉 WINNER 🎉</h2>
+                    <h1 style="color:gold;font-size:80px;">
+                        {winner_name}
+                    </h1>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
 
         st.button("Logout", on_click=logout, type="secondary")
         st.button("Delete All Entries", on_click=delete_all, type="secondary")
@@ -666,4 +663,3 @@ elif st.session_state.page == "raffle":
         st.info("No registrations yet")
 
     st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
-
