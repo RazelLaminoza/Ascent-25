@@ -227,7 +227,9 @@ def login_admin():
         st.session_state.login_error = True
 
 def run_raffle():
-    if not st.session_state.entries:
+    # Prevent crash when entries are empty
+    if not st.session_state.get("entries"):
+        st.warning("No entries to shuffle. Please upload an Excel first.")
         return
 
     st.session_state.winner = None
@@ -236,8 +238,6 @@ def run_raffle():
     start_time = time.time()
     while time.time() - start_time < 10:
         current = random.choice(st.session_state.entries)
-
-        # ALWAYS use Full Name
         full_name = current.get("Full Name", "Unknown")
 
         placeholder.markdown(
@@ -253,7 +253,6 @@ def run_raffle():
         )
         time.sleep(0.05)
 
-    # Final winner (Full Name only)
     st.session_state.winner = random.choice(st.session_state.entries)
     placeholder.empty()
 
