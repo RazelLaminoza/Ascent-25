@@ -227,24 +227,22 @@ def login_admin():
         st.session_state.login_error = True
 
 def run_raffle():
-    entries = st.session_state.get("entries", [])
-
-    if not entries:
-        st.warning("No entries to raffle. Upload Excel or add entries first.")
+    if not st.session_state.entries:
         return
 
+    st.session_state.winner = None
     placeholder = st.empty()
-    start_time = time.time()
 
-    # Shuffle effect for 10 seconds
+    start_time = time.time()
     while time.time() - start_time < 10:
-        current = random.choice(entries)
+        current = random.choice(st.session_state.entries)
+
         placeholder.markdown(
             f"""
-            <div style="text-align:center; margin-top:20px;">
+            <div style="text-align:center; margin-top:30px;">
                 <h2 style="color:white;">Shuffling...</h2>
                 <h1 style="color:gold; font-size:60px;">
-                    {current.get("Full Name", "Unknown")}
+                    {current['Full Name']}
                 </h1>
             </div>
             """,
@@ -252,9 +250,7 @@ def run_raffle():
         )
         time.sleep(0.05)
 
-    # Final winner
-    winner = random.choice(entries)
-    st.session_state.winner = {"Full Name": winner.get("Full Name", "Unknown")}
+    st.session_state.winner = random.choice(st.session_state.entries)
     placeholder.empty()
 
 
@@ -361,9 +357,9 @@ if st.session_state.page == "landing":
         <div class="landing">
             <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' width='160'/>
             <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' style='width:70%; max-width:900px; margin-top:20px;'/>
-            <p style="font-size:23px;">
+            <p style="font-size:18px;">
                 PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
-                <span style="font-size:23px;">January 25, 2026 | OKADA GRAND BALLROOM </span>
+                <span style="font-size:16px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
             </p>
         </div>
         """,
@@ -592,36 +588,27 @@ elif st.session_state.page == "raffle":
             "emp_id": "Employee ID",
             "Full Name": "Full Name",
             "Full name": "Full Name",
-            "full name": "Full Name",
             "Name": "Full Name"
         })
 
+        # Check if Employee ID exists
         if "Employee ID" not in df_excel.columns:
             st.error("Please include 'Employee ID' column.")
             st.stop()
 
+        # Remove duplicates based on Employee ID
+        df_excel = df_excel.drop_duplicates(subset=["Employee ID"])
+
+        # Keep only required columns
         df_excel = df_excel[["Employee ID", "Full Name"]]
-        df_excel["Employee ID"] = df_excel["Employee ID"].astype(str)
 
-        # Save current upload separately
-        st.session_state.current_excel = df_excel.to_dict("records")
-
-        # Combine with existing entries
-        existing_df = pd.DataFrame(st.session_state.entries) if st.session_state.entries else pd.DataFrame()
-        combined_df = pd.concat([existing_df, df_excel], ignore_index=True)
-        combined_df = combined_df.drop_duplicates(subset=["Employee ID"], keep="first")
-        st.session_state.entries = combined_df.to_dict("records")
-
-        st.session_state.winner = None
+        st.session_state.entries = df_excel.to_dict("records")
 
     # ---- SHOW TABLE ----
     if st.session_state.entries:
         df = pd.DataFrame(st.session_state.entries)
 
         st.data_editor(df, key="raffle_editor")
-
-        # Update entries from data editor so shuffle uses the correct data
-        st.session_state.entries = st.session_state.raffle_editor
 
         # ---- RUN RAFFLE BUTTON ----
         st.button("🎰 Run Raffle", on_click=run_raffle, key="run_raffle_btn", type="primary")
@@ -638,7 +625,11 @@ elif st.session_state.page == "raffle":
 
         # ---- WINNER DISPLAY ----
         if st.session_state.winner is not None:
-            winner_name = st.session_state.winner.get("Full Name", "Unknown")
+            winner_name = (
+                st.session_state.winner.get("Full Name")
+                if isinstance(st.session_state.winner, dict)
+                else st.session_state.winner
+            )
 
             st.markdown(
                 f"""
@@ -659,4 +650,3 @@ elif st.session_state.page == "raffle":
         st.info("No registrations yet")
 
     st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
-
