@@ -207,7 +207,7 @@ if st.session_state.page == "landing":
         f"""
         <div style='height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;'>
             <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' width='160'/>
-            <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' style='width:70%; max-width:1000px; margin-top:20px;'/>
+            <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' style='width:80%; max-width:1100px; margin-top:20px;'/>
             <p style="font-size:18px;">
                 PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
                 <span style="font-size:16px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
