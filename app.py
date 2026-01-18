@@ -222,7 +222,7 @@ if st.session_state.page == "landing":
 
     col1, col2, col3 = st.columns([5.5, 5, 1])
 
-     with col2:
+with col2:
         if "clicked" not in st.session_state:
             st.session_state.clicked = False
 
