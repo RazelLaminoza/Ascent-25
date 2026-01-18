@@ -271,7 +271,7 @@ if st.session_state.page == "landing":
                 font-size: 22px;
                 font-weight: 800;
                 background-color: #FFD700 !important;  /* yellow */
-                color: black !important;                /* black font */
+                color: black !important;                /* black text */
                 border: none !important;
                 white-space: nowrap;
                 margin-top: -25px;
@@ -284,7 +284,7 @@ if st.session_state.page == "landing":
                     height: 60px;
                     font-size: 20px;
                     background-color: #FFD700 !important; /* yellow */
-                    color: black !important;               /* black font */
+                    color: black !important;               /* black text */
                     white-space: nowrap;
                     margin-top: -20px;
                 }
@@ -306,18 +306,6 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
-    col1, col2, col3 = st.columns([5.5, 5, 1])
-
-    with col2:
-        st.button(
-            "Pre-register",
-            on_click=go_to,
-            args=("register",),
-            type="primary",
-            key="landing_register"
-        )
-
-
     # ---------- COLUMNS (RESTORED) ----------
     col1, col2, col3 = st.columns([5.5, 5, 1])
 
@@ -327,9 +315,8 @@ if st.session_state.page == "landing":
             on_click=go_to,
             args=("register",),
             type="primary",
-            key="landing_register"
+            key="landing_register_1"   # <-- unique key
         )
-
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
