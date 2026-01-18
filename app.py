@@ -306,23 +306,25 @@ elif st.session_state.page == "admin":
         unsafe_allow_html=True
     )
 
-    uploaded_file = st.file_uploader("Upload Employee List (Excel)", type=["xlsx"])
+    st.text_input("Username", key="user")
+    st.text_input("Password", type="password", key="pwd")
+
+    st.button("Login", on_click=login_admin, type="primary")
+
+    if st.session_state.get("login_error", False):
+        st.error("Invalid login")
+        st.session_state.login_error = False
+
+    st.markdown("<hr style='border:1px solid rgba(255,255,255,0.2)'/>", unsafe_allow_html=True)
+
+    st.markdown("<p style='text-align:center;'>Upload Employee List (Excel)</p>", unsafe_allow_html=True)
+    uploaded_file = st.file_uploader("", type=["xlsx"])
 
     if uploaded_file:
         df_emp = pd.read_excel(uploaded_file)
         st.session_state.valid_employees = df_emp.set_index("EMP ID")["Full Name"].to_dict()
         save_employees()
         st.success("Employee list loaded and saved!")
-
-    st.text_input("Username", key="user")
-    st.text_input("Password", type="password", key="pwd")
-
-    if st.button("Login", on_click=login_admin, type="primary"):
-        pass
-
-    if st.session_state.get("login_error", False):
-        st.error("Invalid login")
-        st.session_state.login_error = False
 
     st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
 
