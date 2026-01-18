@@ -227,7 +227,6 @@ def login_admin():
         st.session_state.login_error = True
 
 def run_raffle():
-    # Use current upload if available
     entries = st.session_state.get("current_excel") or st.session_state.get("entries") or []
 
     if not entries:
@@ -255,10 +254,14 @@ def run_raffle():
         )
         time.sleep(0.05)
 
-    st.session_state.winner = random.choice(entries)
+    # 🔥 WINNER MUST BE A DICT
+    winner = random.choice(entries)
+    st.session_state.winner = {
+        "Employee ID": winner.get("Employee ID", ""),
+        "Full Name": winner.get("Full Name", "Unknown")
+    }
+
     placeholder.empty()
-
-
 
 def logout():
     st.session_state.admin = False
@@ -640,24 +643,21 @@ elif st.session_state.page == "raffle":
         )
 
         # ---- WINNER DISPLAY ----
-        if st.session_state.winner is not None:
-            winner_name = (
-                st.session_state.winner.get("Full Name")
-                if isinstance(st.session_state.winner, dict)
-                else st.session_state.winner
-            )
+       if st.session_state.winner is not None:
+    winner_name = st.session_state.winner.get("Full Name", "Unknown")
 
-            st.markdown(
-                f"""
-                <div style="text-align:center;margin-top:40px;">
-                    <h2 style="color:white;">🎉 WINNER 🎉</h2>
-                    <h1 style="color:gold;font-size:80px;">
-                        {winner_name}
-                    </h1>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+    st.markdown(
+        f"""
+        <div style="text-align:center;margin-top:40px;">
+            <h2 style="color:white;">🎉 WINNER 🎉</h2>
+            <h1 style="color:gold;font-size:80px;">
+                {winner_name}
+            </h1>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
 
         st.button("Logout", on_click=logout, type="secondary")
         st.button("Delete All Entries", on_click=delete_all, type="secondary")
