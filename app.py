@@ -19,6 +19,7 @@ st.set_page_config(
 DATA_FILE = "raffle_data.json"
 EMPLOYEE_FILE = "employees.json"
 
+# Load raffle entries
 if os.path.exists(DATA_FILE):
     with open(DATA_FILE, "r") as f:
         data = json.load(f)
@@ -26,6 +27,7 @@ if os.path.exists(DATA_FILE):
 else:
     st.session_state.entries = []
 
+# Load employee list (persisted)
 if os.path.exists(EMPLOYEE_FILE):
     with open(EMPLOYEE_FILE, "r") as f:
         st.session_state.valid_employees = json.load(f)
@@ -55,6 +57,7 @@ def generate_qr(data):
     return qr.make_image(fill_color="black", back_color="white")
 
 def create_pass_image(name, emp, qr_img):
+    # Load background image
     bg = Image.open("bgna.png").convert("RGBA")
     bg = bg.resize((900, 500))
 
@@ -116,6 +119,7 @@ def set_bg(image):
         height: 0px;
     }}
 
+    /* Minimal button style */
     button {{
         min-height: 48px;
         font-size: 18px;
@@ -129,18 +133,21 @@ def set_bg(image):
         cursor: pointer;
     }}
 
+    /* Yellow primary */
     button[kind="primary"] {{
         background-color: #FFD400 !important;
         color: black !important;
         font-weight: 700;
     }}
 
+    /* Black secondary */
     button[kind="secondary"] {{
         background-color: #000000 !important;
         color: white !important;
         font-weight: 500;
     }}
 
+    /* Minimal form inputs */
     .stTextInput > div > input {{
         max-width: 320px;
         margin: 0 auto;
@@ -210,11 +217,14 @@ if st.session_state.page == "landing":
     )
 
     st.markdown(
-        "<div style='width:70%; max-width:900px; margin:0 auto; text-align:center;'>",
+        """
+        <div style="display:flex; justify-content:center;">
+            <div style="width:100%; max-width:280px;">
+        """,
         unsafe_allow_html=True
     )
     st.button("Register", on_click=go_to, args=("register",), type="primary")
-    st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("</div></div>", unsafe_allow_html=True)
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
@@ -281,18 +291,15 @@ elif st.session_state.page == "register":
                     type="primary"
                 )
 
-    st.markdown("<div style='width:70%; max-width:900px; margin:0 auto; text-align:center;'>", unsafe_allow_html=True)
     st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
     st.button("Admin Login", on_click=go_to, args=("admin",), type="secondary")
-    st.markdown("</div>", unsafe_allow_html=True)
 
 # ---------------- ADMIN ----------------
 elif st.session_state.page == "admin":
     st.markdown("<h1>Admin Panel</h1>", unsafe_allow_html=True)
 
-    st.markdown("<div style='width:70%; max-width:900px; margin:0 auto; text-align:center;'>", unsafe_allow_html=True)
-
     uploaded_file = st.file_uploader("Upload Employee List (Excel)", type=["xlsx"])
+
     if uploaded_file:
         df_emp = pd.read_excel(uploaded_file)
         st.session_state.valid_employees = df_emp.set_index("EMP ID")["Full Name"].to_dict()
@@ -302,7 +309,8 @@ elif st.session_state.page == "admin":
     st.text_input("Username", key="user")
     st.text_input("Password", type="password", key="pwd")
 
-    st.button("Login", on_click=login_admin, type="primary")
+    if st.button("Login", on_click=login_admin, type="primary"):
+        pass
 
     if st.session_state.get("login_error", False):
         st.error("Invalid login")
@@ -310,16 +318,12 @@ elif st.session_state.page == "admin":
 
     st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
 
-    st.markdown("</div>", unsafe_allow_html=True)
-
 # ---------------- RAFFLE ----------------
 elif st.session_state.page == "raffle":
     if not st.session_state.admin:
         st.stop()
 
     st.markdown("<h1>Raffle Draw</h1>", unsafe_allow_html=True)
-
-    st.markdown("<div style='width:70%; max-width:900px; margin:0 auto; text-align:center;'>", unsafe_allow_html=True)
 
     if st.session_state.entries:
         df = pd.DataFrame(st.session_state.entries)
@@ -349,6 +353,4 @@ elif st.session_state.page == "raffle":
     else:
         st.info("No registrations yet")
 
-    st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
-
-    st.markdown("</div>", unsafe_allow_html=True)
+    st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary") 
