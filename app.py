@@ -260,21 +260,21 @@ if st.session_state.page == "landing":
                 justify-content: center;
                 align-items: center;
                 text-align: center;
-                margin-top: -90px;   /* move everything higher */
+                margin-top: -90px;
             }
 
             /* Button styling */
             div[data-testid="stButton"] > button {
                 width: 90%;
                 max-width: 520px;
-                height: 70px;                 /* adjust height */
+                height: 70px;
                 font-size: 22px;
                 font-weight: 800;
-                background-color: black !important;
-                color: white !important;
+                background-color: #FFD700 !important;  /* yellow */
+                color: black !important;                /* black font */
                 border: none !important;
-                white-space: nowrap;          /* prevent word split */
-                margin-top: -25px;            /* move button higher */
+                white-space: nowrap;
+                margin-top: -25px;
             }
 
             @media (max-width: 600px) {
@@ -283,10 +283,10 @@ if st.session_state.page == "landing":
                     max-width: 420px;
                     height: 60px;
                     font-size: 20px;
-                    background-color: black !important;
-                    color: white !important;
+                    background-color: #FFD700 !important; /* yellow */
+                    color: black !important;               /* black font */
                     white-space: nowrap;
-                    margin-top: -20px;        /* move button higher on mobile */
+                    margin-top: -20px;
                 }
             }
         </style>
@@ -305,6 +305,18 @@ if st.session_state.page == "landing":
         """,
         unsafe_allow_html=True
     )
+
+    col1, col2, col3 = st.columns([5.5, 5, 1])
+
+    with col2:
+        st.button(
+            "Pre-register",
+            on_click=go_to,
+            args=("register",),
+            type="primary",
+            key="landing_register"
+        )
+
 
     # ---------- COLUMNS (RESTORED) ----------
     col1, col2, col3 = st.columns([5.5, 5, 1])
