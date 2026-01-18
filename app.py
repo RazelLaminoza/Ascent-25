@@ -236,19 +236,34 @@ def export_csv():
     st.session_state.exported = True
 
 # ---------------- LANDING PAGE ----------------
-# ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
 
     st.markdown("""
         <style>
-            /* Make container full width */
+            /* Remove default padding */
             .block-container {
+                padding: 0 !important;
                 max-width: 100% !important;
-                padding-left: 0px !important;
-                padding-right: 0px !important;
             }
 
-            /* Responsive button style */
+            /* Hide scrollbar + disable scrolling */
+            html, body {
+                overflow: hidden !important;
+                height: 100% !important;
+            }
+
+            /* Move content higher (no gap) */
+            .landing {
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+                margin-top: -70px;   /* <-- move everything higher */
+            }
+
+            /* Button styling */
             div[data-testid="stButton"] > button {
                 width: 90%;
                 max-width: 420px;
@@ -257,7 +272,6 @@ if st.session_state.page == "landing":
                 font-weight: 800;
             }
 
-            /* Mobile view */
             @media (max-width: 600px) {
                 div[data-testid="stButton"] > button {
                     width: 95%;
@@ -271,7 +285,7 @@ if st.session_state.page == "landing":
 
     st.markdown(
         f"""
-        <div style='height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;'>
+        <div class="landing">
             <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' width='160'/>
             <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' style='width:70%; max-width:900px; margin-top:20px;'/>
             <p style="font-size:18px;">
@@ -283,7 +297,7 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
-    st.markdown("<br>", unsafe_allow_html=True)
+    # <-- NO <br> here (REMOVED)
 
     col1, col2, col3 = st.columns([5.5, 5, 1])
 
@@ -295,6 +309,7 @@ if st.session_state.page == "landing":
             type="primary",
             key="landing_register"
         )
+
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
