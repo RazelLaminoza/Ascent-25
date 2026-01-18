@@ -8,6 +8,12 @@ import json
 import os
 from PIL import Image, ImageDraw, ImageFont
 
+
+def resize_keep_aspect(img, max_size):
+    img = img.convert("RGBA")
+    img.thumbnail(max_size, Image.ANTIALIAS)
+    return img
+
 # ---------------- PAGE CONFIG ----------------
 st.set_page_config(
     page_title="ASCENT APAC 2026",
