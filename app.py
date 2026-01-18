@@ -201,6 +201,7 @@ def export_csv():
     st.session_state.exported = True
 
 # ---------------- LANDING PAGE ----------------
+# ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
 
     st.markdown(
@@ -212,17 +213,15 @@ if st.session_state.page == "landing":
                 PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
                 <span style="font-size:16px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
             </p>
+
+            <!-- BUTTON INSIDE SAME CONTAINER -->
+            <div style="margin-top: 20px;">
+                <button onclick="window.location.href='?page=register'">Register Here</button>
+            </div>
         </div>
         """,
         unsafe_allow_html=True
     )
-
-    # CENTER button without using <div>
-    col1, col2, col3 = st.columns([1, 1.9, 1])
-    with col2:
-        if st.button("Register Here"):
-            go_to("register")
-
 
 
 # ---------------- REGISTER ----------------
