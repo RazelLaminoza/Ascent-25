@@ -581,10 +581,21 @@ elif st.session_state.page == "raffle":
     if uploaded_file:
         df_excel = pd.read_excel(uploaded_file)
 
-        # Remove duplicates based on employee ID (assuming column name is 'emp_id')
-        df_excel = df_excel.drop_duplicates(subset=["emp_id"])
+        # auto-detect ID column
+        possible_id_cols = ["emp_id", "Employee ID", "EmployeeID", "Emp ID", "ID"]
+        id_col = None
 
-        # Save to session
+        for col in possible_id_cols:
+            if col in df_excel.columns:
+                id_col = col
+                break
+
+        if id_col:
+            df_excel = df_excel.drop_duplicates(subset=[id_col])
+        else:
+            st.error("No valid Employee ID column found. Please name it 'emp_id' or 'Employee ID'.")
+            st.stop()
+
         st.session_state.entries = df_excel.to_dict("records")
 
     # ---- SHOW TABLE ----
@@ -595,7 +606,7 @@ elif st.session_state.page == "raffle":
         # ---- RUN RAFFLE BUTTON ----
         st.button("🎰 Run Raffle", on_click=run_raffle, key="run_raffle_btn", type="primary")
 
-        # ---- DOWNLOAD CSV ----
+        # ---- DOWNLOAD BUTTON ----
         csv_bytes = df.to_csv(index=False).encode("utf-8-sig")
         st.download_button(
             label="⬇️ Download CSV",
