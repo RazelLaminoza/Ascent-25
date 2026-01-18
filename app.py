@@ -573,32 +573,39 @@ elif st.session_state.page == "raffle":
 
     st.markdown("<h1>Raffle Draw</h1>", unsafe_allow_html=True)
 
-    # ---- EXCEL IMPORT ----
     uploaded_file = st.file_uploader("Upload Excel (.xlsx)", type=["xlsx"])
 
     if uploaded_file:
         df_excel = pd.read_excel(uploaded_file)
 
-        # auto-detect ID column
-        possible_id_cols = ["emp_id", "Employee ID", "EmployeeID", "Emp ID", "ID"]
-        id_col = None
+        # --- Rename columns to match required output ---
+        df_excel = df_excel.rename(columns={
+            "Employee ID": "Employee ID",
+            "employee id": "Employee ID",
+            "Emp ID": "Employee ID",
+            "emp_id": "Employee ID",
+            "Full Name": "Full Name",
+            "Full name": "Full Name",
+            "Name": "Full Name"
+        })
 
-        for col in possible_id_cols:
-            if col in df_excel.columns:
-                id_col = col
-                break
-
-        if id_col:
-            df_excel = df_excel.drop_duplicates(subset=[id_col])
-        else:
-            st.error("No valid Employee ID column found. Please name it 'emp_id' or 'Employee ID'.")
+        # --- Remove duplicates based on Employee ID ---
+        if "Employee ID" not in df_excel.columns:
+            st.error("Please include 'Employee ID' column.")
             st.stop()
+
+        df_excel = df_excel.drop_duplicates(subset=["Employee ID"])
+
+        # --- Keep only required columns ---
+        df_excel = df_excel[["Employee ID", "Full Name"]]
 
         st.session_state.entries = df_excel.to_dict("records")
 
     # ---- SHOW TABLE ----
     if st.session_state.entries:
         df = pd.DataFrame(st.session_state.entries)
+
+        # display table with correct columns
         st.data_editor(df, key="raffle_editor")
 
         # ---- RUN RAFFLE BUTTON ----
@@ -606,6 +613,7 @@ elif st.session_state.page == "raffle":
 
         # ---- DOWNLOAD BUTTON ----
         csv_bytes = df.to_csv(index=False).encode("utf-8-sig")
+
         st.download_button(
             label="⬇️ Download CSV",
             data=csv_bytes,
@@ -621,7 +629,7 @@ elif st.session_state.page == "raffle":
                 <div style="text-align:center;margin-top:40px;">
                     <h2 style="color:white;">🎉 WINNER 🎉</h2>
                     <h1 style="color:gold;font-size:80px;">
-                        {st.session_state.winner['Full name']}
+                        {st.session_state.winner['Full Name']}
                     </h1>
                 </div>
                 """,
