@@ -586,18 +586,35 @@ elif st.session_state.page == "raffle":
     if uploaded_file:
     df_excel = pd.read_excel(uploaded_file)
 
-    # rename columns...
+    # Rename columns to required output
+    df_excel = df_excel.rename(columns={
+        "Employee ID": "Employee ID",
+        "employee id": "Employee ID",
+        "Emp ID": "Employee ID",
+        "emp_id": "Employee ID",
+        "Full Name": "Full Name",
+        "Full name": "Full Name",
+        "Name": "Full Name"
+    })
+
+    if "Employee ID" not in df_excel.columns:
+        st.error("Please include 'Employee ID' column.")
+        st.stop()
+
     df_excel = df_excel[["Employee ID", "Full Name"]]
     df_excel["Employee ID"] = df_excel["Employee ID"].astype(str)
 
-    # Save current file separately
+    # Save current upload separately
     st.session_state.current_excel = df_excel.to_dict("records")
 
-    # Also merge with previous entries (all entries)
+    # Combine with existing entries
     existing_df = pd.DataFrame(st.session_state.entries) if st.session_state.entries else pd.DataFrame()
     combined_df = pd.concat([existing_df, df_excel], ignore_index=True)
     combined_df = combined_df.drop_duplicates(subset=["Employee ID"], keep="first")
     st.session_state.entries = combined_df.to_dict("records")
+
+    st.session_state.winner = None
+
 
 
     # ---- SHOW TABLE ----
