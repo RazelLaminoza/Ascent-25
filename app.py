@@ -362,15 +362,36 @@ elif st.session_state.page == "register":
     st.markdown(
         """
         <style>
-        form div[data-testid="stButton"] > button {
+        div[data-testid="stFormSubmitButton"] > button {
+            width: 100% !important;
+            max-width: 520px !important;
+            height: 70px !important;
+            font-size: 22px !important;
+            font-weight: 800 !important;
             background-color: #FFD700 !important;
             color: black !important;
             border: none !important;
+            border-radius: 0px !important;
+            white-space: nowrap !important;
+            margin-top: -25px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
         }
 
-        form div[data-testid="stButton"] > button span,
-        form div[data-testid="stButton"] > button span * {
+        div[data-testid="stFormSubmitButton"] > button span,
+        div[data-testid="stFormSubmitButton"] > button span * {
             color: black !important;
+        }
+
+        @media (max-width: 600px) {
+            div[data-testid="stFormSubmitButton"] > button {
+                width: 95% !important;
+                max-width: 420px !important;
+                height: 60px !important;
+                font-size: 20px !important;
+                margin-top: -20px !important;
+            }
         }
         </style>
         """,
