@@ -227,9 +227,11 @@ def login_admin():
         st.session_state.login_error = True
 
 def run_raffle():
-    # Prevent crash when entries are empty
-    if not st.session_state.get("entries"):
-        st.warning("No entries to shuffle. Please upload an Excel first.")
+    # Use current upload if available
+    entries = st.session_state.get("current_excel") or st.session_state.get("entries") or []
+
+    if not entries:
+        st.warning("No entries available. Please upload Excel first.")
         return
 
     st.session_state.winner = None
@@ -237,7 +239,7 @@ def run_raffle():
 
     start_time = time.time()
     while time.time() - start_time < 10:
-        current = random.choice(st.session_state.entries)
+        current = random.choice(entries)
         full_name = current.get("Full Name", "Unknown")
 
         placeholder.markdown(
@@ -253,7 +255,7 @@ def run_raffle():
         )
         time.sleep(0.05)
 
-    st.session_state.winner = random.choice(st.session_state.entries)
+    st.session_state.winner = random.choice(entries)
     placeholder.empty()
 
 
@@ -582,41 +584,21 @@ elif st.session_state.page == "raffle":
     uploaded_file = st.file_uploader("Upload Excel (.xlsx)", type=["xlsx"])
 
     if uploaded_file:
-        df_excel = pd.read_excel(uploaded_file)
+    df_excel = pd.read_excel(uploaded_file)
 
-        # Rename columns to required output
-        df_excel = df_excel.rename(columns={
-            "Employee ID": "Employee ID",
-            "employee id": "Employee ID",
-            "Emp ID": "Employee ID",
-            "emp_id": "Employee ID",
-            "Full Name": "Full Name",
-            "Full name": "Full Name",
-            "Name": "Full Name"
-        })
+    # rename columns...
+    df_excel = df_excel[["Employee ID", "Full Name"]]
+    df_excel["Employee ID"] = df_excel["Employee ID"].astype(str)
 
-        if "Employee ID" not in df_excel.columns:
-            st.error("Please include 'Employee ID' column.")
-            st.stop()
+    # Save current file separately
+    st.session_state.current_excel = df_excel.to_dict("records")
 
-        # Keep only required columns
-        df_excel = df_excel[["Employee ID", "Full Name"]]
+    # Also merge with previous entries (all entries)
+    existing_df = pd.DataFrame(st.session_state.entries) if st.session_state.entries else pd.DataFrame()
+    combined_df = pd.concat([existing_df, df_excel], ignore_index=True)
+    combined_df = combined_df.drop_duplicates(subset=["Employee ID"], keep="first")
+    st.session_state.entries = combined_df.to_dict("records")
 
-        # Convert Employee ID to string (no .0)
-        df_excel["Employee ID"] = df_excel["Employee ID"].astype(str)
-
-        # Combine with existing entries
-        existing_df = pd.DataFrame(st.session_state.entries) if st.session_state.entries else pd.DataFrame()
-        combined_df = pd.concat([existing_df, df_excel], ignore_index=True)
-
-        # Remove duplicates
-        combined_df = combined_df.drop_duplicates(subset=["Employee ID"], keep="first")
-
-        # Save back to session
-        st.session_state.entries = combined_df.to_dict("records")
-
-        # Reset winner
-        st.session_state.winner = None
 
     # ---- SHOW TABLE ----
     if st.session_state.entries:
