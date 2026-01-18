@@ -172,44 +172,31 @@ def export_csv():
 
 # ---------------- LANDING ----------------
 if st.session_state.page == "landing":
-    st.markdown(f"""
-    <div style="height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;">
-        <img src="data:image/png;base64,{base64.b64encode(open('2.png','rb').read()).decode()}" width="160">
-        <img src="data:image/png;base64,{base64.b64encode(open('1.png','rb').read()).decode()}"
-             style="width:70%;max-width:900px;margin-top:20px;">
-        <p style="font-size:18px;">PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
-        <span style="font-size:16px;">January 25, 2026 | OKADA BALLROOM 1–3</span></p>
-        <button onclick="window.location.href='/?page=register'"
-            style="background:#FFD400;color:black;font-size:22px;font-weight:800;">
-            Register Here
-        </button>
-    </div>
-    """, unsafe_allow_html=True)
 
-# ---------------- REGISTER ----------------
-elif st.session_state.page == "register":
-    st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
-    with st.form("form"):
-        emp = st.text_input("Employee ID")
-        submit = st.form_submit_button("Submit", type="primary")
+    st.markdown(
+        f"""
+        <div style='height:100vh; display:flex; flex-direction:column;
+                    justify-content:center; align-items:center; text-align:center;'>
+            <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' width='160'/>
+            <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}'
+                 style='width:70%; max-width:900px; margin-top:20px;'/>
+            <p style="font-size:18px;">
+                PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
+                <span style="font-size:16px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-    if submit:
-        if emp not in st.session_state.valid_employees:
-            st.error("Employee ID NOT VERIFIED ❌")
-        else:
-            name = st.session_state.valid_employees[emp]
-            st.session_state.entries.append({"emp": emp, "name": name})
-            save_data()
-            qr = generate_qr(f"{name}|{emp}")
-            img = create_pass_image(name, emp, qr)
-            buf = io.BytesIO()
-            img.save(buf, format="PNG")
-            st.success("Registered ✔️")
-            st.image(buf.getvalue(), use_container_width=True)
-            st.download_button("📥 Download Pass", buf.getvalue(), f"{emp}_pass.png")
-
-    st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
-    st.button("Admin Login", on_click=go_to, args=("admin",), type="secondary")
+    # ✅ STREAMLIT BUTTON (THIS FIXES REGISTER PAGE)
+    st.button(
+        "Register Here",
+        on_click=go_to,
+        args=("register",),
+        type="primary",
+        key="landing_register"
+    )
 
 # ---------------- ADMIN ----------------
 elif st.session_state.page == "admin":
