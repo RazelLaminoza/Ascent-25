@@ -202,29 +202,32 @@ def export_csv():
 
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
-    st.markdown(
-        f"""
-        <div style='height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center;'>
-            <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' width='160'/>
-            <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' style='width:70%; max-width:900px;'/>
-            <p>
-                PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
-                <span style="font-size:16px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
-            </p>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
 
-    st.markdown(
-        """
-        <div style="display:flex; justify-content:center;">
-            <div style="width:100%; max-width:280px;">
-        """,
-        unsafe_allow_html=True
-    )
-    st.button("Register", on_click=go_to, args=("register",), type="primary")
-    st.markdown("</div></div>", unsafe_allow_html=True)
+    # Center everything using columns
+    col1, col2, col3 = st.columns([1, 2, 1])
+
+    with col2:
+        st.markdown(
+            f"""
+            <div style='height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;'>
+                <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' width='160'/>
+                <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' style='width:70%; max-width:900px;'/>
+                <p style="font-size:18px;">
+                    PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
+                    <span style="font-size:16px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
+                </p>
+
+                <!-- BUTTON -->
+                <div style="display:flex; justify-content:center; margin-top:20px;">
+                    <button onclick="window.location.reload()" style="background:#FFD700; padding:12px 25px; border:none; border-radius:10px; font-weight:bold;">
+                        Register
+                    </button>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
