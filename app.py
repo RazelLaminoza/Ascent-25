@@ -107,8 +107,8 @@ def create_pass_image(name, emp, qr_img):
 
     # Text
     draw.text((40, 40), "ASCENT APAC 2026", fill=text_color, font=font_big)
-    draw.text((40, 120), "FULL NAME:", fill=text_color, font=font_small)
-    draw.text((40, 160), name, fill=text_color, font=font_big)
+    draw.text((40, 120), "FULL NAME:", fill=text_color, font=font_big)
+    draw.text((40, 160), name, fill=text_color, font=font_small)
 
     draw.text((40, 260), "EMPLOYEE NO:", fill=text_color, font=font_small)
     draw.text((40, 300), emp, fill=text_color, font=font_big)
