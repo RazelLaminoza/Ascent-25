@@ -129,7 +129,6 @@ def set_bg(image):
         font-weight: 600 !important;
     }}
 
-    /* Secondary buttons */
     .stButton>button.secondary {{
         background-color: black !important;
         color: white !important;
@@ -209,7 +208,8 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
-    # CENTERED REGISTER BUTTON
+    st.markdown("<div style='text-align:center; margin-top:-40px;'></div>", unsafe_allow_html=True)
+
     col1, col2, col3 = st.columns([3,2,3])
     with col2:
         st.button("Register", on_click=go_to, args=("register",))
@@ -275,13 +275,11 @@ elif st.session_state.page == "register":
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # CENTERED NAV BUTTONS
-    cols = st.columns([1,1,1])
-    with cols[1]:
-        st.button("Back to Landing", on_click=go_to, args=("landing",), key="back1")
-    st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
-    with cols[1]:
-        st.button("Admin Login", on_click=go_to, args=("admin",), key="admin1")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.button("Back to Landing", on_click=go_to, args=("landing",))
+    with col2:
+        st.button("Admin Login", on_click=go_to, args=("admin",))
 
 # ---------------- ADMIN ----------------
 elif st.session_state.page == "admin":
@@ -306,11 +304,7 @@ elif st.session_state.page == "admin":
         st.error("Invalid login")
         st.session_state.login_error = False
 
-    # CENTERED BACK BUTTON
-    cols = st.columns([1,1,1])
-    with cols[1]:
-        st.button("Back to Landing", on_click=go_to, args=("landing",), key="back2")
-
+    st.button("Back to Landing", on_click=go_to, args=("landing",))
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ---------------- RAFFLE ----------------
@@ -352,7 +346,4 @@ elif st.session_state.page == "raffle":
     else:
         st.info("No registrations yet")
 
-    # CENTERED BACK BUTTON
-    cols = st.columns([1,1,1])
-    with cols[1]:
-        st.button("Back to Landing", on_click=go_to, args=("landing",), key="back3")
+    st.button("Back to Landing", on_click=go_to, args=("landing",))
