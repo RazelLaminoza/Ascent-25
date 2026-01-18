@@ -221,9 +221,10 @@ if st.session_state.page == "landing":
         )
 
         # Move button to the right
-        st.markdown("<div style='display:flex; justify-content:flex-end; padding-right:50px;'>", unsafe_allow_html=True)
+        st.markdown("<div style='display:flex; justify-content:center;'>", unsafe_allow_html=True)
         st.button("Register", on_click=go_to, args=("register",), type="primary")
         st.markdown("</div>", unsafe_allow_html=True)
+
 
 
 
