@@ -393,8 +393,9 @@ elif st.session_state.page == "register":
                         f"""
                         <div style="display:flex; justify-content:center; margin-top: 20px;">
                             <div style="
-                                background: rgba(255, 255, 255, 0.12);
-                                border: 1px solid rgba(255, 255, 255, 0.25);
+                                background: #FFD700;  /* yellow background */
+                                color: #000000;       /* black text */
+                                border: 1px solid rgba(0, 0, 0, 0.25);
                                 border-radius: 18px;
                                 padding: 16px;
                                 backdrop-filter: blur(8px);
