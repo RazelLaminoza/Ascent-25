@@ -241,7 +241,7 @@ def run_raffle():
             <div style="text-align:center; margin-top:30px;">
                 <h2 style="color:white;">Shuffling...</h2>
                 <h1 style="color:gold; font-size:60px;">
-                    {current['name']}
+                    {current['Full name']}
                 </h1>
             </div>
             """,
