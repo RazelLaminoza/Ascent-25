@@ -95,13 +95,15 @@ def create_pass_image(name, emp, qr_img):
 
     text_color = (255, 255, 255, 255)
 
-    # Add 1.png and 2.png at the top-right
+    # Add 1.png and 2.png at the top-right (no stretching)
     logo1 = Image.open("1.png").convert("RGBA")
     logo2 = Image.open("2.png").convert("RGBA")
 
-    logo1 = logo1.resize((120, 120))
-    logo2 = logo2.resize((120, 120))
+    # Resize while maintaining aspect ratio
+    logo1 = resize_keep_aspect(logo1, (120, 120))
+    logo2 = resize_keep_aspect(logo2, (120, 120))
 
+    # Paste logos centered in their frames
     img.paste(logo1, (620, 30), logo1)
     img.paste(logo2, (760, 30), logo2)
 
@@ -124,6 +126,7 @@ def create_pass_image(name, emp, qr_img):
     img.paste(qr_img, (620, 140), qr_img.convert("RGBA"))
 
     return img.convert("RGB")
+
 
 
 
