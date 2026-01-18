@@ -238,6 +238,23 @@ def export_csv():
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
 
+    st.markdown("""
+        <style>
+            /* Disable scrolling */
+            html, body {
+                overflow: hidden !important;
+            }
+
+            /* Hide scrollbar (just in case) */
+            ::-webkit-scrollbar {
+                display: none;
+            }
+            html {
+                scrollbar-width: none;
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
     st.markdown(
         f"""
         <div style='height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;'>
