@@ -218,7 +218,7 @@ if st.session_state.page == "landing":
     )
 
     # CENTER BUTTON using columns
-    col1, col2, col3 = st.columns([5, 0, 5])
+    col1, col2, col3 = st.columns([3, 1, 3])
 
     with col2:
         st.button("Register", on_click=go_to, args=("register",), type="primary")
