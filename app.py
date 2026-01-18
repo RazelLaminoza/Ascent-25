@@ -333,30 +333,32 @@ elif st.session_state.page == "register":
 elif st.session_state.page == "admin":
     st.markdown("<h1>Admin Panel</h1>", unsafe_allow_html=True)
 
-    with st.form("admin_form"):
-        uploaded_file = st.file_uploader("Upload Employee List (Excel)", type=["xlsx"])
+    st.markdown("<br>", unsafe_allow_html=True)
 
-        st.text_input("Username", key="user")
-        st.text_input("Password", type="password", key="pwd")
+    # Upload employee list
+    uploaded_file = st.file_uploader("Upload Employee List (Excel)", type=["xlsx"])
 
-        submit_admin = st.form_submit_button("Login", type="primary")
+    st.text_input("Username", key="user")
+    st.text_input("Password", type="password", key="pwd")
 
-        if submit_admin:
-            # Upload employee list first
-            if uploaded_file:
-                df_emp = pd.read_excel(uploaded_file)
-                st.session_state.valid_employees = df_emp.set_index("EMP ID")["Full Name"].to_dict()
-                save_employees()
-                st.success("Employee list loaded and saved!")
+    # Login button (only one)
+    if st.button("Login", type="primary"):
+        # Upload employee list first (if file selected)
+        if uploaded_file:
+            df_emp = pd.read_excel(uploaded_file)
+            st.session_state.valid_employees = df_emp.set_index("EMP ID")["Full Name"].to_dict()
+            save_employees()
+            st.success("Employee list loaded and saved!")
 
-            # Validate login only once
-            login_admin()
+        # Validate login
+        login_admin()
 
     if st.session_state.get("login_error", False):
         st.error("Invalid login")
         st.session_state.login_error = False
 
     st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
+
 
 # ---------------- RAFFLE ----------------
 elif st.session_state.page == "raffle":
