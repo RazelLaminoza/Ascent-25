@@ -358,11 +358,10 @@ if st.session_state.page == "landing":
 elif st.session_state.page == "register":
     st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
 
-    # ---------- EDGE-TO-EDGE SUBMIT BUTTON STYLE ----------
+    # ---------- ROUNDED SUBMIT BUTTON STYLE ----------
     st.markdown(
         """
         <style>
-        /* Submit button edge-to-edge */
         div[data-testid="stFormSubmitButton"] > button {
             width: 100% !important;
             max-width: none !important;
@@ -372,7 +371,7 @@ elif st.session_state.page == "register":
             background-color: #FFD700 !important;
             color: black !important;
             border: none !important;
-            border-radius: 0px !important;
+            border-radius: 12px !important;   /* Rounded edges */
             margin: 0 !important;
             padding: 0 !important;
             white-space: nowrap !important;
