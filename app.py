@@ -209,12 +209,25 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
+    # Center the button perfectly
     st.markdown(
-        "<div style='width:70%; max-width:900px; margin:0 auto; text-align:center;'>",
+        """
+        <div style="display:flex; justify-content:center; width:100%;">
+            <div style="width:70%; max-width:900px; text-align:center;">
+        """,
         unsafe_allow_html=True
     )
+
     st.button("Register", on_click=go_to, args=("register",), type="primary")
-    st.markdown("</div>", unsafe_allow_html=True)
+
+    st.markdown(
+        """
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
