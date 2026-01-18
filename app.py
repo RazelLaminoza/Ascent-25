@@ -358,56 +358,24 @@ if st.session_state.page == "landing":
 elif st.session_state.page == "register":
     st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
 
-    # ---------- BUTTON CSS ----------
+    # ---------- ONLY SUBMIT BUTTON STYLE ----------
     st.markdown(
-    """
-    <style>
-    /* Style ONLY the submit button inside the form */
-    form div[data-testid="stButton"] > button {
-        width: 100% !important;
-        max-width: 520px !important;
-        height: 70px !important;
-        font-size: 22px !important;
-        font-weight: 800 !important;
-        background-color: #FFD700 !important;  /* yellow */
-        color: black !important;                /* black text */
-        border: none !important;
-        border-radius: 0px !important;
-        white-space: nowrap !important;
-        margin-top: -25px !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-    }
-
-    /* Force text color to black */
-    form div[data-testid="stButton"] > button span,
-    form div[data-testid="stButton"] > button span * {
-        color: black !important;
-    }
-
-    @media (max-width: 600px) {
+        """
+        <style>
         form div[data-testid="stButton"] > button {
-            width: 95% !important;
-            max-width: 420px !important;
-            height: 60px !important;
-            font-size: 20px !important;
             background-color: #FFD700 !important;
             color: black !important;
-            border-radius: 0px !important;
-            white-space: nowrap !important;
-            margin-top: -20px !important;
+            border: none !important;
         }
 
         form div[data-testid="stButton"] > button span,
         form div[data-testid="stButton"] > button span * {
             color: black !important;
         }
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
     with st.form("form"):
         emp = st.text_input("Employee ID")
@@ -476,6 +444,7 @@ elif st.session_state.page == "register":
 
     with col2:
         st.button("Admin Login", on_click=go_to, args=("admin",), type="secondary")
+
 
 # ---------------- ADMIN ----------------
 elif st.session_state.page == "admin":
