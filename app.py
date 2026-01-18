@@ -67,8 +67,9 @@ def create_pass_image(name, emp, qr_img):
     draw = ImageDraw.Draw(img)
 
     try:
-        font_big = ImageFont.truetype("Roboto-Regular.ttf", 42)
-        font_small = ImageFont.truetype("Roboto-Regular.ttf", 26)
+        # Use Courier Prime font (typewriter)
+        font_big = ImageFont.truetype("CourierPrime-Regular.ttf", 42)
+        font_small = ImageFont.truetype("CourierPrime-Regular.ttf", 26)
     except:
         font_big = font_small = ImageFont.load_default()
 
@@ -99,12 +100,6 @@ def set_bg(image):
 
     st.markdown(f"""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
-
-    * {{
-        font-family: 'Roboto', sans-serif !important;
-    }}
-
     [data-testid="stAppViewContainer"] {{
         background-image: url("data:image/png;base64,{encoded}");
         background-size: cover;
@@ -125,43 +120,35 @@ def set_bg(image):
         height: 0px;
     }}
 
-    /* Minimal button style */
-    button {{
-        min-height: 48px;
-        font-size: 18px;
-        max-width: 280px;
-        width: auto;
-        margin: 8px auto;
-        display: block;
-        padding: 12px 24px;
-        border-radius: 24px;
-        border: none;
-        cursor: pointer;
-    }}
-
-    /* Yellow primary */
-    button[kind="primary"] {{
-        background-color: #FFD400 !important;
+    /* Buttons */
+    .stButton>button {{
+        background-color: #FFD700 !important;
         color: black !important;
-        font-weight: 700;
+        border-radius: 12px !important;
+        height: 44px !important;
+        font-weight: 600 !important;
     }}
 
-    /* Black secondary */
-    button[kind="secondary"] {{
-        background-color: #000000 !important;
+    /* Secondary buttons */
+    .stButton>button.secondary {{
+        background-color: black !important;
         color: white !important;
-        font-weight: 500;
     }}
 
-    /* Minimal form inputs */
-    .stTextInput > div > input {{
-        max-width: 320px;
-        margin: 0 auto;
+    /* Inputs */
+    .stTextInput>div>div>input {{
+        border-radius: 12px !important;
+        padding: 12px !important;
     }}
 
-    .stForm {{
-        max-width: 360px;
-        margin: 0 auto;
+    /* Minimal container */
+    .minimal-card {{
+        background: rgba(0,0,0,0.45);
+        padding: 24px;
+        border-radius: 18px;
+        width: 100%;
+        max-width: 420px;
+        margin: auto;
     }}
 
     h1, p {{
@@ -222,23 +209,19 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
-    st.markdown(
-        """
-        <div style="display:flex; justify-content:center;">
-            <div style="width:100%; max-width:280px;">
-        """,
-        unsafe_allow_html=True
-    )
-    st.button("Register", on_click=go_to, args=("register",), type="primary")
-    st.markdown("</div></div>", unsafe_allow_html=True)
+    # CENTERED REGISTER BUTTON
+    col1, col2, col3 = st.columns([3,2,3])
+    with col2:
+        st.button("Register", on_click=go_to, args=("register",))
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
-    st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
+    st.markdown("<div class='minimal-card'>", unsafe_allow_html=True)
+    st.markdown("<h1>Register</h1>", unsafe_allow_html=True)
 
     with st.form("form"):
         emp = st.text_input("Employee ID")
-        submit = st.form_submit_button("Submit", type="primary")
+        submit = st.form_submit_button("Submit")
 
     if submit:
         if not emp:
@@ -261,47 +244,48 @@ elif st.session_state.page == "register":
                 pass_bytes = buf.getvalue()
 
                 st.success("Registered and VERIFIED ✔️")
+                st.image(pass_bytes, use_container_width=True)
 
-                img_b64 = base64.b64encode(pass_bytes).decode()
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.download_button(
+                        "📥 Download Pass (PNG)",
+                        pass_bytes,
+                        file_name=f"{emp}_event_pass.png",
+                        mime="image/png"
+                    )
+                with col2:
+                    st.markdown(
+                        """
+                        <button onclick="window.print()"
+                        style="
+                            width:100%;
+                            height:48px;
+                            border-radius:24px;
+                            border:none;
+                            background:black;
+                            color:white;
+                            font-size:16px;
+                            cursor:pointer;">
+                            🖨 Print Pass
+                        </button>
+                        """,
+                        unsafe_allow_html=True
+                    )
 
-                st.markdown(
-                    f"""
-                    <div style="
-                        display:flex;
-                        justify-content:center;
-                        margin-top: 20px;
-                    ">
-                        <div style="
-                            background: rgba(255, 255, 255, 0.12);
-                            border: 1px solid rgba(255, 255, 255, 0.25);
-                            border-radius: 18px;
-                            padding: 16px;
-                            backdrop-filter: blur(8px);
-                            -webkit-backdrop-filter: blur(8px);
-                            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-                            max-width: 520px;
-                            width: 100%;
-                        ">
-                            <img src="data:image/png;base64,{img_b64}" style="width:100%; border-radius: 12px;" />
-                        </div>
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
+    st.markdown("</div>", unsafe_allow_html=True)
 
-                st.download_button(
-                    "📥 Download Pass (PNG)",
-                    pass_bytes,
-                    file_name=f"{emp}_event_pass.png",
-                    mime="image/png",
-                    type="primary"
-                )
-
-    st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
-    st.button("Admin Login", on_click=go_to, args=("admin",), type="secondary")
+    # CENTERED NAV BUTTONS
+    cols = st.columns([1,1,1])
+    with cols[1]:
+        st.button("Back to Landing", on_click=go_to, args=("landing",), key="back1")
+    st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
+    with cols[1]:
+        st.button("Admin Login", on_click=go_to, args=("admin",), key="admin1")
 
 # ---------------- ADMIN ----------------
 elif st.session_state.page == "admin":
+    st.markdown("<div class='minimal-card'>", unsafe_allow_html=True)
     st.markdown("<h1>Admin Panel</h1>", unsafe_allow_html=True)
 
     uploaded_file = st.file_uploader("Upload Employee List (Excel)", type=["xlsx"])
@@ -315,14 +299,19 @@ elif st.session_state.page == "admin":
     st.text_input("Username", key="user")
     st.text_input("Password", type="password", key="pwd")
 
-    if st.button("Login", on_click=login_admin, type="primary"):
+    if st.button("Login", on_click=login_admin):
         pass
 
     if st.session_state.get("login_error", False):
         st.error("Invalid login")
         st.session_state.login_error = False
 
-    st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
+    # CENTERED BACK BUTTON
+    cols = st.columns([1,1,1])
+    with cols[1]:
+        st.button("Back to Landing", on_click=go_to, args=("landing",), key="back2")
+
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # ---------------- RAFFLE ----------------
 elif st.session_state.page == "raffle":
@@ -335,7 +324,7 @@ elif st.session_state.page == "raffle":
         df = pd.DataFrame(st.session_state.entries)
         st.data_editor(df, key="raffle_editor")
 
-        st.button("🎰 Run Raffle", on_click=run_raffle, key="run_raffle_btn", type="primary")
+        st.button("🎰 Run Raffle", on_click=run_raffle, key="run_raffle_btn")
 
         if st.session_state.winner is not None:
             st.markdown(
@@ -350,13 +339,20 @@ elif st.session_state.page == "raffle":
                 unsafe_allow_html=True
             )
 
-        st.button("Logout", on_click=logout, type="secondary")
-        st.button("Delete All Entries", on_click=delete_all, type="secondary")
-        st.button("Export CSV", on_click=export_csv, type="secondary")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.button("Logout", on_click=logout)
+        with col2:
+            st.button("Delete All Entries", on_click=delete_all)
+        with col3:
+            st.button("Export CSV", on_click=export_csv)
 
         if st.session_state.get("exported", False):
             st.success("CSV exported as entries.csv")
     else:
         st.info("No registrations yet")
 
-    st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
+    # CENTERED BACK BUTTON
+    cols = st.columns([1,1,1])
+    with cols[1]:
+        st.button("Back to Landing", on_click=go_to, args=("landing",), key="back3")
