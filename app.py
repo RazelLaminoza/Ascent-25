@@ -238,6 +238,17 @@ def export_csv():
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
 
+    st.markdown("""
+        <style>
+            /* Make the main content container full width */
+            .block-container {
+                max-width: 100% !important;
+                padding-left: 0px !important;
+                padding-right: 0px !important;
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
     st.markdown(
         f"""
         <div style='height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;'>
@@ -261,7 +272,7 @@ if st.session_state.page == "landing":
             <style>
                 div[data-testid="stButton"] > button {
                     width: 100%;
-                    height: 60px;          /* BUTTON HEIGHT */
+                    height: 60px;
                     font-size: 22px;
                     font-weight: 800;
                 }
