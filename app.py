@@ -358,6 +358,20 @@ if st.session_state.page == "landing":
 elif st.session_state.page == "register":
     st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
 
+    # ---------- BUTTON CSS ----------
+    st.markdown(
+        """
+        <style>
+        div.stButton > button[kind="primary"] {
+            background-color: #FFD700 !important;
+            color: #000000 !important;
+            border: 1px solid #000000 !important;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
     with st.form("form"):
         emp = st.text_input("Employee ID")
         submit = st.form_submit_button("Submit", type="primary")
@@ -393,8 +407,8 @@ elif st.session_state.page == "register":
                         f"""
                         <div style="display:flex; justify-content:center; margin-top: 20px;">
                             <div style="
-                                background: #FFD700;  /* yellow background */
-                                color: #000000;       /* black text */
+                                background: #FFD700;
+                                color: #000000;
                                 border: 1px solid rgba(0, 0, 0, 0.25);
                                 border-radius: 18px;
                                 padding: 16px;
@@ -419,7 +433,6 @@ elif st.session_state.page == "register":
                         type="primary"
                     )
 
-    # Buttons aligned horizontally
     col1, col2 = st.columns(2)
     with col1:
         st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
