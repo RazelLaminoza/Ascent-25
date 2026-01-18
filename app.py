@@ -238,23 +238,6 @@ def export_csv():
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
 
-    st.markdown("""
-        <style>
-            /* Disable scrolling */
-            html, body {
-                overflow: hidden !important;
-            }
-
-            /* Hide scrollbar (just in case) */
-            ::-webkit-scrollbar {
-                display: none;
-            }
-            html {
-                scrollbar-width: none;
-            }
-        </style>
-    """, unsafe_allow_html=True)
-
     st.markdown(
         f"""
         <div style='height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;'>
@@ -269,13 +252,31 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
-    st.markdown("<br>", unsafe_allow_html=True)
+    # ↑↑↑ add spacing here to move the button higher
+    st.markdown("<br><br><br>", unsafe_allow_html=True)
 
-    col1, col2, col3 = st.columns([5.5, 5, 1])
+    col1, col2, col3 = st.columns([4, 4, 4])
 
     with col2:
-        st.button("Register Here", on_click=go_to, args=("register",), type="primary", key="landing_register")
+        st.markdown("""
+            <style>
+                /* Bigger button size */
+                div[data-testid="stButton"] > button {
+                    width: 100%;
+                    padding: 22px 0;
+                    font-size: 24px;
+                    font-weight: 800;
+                }
+            </style>
+        """, unsafe_allow_html=True)
 
+        st.button(
+            "Register Here",
+            on_click=go_to,
+            args=("register",),
+            type="primary",
+            key="landing_register"
+        )
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
     st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
