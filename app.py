@@ -267,26 +267,26 @@ if st.session_state.page == "landing":
             div[data-testid="stButton"] > button {
                 width: 90%;
                 max-width: 520px;
-                height: 70px;                 /* <-- adjust height */
+                height: 70px;                 /* adjust height */
                 font-size: 22px;
                 font-weight: 800;
                 background-color: black !important;
                 color: white !important;
                 border: none !important;
-                white-space: nowrap;
-                margin-top: -10px;            /* <-- move button higher */
+                white-space: nowrap;          /* prevent word split */
+                margin-top: -25px;            /* move button higher */
             }
 
             @media (max-width: 600px) {
                 div[data-testid="stButton"] > button {
                     width: 95%;
                     max-width: 420px;
-                    height: 60px;             /* <-- adjust height for mobile */
+                    height: 60px;
                     font-size: 20px;
                     background-color: black !important;
                     color: white !important;
                     white-space: nowrap;
-                    margin-top: -10px;        /* <-- move button higher */
+                    margin-top: -20px;        /* move button higher on mobile */
                 }
             }
         </style>
@@ -297,23 +297,26 @@ if st.session_state.page == "landing":
         <div class="landing">
             <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' width='160'/>
             <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' style='width:70%; max-width:900px; margin-top:20px;'/>
-            <p style="font-size:25px;">
+            <p style="font-size:18px;">
                 PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
-                <span style="font-size:25px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
+                <span style="font-size:16px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
             </p>
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    # Button directly below landing content
-    st.button(
-        "Pre-register",
-        on_click=go_to,
-        args=("register",),
-        type="primary",
-        key="landing_register"
-    )
+    # ---------- COLUMNS (RESTORED) ----------
+    col1, col2, col3 = st.columns([5.5, 5, 1])
+
+    with col2:
+        st.button(
+            "Pre-register",
+            on_click=go_to,
+            args=("register",),
+            type="primary",
+            key="landing_register"
+        )
 
 
 # ---------------- REGISTER ----------------
