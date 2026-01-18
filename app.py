@@ -237,12 +237,15 @@ def run_raffle():
     while time.time() - start_time < 10:
         current = random.choice(st.session_state.entries)
 
+        # ALWAYS use Full Name
+        full_name = current.get("Full Name", "Unknown")
+
         placeholder.markdown(
             f"""
             <div style="text-align:center; margin-top:30px;">
                 <h2 style="color:white;">Shuffling...</h2>
                 <h1 style="color:gold; font-size:60px;">
-                    {current['Full Name']}
+                    {full_name}
                 </h1>
             </div>
             """,
@@ -250,8 +253,10 @@ def run_raffle():
         )
         time.sleep(0.05)
 
+    # Final winner (Full Name only)
     st.session_state.winner = random.choice(st.session_state.entries)
     placeholder.empty()
+
 
 
 def logout():
@@ -578,31 +583,43 @@ elif st.session_state.page == "raffle":
     uploaded_file = st.file_uploader("Upload Excel (.xlsx)", type=["xlsx"])
 
     if uploaded_file:
-        df_excel = pd.read_excel(uploaded_file)
+    df_excel = pd.read_excel(uploaded_file)
 
-        # Rename columns to required output
-        df_excel = df_excel.rename(columns={
-            "Employee ID": "Employee ID",
-            "employee id": "Employee ID",
-            "Emp ID": "Employee ID",
-            "emp_id": "Employee ID",
-            "Full Name": "Full Name",
-            "Full name": "Full Name",
-            "Name": "Full Name"
-        })
+    # Rename columns to required output
+    df_excel = df_excel.rename(columns={
+        "Employee ID": "Employee ID",
+        "employee id": "Employee ID",
+        "Emp ID": "Employee ID",
+        "emp_id": "Employee ID",
+        "Full Name": "Full Name",
+        "Full name": "Full Name",
+        "Name": "Full Name"
+    })
 
-        # Check if Employee ID exists
-        if "Employee ID" not in df_excel.columns:
-            st.error("Please include 'Employee ID' column.")
-            st.stop()
+    if "Employee ID" not in df_excel.columns:
+        st.error("Please include 'Employee ID' column.")
+        st.stop()
 
-        # Remove duplicates based on Employee ID
-        df_excel = df_excel.drop_duplicates(subset=["Employee ID"])
+    # Keep only required columns
+    df_excel = df_excel[["Employee ID", "Full Name"]]
 
-        # Keep only required columns
-        df_excel = df_excel[["Employee ID", "Full Name"]]
+    # Convert Employee ID to string (no .0)
+    df_excel["Employee ID"] = df_excel["Employee ID"].astype(str)
 
-        st.session_state.entries = df_excel.to_dict("records")
+    # Combine with existing entries
+    existing_df = pd.DataFrame(st.session_state.entries) if st.session_state.entries else pd.DataFrame()
+
+    combined_df = pd.concat([existing_df, df_excel], ignore_index=True)
+
+    # Remove duplicates
+    combined_df = combined_df.drop_duplicates(subset=["Employee ID"], keep="first")
+
+    # Save back to session
+    st.session_state.entries = combined_df.to_dict("records")
+
+    # Reset winner
+    st.session_state.winner = None
+
 
     # ---- SHOW TABLE ----
     if st.session_state.entries:
