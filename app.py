@@ -217,11 +217,14 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
-    # CENTER button under image 2 (inside same center area)
-    st.markdown("<div style='text-align:center; margin-top: 40px;'>", unsafe_allow_html=True)
-    if st.button("Register Here"):
-        go_to("register")
-    st.markdown("</div>", unsafe_allow_html=True)
+    # Align button exactly like the text
+    st.markdown("<br>", unsafe_allow_html=True)
+    col1, col2, col3 = st.columns([1, 2, 1])
+
+    with col2:
+        if st.button("Register Here"):
+            go_to("register")
+
 
 
 # ---------------- REGISTER ----------------
