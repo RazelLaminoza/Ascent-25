@@ -621,7 +621,7 @@ elif st.session_state.page == "raffle":
                 <div style="text-align:center;margin-top:40px;">
                     <h2 style="color:white;">🎉 WINNER 🎉</h2>
                     <h1 style="color:gold;font-size:80px;">
-                        {st.session_state.winner['name']}
+                        {st.session_state.winner['Full name']}
                     </h1>
                 </div>
                 """,
