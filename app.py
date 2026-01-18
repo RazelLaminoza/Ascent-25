@@ -56,6 +56,26 @@ def generate_qr(data):
     qr.make(fit=True)
     return qr.make_image(fill_color="black", back_color="white")
 
+# ---- ADD THIS FUNCTION HERE ----
+def wrap_text(text, font, max_width):
+    words = text.split(" ")
+    lines = []
+    current_line = ""
+
+    for word in words:
+        test_line = current_line + (" " if current_line else "") + word
+        if font.getsize(test_line)[0] <= max_width:
+            current_line = test_line
+        else:
+            lines.append(current_line)
+            current_line = word
+
+    if current_line:
+        lines.append(current_line)
+
+    return lines
+# -------------------------------
+
 def create_pass_image(name, emp, qr_img):
     # Load background image
     bg = Image.open("bgna.png").convert("RGBA")
@@ -112,6 +132,7 @@ def create_pass_image(name, emp, qr_img):
     img.paste(qr_img, (620, 140), qr_img.convert("RGBA"))
 
     return img.convert("RGB")
+
 
 
 def set_bg(image):
