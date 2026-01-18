@@ -358,20 +358,21 @@ if st.session_state.page == "landing":
 elif st.session_state.page == "register":
     st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
 
+    # ---------- SLIGHTLY SMALLER SUBMIT BUTTON ----------
     st.markdown(
         """
         <style>
         div[data-testid="stFormSubmitButton"] > button {
-            width: 100% !important;
-            max-width: none !important;
+            width: 90% !important;           /* slightly smaller */
+            max-width: 480px !important;     /* controls max width */
             font-size: 22px !important;
             font-weight: 800 !important;
             background-color: #FFD700 !important;
             color: black !important;
             border: none !important;
             border-radius: 12px !important;
-            margin: 0 !important;
-            padding: 18px 0 !important;   /* adaptive height */
+            margin: 0 auto !important;       /* center the button */
+            padding: 18px 0 !important;
             white-space: nowrap !important;
             display: flex !important;
             align-items: center !important;
@@ -385,6 +386,8 @@ elif st.session_state.page == "register":
 
         @media (max-width: 600px) {
             div[data-testid="stFormSubmitButton"] > button {
+                width: 95% !important;
+                max-width: 420px !important;
                 font-size: 20px !important;
                 padding: 16px 0 !important;
             }
