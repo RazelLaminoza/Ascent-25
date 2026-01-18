@@ -356,61 +356,75 @@ if st.session_state.page == "landing":
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
-
-    # APPLY LANDING CSS
-    elif st.session_state.page == "register":
-
     st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
 
     with st.form("form"):
         emp = st.text_input("Employee ID")
         submit = st.form_submit_button("Submit", type="primary")
 
-    if submit:
-        if not emp:
-            st.error("Please enter Employee ID")
-        elif any(e["emp"] == emp for e in st.session_state.entries):
-            st.warning("Employee ID already registered")
-        else:
-            if emp not in st.session_state.valid_employees:
-                st.error("Employee ID NOT VERIFIED ❌")
+        if submit:
+            if not emp:
+                st.error("Please enter Employee ID")
+
+            elif any(e["emp"] == emp for e in st.session_state.entries):
+                st.warning("Employee ID already registered")
+
             else:
-                name = st.session_state.valid_employees.get(emp, "Unknown")
-                st.session_state.entries.append({"emp": emp, "name": name})
-                save_data()
+                if emp not in st.session_state.valid_employees:
+                    st.error("Employee ID NOT VERIFIED ❌")
 
-                qr_img = generate_qr(f"{name} | {emp}")
-                pass_img = create_pass_image(name, emp, qr_img)
+                else:
+                    name = st.session_state.valid_employees.get(emp, "Unknown")
+                    st.session_state.entries.append({"emp": emp, "name": name})
+                    save_data()
 
-                buf = io.BytesIO()
-                pass_img.save(buf, format="PNG")
-                pass_bytes = buf.getvalue()
+                    qr_img = generate_qr(f"{name} | {emp}")
+                    pass_img = create_pass_image(name, emp, qr_img)
 
-                st.success("Registered and VERIFIED ✔️")
+                    buf = io.BytesIO()
+                    pass_img.save(buf, format="PNG")
+                    pass_bytes = buf.getvalue()
 
-                img_b64 = base64.b64encode(pass_bytes).decode()
+                    st.success("Registered and VERIFIED ✔️")
 
-                st.markdown(
-                    f"""
-                    <div style=" display:flex; justify-content:center; margin-top: 20px; ">
-                        <div style=" background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 18px; padding: 16px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: 0 10px 30px rgba(0,0,0,0.25); max-width: 520px; width: 100%; ">
-                            <img src="data:image/png;base64,{img_b64}" style="width:100%; border-radius: 12px;" />
+                    img_b64 = base64.b64encode(pass_bytes).decode()
+
+                    st.markdown(
+                        f"""
+                        <div style="display:flex; justify-content:center; margin-top: 20px;">
+                            <div style="
+                                background: rgba(255, 255, 255, 0.12);
+                                border: 1px solid rgba(255, 255, 255, 0.25);
+                                border-radius: 18px;
+                                padding: 16px;
+                                backdrop-filter: blur(8px);
+                                -webkit-backdrop-filter: blur(8px);
+                                box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+                                max-width: 520px;
+                                width: 100%;
+                            ">
+                                <img src="data:image/png;base64,{img_b64}" style="width:100%; border-radius: 12px;" />
+                            </div>
                         </div>
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
+                        """,
+                        unsafe_allow_html=True
+                    )
 
-                st.download_button(
-                    "📥 Download Pass (PNG)",
-                    pass_bytes,
-                    file_name=f"{emp}_event_pass.png",
-                    mime="image/png",
-                    type="primary"
-                )
+                    st.download_button(
+                        "📥 Download Pass (PNG)",
+                        pass_bytes,
+                        file_name=f"{emp}_event_pass.png",
+                        mime="image/png",
+                        type="primary"
+                    )
 
-    st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
-    st.button("Admin Login", on_click=go_to, args=("admin",), type="secondary")
+    # Buttons aligned horizontally
+    col1, col2 = st.columns(2)
+    with col1:
+        st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
+
+    with col2:
+        st.button("Admin Login", on_click=go_to, args=("admin",), type="secondary")
 
 
 
