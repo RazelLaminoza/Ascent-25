@@ -474,26 +474,26 @@ elif st.session_state.page == "register":
 elif st.session_state.page == "admin":
     st.markdown("<h1>Admin Panel</h1>", unsafe_allow_html=True)
 
-    # ---------- BUTTON STYLE ----------
+    # ---------- LOGIN BUTTON STYLE ----------
     st.markdown(
         """
         <style>
-        /* Back to Landing button on Admin page */
-        div[data-testid="stButton"] > button {
-            background-color: #FFD700 !important;  /* yellow */
-            color: black !important;               /* black text */
-            border: none !important;
-            border-radius: 8px !important;
+        /* Login button inside admin form */
+        div[data-testid="stFormSubmitButton"] > button {
+            width: 100% !important;
+            max-width: 360px !important;
             height: 55px !important;
             font-size: 16px !important;
             font-weight: 700 !important;
-            width: 100% !important;
-            max-width: 360px !important;
+            background-color: #FFD700 !important;
+            color: black !important;
+            border: none !important;
+            border-radius: 8px !important;
             margin: 0 auto !important;
         }
 
-        div[data-testid="stButton"] > button span,
-        div[data-testid="stButton"] > button span * {
+        div[data-testid="stFormSubmitButton"] > button span,
+        div[data-testid="stFormSubmitButton"] > button span * {
             color: black !important;
         }
         </style>
@@ -501,7 +501,7 @@ elif st.session_state.page == "admin":
         unsafe_allow_html=True
     )
 
-    # --- Same centered form style like register page ---
+    # --- Centered form style ---
     st.markdown(
         """
         <div style='display:flex; justify-content:center; margin-top:20px;'>
@@ -540,6 +540,7 @@ elif st.session_state.page == "admin":
         st.session_state.login_error = False
 
     st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
+
 
 # ---------------- RAFFLE ----------------
 elif st.session_state.page == "raffle":
