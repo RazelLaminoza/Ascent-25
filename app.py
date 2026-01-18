@@ -208,9 +208,9 @@ if st.session_state.page == "landing":
         <div style='height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;'>
             <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' width='160'/>
             <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' style='width:70%; max-width:900px; margin-top:20px;'/>
-            <p style="font-size:25px;">
+            <p style="font-size:18px;">
                 PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
-                <span style="font-size:18px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
+                <span style="font-size:16px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
             </p>
         </div>
         """,
@@ -222,17 +222,11 @@ if st.session_state.page == "landing":
     col1, col2, col3 = st.columns([5.5, 5, 1])
 
     with col2:
-        if "clicked" not in st.session_state:
-            st.session_state.clicked = False
+        with st.form(key="landing_form"):
+            submit = st.form_submit_button("Register Here")
 
-        # disable after first click
-        if st.button("Register Here", key="landing_register", disabled=st.session_state.clicked):
-            st.session_state.clicked = True
-            go_to("register")
-
-
-
-
+            if submit:
+                st.session_state.page = "register"
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
