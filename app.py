@@ -219,9 +219,9 @@ if st.session_state.page == "landing":
 
     # Align button exactly like the text
     st.markdown("<br>", unsafe_allow_html=True)
-    col1, col2, col3 = st.columns([1.5, 2, 1.5])
+    col1, col2, col3 = st.columns([3, 2, 3])
 
-    with col2:
+    with col4:
         if st.button("Register Here"):
             go_to("register")
 
