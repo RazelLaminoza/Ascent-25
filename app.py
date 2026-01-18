@@ -225,6 +225,7 @@ if st.session_state.page == "landing":
         st.button("Register Here", on_click=go_to, args=("register",), type="primary", key="landing_register")
 
 
+
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
     st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
