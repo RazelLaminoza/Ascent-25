@@ -5,6 +5,7 @@ import io
 import pandas as pd
 import base64
 import json
+import time
 import os
 from PIL import Image, ImageDraw, ImageFont
 
