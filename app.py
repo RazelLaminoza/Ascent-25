@@ -298,6 +298,14 @@ elif st.session_state.page == "register":
 elif st.session_state.page == "admin":
     st.markdown("<h1>Admin Panel</h1>", unsafe_allow_html=True)
 
+    st.markdown(
+        """
+        <div style="display:flex; justify-content:center;">
+            <div style="width:100%; max-width:360px;">
+        """,
+        unsafe_allow_html=True
+    )
+
     uploaded_file = st.file_uploader("Upload Employee List (Excel)", type=["xlsx"])
 
     if uploaded_file:
@@ -318,12 +326,22 @@ elif st.session_state.page == "admin":
 
     st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
 
+    st.markdown("</div></div>", unsafe_allow_html=True)
+
 # ---------------- RAFFLE ----------------
 elif st.session_state.page == "raffle":
     if not st.session_state.admin:
         st.stop()
 
     st.markdown("<h1>Raffle Draw</h1>", unsafe_allow_html=True)
+
+    st.markdown(
+        """
+        <div style="display:flex; justify-content:center;">
+            <div style="width:100%; max-width:520px;">
+        """,
+        unsafe_allow_html=True
+    )
 
     if st.session_state.entries:
         df = pd.DataFrame(st.session_state.entries)
@@ -354,3 +372,5 @@ elif st.session_state.page == "raffle":
         st.info("No registrations yet")
 
     st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
+
+    st.markdown("</div></div>", unsafe_allow_html=True)
