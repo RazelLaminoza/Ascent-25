@@ -68,8 +68,8 @@ def create_pass_image(name, emp, qr_img):
 
     # Load fonts (regular)
     try:
-        font_big = ImageFont.truetype("CourierPrime-Bold.ttf", 42)
-        font_small = ImageFont.truetype("CourierPrime-Bold.ttf", 26)
+        font_big = ImageFont.truetype("Roboto-Regular.ttf", 42)
+        font_small = ImageFont.truetype("Roboto-Regular.ttf", 26)
     except:
         font_big = font_small = ImageFont.load_default()
 
@@ -88,13 +88,21 @@ def create_pass_image(name, emp, qr_img):
     # Text
     draw.text((40, 40), "ASCENT APAC 2026", fill=text_color, font=font_big)
     draw.text((40, 120), "FULL NAME:", fill=text_color, font=font_small)
-    draw.text((40, 160), name, fill=text_color, font=font_big)
 
-    draw.text((40, 230), "EMPLOYEE NO:", fill=text_color, font=font_small)
-    draw.text((40, 300), emp, fill=text_color, font=font_big)
+    # Wrap name text
+    max_width = 720  # max width for name area
+    lines = wrap_text(name, font_big, max_width)
+
+    y = 160
+    for line in lines:
+        draw.text((40, y), line, fill=text_color, font=font_big)
+        y += 50  # spacing between lines
+
+    draw.text((40, y + 20), "EMPLOYEE NO:", fill=text_color, font=font_small)
+    draw.text((40, y + 60), emp, fill=text_color, font=font_big)
 
     draw.text(
-        (40, 340),
+        (40, y + 140),
         "Present this pre-registration pass\nat the check-in counter",
         fill=text_color,
         font=font_small
@@ -104,6 +112,7 @@ def create_pass_image(name, emp, qr_img):
     img.paste(qr_img, (620, 140), qr_img.convert("RGBA"))
 
     return img.convert("RGB")
+
 
 def set_bg(image):
     with open(image, "rb") as f:
