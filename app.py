@@ -231,7 +231,6 @@ def run_raffle():
         return
 
     st.session_state.winner = None
-
     placeholder = st.empty()
 
     # Shuffle for 10 seconds
@@ -254,6 +253,7 @@ def run_raffle():
     # Final winner
     st.session_state.winner = random.choice(st.session_state.entries)
     placeholder.empty()
+
 
 def logout():
     st.session_state.admin = False
@@ -575,14 +575,28 @@ elif st.session_state.page == "raffle":
 
     st.markdown("<h1>Raffle Draw</h1>", unsafe_allow_html=True)
 
+    # ---- EXCEL IMPORT ----
+    uploaded_file = st.file_uploader("Upload Excel (.xlsx)", type=["xlsx"])
+
+    if uploaded_file:
+        df_excel = pd.read_excel(uploaded_file)
+
+        # Remove duplicates based on employee ID (assuming column name is 'emp_id')
+        df_excel = df_excel.drop_duplicates(subset=["emp_id"])
+
+        # Save to session
+        st.session_state.entries = df_excel.to_dict("records")
+
+    # ---- SHOW TABLE ----
     if st.session_state.entries:
         df = pd.DataFrame(st.session_state.entries)
         st.data_editor(df, key="raffle_editor")
 
+        # ---- RUN RAFFLE BUTTON ----
         st.button("🎰 Run Raffle", on_click=run_raffle, key="run_raffle_btn", type="primary")
 
-        # DOWNLOAD BUTTON
-        csv_bytes = df.to_csv(index=False).encode("utf-8")
+        # ---- DOWNLOAD CSV ----
+        csv_bytes = df.to_csv(index=False).encode("utf-8-sig")
         st.download_button(
             label="⬇️ Download CSV",
             data=csv_bytes,
@@ -591,7 +605,7 @@ elif st.session_state.page == "raffle":
             key="download_csv_btn"
         )
 
-        # SHOW WINNER
+        # ---- WINNER DISPLAY ----
         if st.session_state.winner is not None:
             st.markdown(
                 f"""
@@ -612,3 +626,4 @@ elif st.session_state.page == "raffle":
         st.info("No registrations yet")
 
     st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
+
