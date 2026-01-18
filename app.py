@@ -227,26 +227,24 @@ def login_admin():
         st.session_state.login_error = True
 
 def run_raffle():
-    entries = st.session_state.get("current_excel") or st.session_state.get("entries") or []
+    entries = st.session_state.entries
 
     if not entries:
-        st.warning("No entries available. Please upload Excel first.")
+        st.warning("No entries to raffle.")
         return
 
-    st.session_state.winner = None
     placeholder = st.empty()
-
     start_time = time.time()
+
+    # Shuffle effect for 10 seconds
     while time.time() - start_time < 10:
         current = random.choice(entries)
-        full_name = current.get("Full Name", "Unknown")
-
         placeholder.markdown(
             f"""
-            <div style="text-align:center; margin-top:30px;">
+            <div style="text-align:center; margin-top:20px;">
                 <h2 style="color:white;">Shuffling...</h2>
                 <h1 style="color:gold; font-size:60px;">
-                    {full_name}
+                    {current.get("Full Name", "Unknown")}
                 </h1>
             </div>
             """,
@@ -254,14 +252,11 @@ def run_raffle():
         )
         time.sleep(0.05)
 
-    # 🔥 WINNER MUST BE A DICT
+    # Final winner
     winner = random.choice(entries)
-    st.session_state.winner = {
-        "Employee ID": winner.get("Employee ID", ""),
-        "Full Name": winner.get("Full Name", "Unknown")
-    }
-
+    st.session_state.winner = {"Full Name": winner.get("Full Name", "Unknown")}
     placeholder.empty()
+
 
 def logout():
     st.session_state.admin = False
@@ -597,6 +592,7 @@ elif st.session_state.page == "raffle":
             "emp_id": "Employee ID",
             "Full Name": "Full Name",
             "Full name": "Full Name",
+            "full name": "Full Name",
             "Name": "Full Name"
         })
 
@@ -663,3 +659,4 @@ elif st.session_state.page == "raffle":
         st.info("No registrations yet")
 
     st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
+
