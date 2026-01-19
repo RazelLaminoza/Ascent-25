@@ -328,6 +328,14 @@ if st.session_state.page == "landing":
                 margin-top: -90px;
             }
 
+            .btn-right {
+                width: 70%;
+                max-width: 900px;
+                display: flex;
+                justify-content: flex-end;
+                margin-top: 20px;
+            }
+
             /* BUTTON STYLE (same as admin) */
             div[data-testid="stButton"] > button {
                 width: 100% !important;
@@ -339,24 +347,15 @@ if st.session_state.page == "landing":
                 color: black !important;
                 border: none !important;
                 border-radius: 8px !important;
-                margin: 20px auto 0 auto !important;
             }
 
             div[data-testid="stButton"] > button span,
             div[data-testid="stButton"] > button span * {
                 color: black !important;
             }
-
-            @media (max-width: 600px) {
-                div[data-testid="stButton"] > button {
-                    max-width: 320px !important;
-                    font-size: 15px !important;
-                }
-            }
         </style>
     """, unsafe_allow_html=True)
 
-    # ---- HTML CONTENT ----
     st.markdown(
         f"""
         <div class="landing">
@@ -366,13 +365,20 @@ if st.session_state.page == "landing":
                 PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
                 <span style="font-size:16px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
             </p>
+
+            <!-- this div will align the button to the right -->
+            <div class="btn-right">
+                <!-- Streamlit button placeholder -->
+                <div id="st_button_placeholder"></div>
+            </div>
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    # ---- STREAMLIT BUTTON (separate, NOT inside markdown) ----
-    col1, col2, col3 = st.columns([3, 2, 1])
+    # ---- STREAMLIT BUTTON (put inside the placeholder) ----
+    # Use columns to move it to the right inside the placeholder
+    col1, col2 = st.columns([5, 1])
     with col2:
         st.button(
             "Pre-register",
