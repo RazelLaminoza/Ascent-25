@@ -372,7 +372,7 @@ if st.session_state.page == "landing":
     )
 
     # ---- STREAMLIT BUTTON (separate, NOT inside markdown) ----
-    col1, col2, col3 = st.columns([1, 2, 1])
+    col1, col2, col3 = st.columns([3, 2, 1])
     with col2:
         st.button(
             "Pre-register",
