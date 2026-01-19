@@ -272,82 +272,68 @@ def export_csv():
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
 
-    # ---------- CSS ----------
     st.markdown("""
-    <style>
-    .block-container {
-        padding: 0 !important;
-        max-width: 100% !important;
-    }
+        <style>
+            .block-container {
+                padding: 0 !important;
+                max-width: 100% !important;
+            }
 
-    html, body {
-        height: 100% !important;
-        overflow: hidden !important;
-    }
+            html, body {
+                overflow: hidden !important;
+                height: 100% !important;
+            }
 
-    /* ===== CENTER WRAPPER ===== */
-    .landing {
-        height: 100vh;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;    /* vertical center */
-        align-items: center;        /* horizontal center */
-        text-align: center;
-        gap: 18px;
-    }
+            .landing {
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+                margin-top: -90px;
+            }
 
-    /* Images */
-    .landing img {
-        display: block;
-        margin: 0 auto;
-    }
+            /* ===== CENTERED OBLONG BUTTON ===== */
+            div[data-testid="stButton"] > button {
+                width: 520px !important;
+                height: 70px !important;
+                font-size: 22px !important;
+                font-weight: 800 !important;
+                background-color: #FFD700 !important;
+                color: black !important;
+                border: none !important;
+                border-radius: 999px !important;
+                margin: 20px auto 0 auto !important;
+                display: block !important;
+            }
 
-    /* ===== CENTERED OBLONG BUTTON ===== */
-    div[data-testid="stButton"] {
-        display: flex !important;
-        justify-content: center !important;
-    }
+            div[data-testid="stButton"] > button span,
+            div[data-testid="stButton"] > button span * {
+                color: black !important;
+            }
 
-    div[data-testid="stButton"] > button {
-        width: 520px !important;
-        height: 70px !important;
-        font-size: 22px !important;
-        font-weight: 800 !important;
-        background-color: #FFD700 !important;
-        color: black !important;
-        border: none !important;
-        border-radius: 999px !important;
-        margin-top: 24px !important;
-    }
-
-    div[data-testid="stButton"] > button span,
-    div[data-testid="stButton"] > button span * {
-        color: black !important;
-    }
-
-    /* ===== MOBILE ===== */
-    @media (max-width: 600px) {
-        div[data-testid="stButton"] > button {
-            width: 90% !important;
-            height: 60px !important;
-            font-size: 20px !important;
-        }
-    }
-    </style>
+            /* ===== MOBILE ===== */
+            @media (max-width: 600px) {
+                div[data-testid="stButton"] > button {
+                    width: 90% !important;
+                    max-width: 420px !important;
+                    height: 60px !important;
+                    font-size: 20px !important;
+                    border-radius: 999px !important;
+                    margin: 16px auto 0 auto !important;
+                }
+            }
+        </style>
     """, unsafe_allow_html=True)
 
-    # ---------- CONTENT ----------
     st.markdown(
         f"""
         <div class="landing">
-            <img src="data:image/png;base64,{base64.b64encode(open('2.png','rb').read()).decode()}"
-                 style="width:160px;" />
-
-            <img src="data:image/png;base64,{base64.b64encode(open('1.png','rb').read()).decode()}"
-                 style="width:70%; max-width:900px;" />
-
-            <p style="font-size:18px; line-height:1.3; margin:0;">
+            <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' width='160'/>
+            <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}'
+                 style='width:70%; max-width:900px; margin-top:20px;'/>
+            <p style="font-size:18px; line-height:1.3;">
                 PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
                 <span style="font-size:16px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
             </p>
@@ -356,14 +342,18 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
-    # ---------- BUTTON ----------
-    st.button(
-        "Pre-register",
-        on_click=go_to,
-        args=("register",),
-        type="primary",
-        key="landing_register_1"
-    )
+    # ✅ SIMPLE CENTERING (NO FIGHTING GRID)
+    col1, col2, col3 = st.columns([1, 2, 1])
+
+    with col2:
+        st.button(
+            "Pre-register",
+            on_click=go_to,
+            args=("register",),
+            type="primary",
+            key="landing_register_1"
+        )
+
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
