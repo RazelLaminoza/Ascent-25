@@ -333,6 +333,11 @@ if st.session_state.page == "landing":
         border-radius: 8px;
         margin-top: 20px;
     }
+
+    /* hide the streamlit button */
+    #hidden-btn {
+        display: none;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -345,24 +350,23 @@ if st.session_state.page == "landing":
                 PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
                 <span style="font-size:16px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
             </p>
-            <button class="landing-btn" onclick="window.location.href='#'">Pre-register</button>
+
+            <!-- HTML button -->
+            <button class="landing-btn" onclick="document.getElementById('hidden-btn').click()">
+                Pre-register
+            </button>
         </div>
         """,
         unsafe_allow_html=True
     )
 
-
-    # Streamlit button placed right after the HTML content
+    # Hidden Streamlit button (triggers go_to)
     st.button(
-        "Pre-register",
+        "hidden",
+        key="hidden-btn",
         on_click=go_to,
-        args=("register",),
-        type="primary",
-        key="landing_register_1"
+        args=("register",)
     )
-
-
-
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
