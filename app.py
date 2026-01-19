@@ -294,61 +294,36 @@ if st.session_state.page == "landing":
                 margin-top: -90px;
             }
 
-            /* Button styling */
+            /* ===== CENTERED OBLONG BUTTON ===== */
             div[data-testid="stButton"] > button {
-                width: 100% !important;
-                max-width: 520px !important;
+                width: 520px !important;
                 height: 70px !important;
                 font-size: 22px !important;
                 font-weight: 800 !important;
-                background-color: #FFD700 !important;  /* yellow */
-                color: black !important;                /* black text */
+                background-color: #FFD700 !important;
+                color: black !important;
                 border: none !important;
-                border-radius: 0px !important;
-                white-space: nowrap !important;
-                margin-top: -25px !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
+                border-radius: 999px !important;
+                margin: 20px auto 0 auto !important;
+                display: block !important;
             }
 
-            /* Force text color to black */
             div[data-testid="stButton"] > button span,
             div[data-testid="stButton"] > button span * {
                 color: black !important;
             }
 
+            /* ===== MOBILE ===== */
             @media (max-width: 600px) {
                 div[data-testid="stButton"] > button {
-                    width: 95% !important;
+                    width: 90% !important;
                     max-width: 420px !important;
                     height: 60px !important;
                     font-size: 20px !important;
-                    background-color: #FFD700 !important;
-                    color: black !important;
-                    border-radius: 0px !important;
-                    white-space: nowrap !important;
-                    margin-top: -20px !important;
-                }
-
-                div[data-testid="stButton"] > button span,
-                div[data-testid="stButton"] > button span * {
-                    color: black !important;
+                    border-radius: 999px !important;
+                    margin: 16px auto 0 auto !important;
                 }
             }
-
-            /* NEW: Text block styling (instead of inline HTML) */
-            .landing-text {
-                font-size: 18px;
-                text-align: center;
-                margin-top: 20px;
-                line-height: 1.3;
-            }
-
-            .landing-text span {
-                font-size: 16px;
-            }
-
         </style>
     """, unsafe_allow_html=True)
 
@@ -356,8 +331,9 @@ if st.session_state.page == "landing":
         f"""
         <div class="landing">
             <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' width='160'/>
-            <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' style='width:70%; max-width:900px; margin-top:20px;'/>
-            <p style="font-size:18px;">
+            <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}'
+                 style='width:70%; max-width:900px; margin-top:20px;'/>
+            <p style="font-size:18px; line-height:1.3;">
                 PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
                 <span style="font-size:16px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
             </p>
@@ -366,8 +342,8 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
-
-    col1, col2, col3 = st.columns([5.5, 5, 1])
+    # ✅ SIMPLE CENTERING (NO FIGHTING GRID)
+    col1, col2, col3 = st.columns([1, 2, 1])
 
     with col2:
         st.button(
@@ -377,7 +353,6 @@ if st.session_state.page == "landing":
             type="primary",
             key="landing_register_1"
         )
-
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
