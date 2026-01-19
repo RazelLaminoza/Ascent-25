@@ -9,15 +9,13 @@ import time
 import os
 from PIL import Image, ImageDraw, ImageFont
 
-# ---------------- CUSTOM FONT ----------------
+# ---------------- CUSTOM FONT (FOR ALL STREAMLIT TEXT) ----------------
 def add_custom_font():
     font_path = "PPNeueMachina-PlainUltrabold.ttf"
 
-    # If font file exists, load it
     if os.path.exists(font_path):
         with open(font_path, "rb") as f:
-            font_data = f.read()
-        font_b64 = base64.b64encode(font_data).decode()
+            font_b64 = base64.b64encode(f.read()).decode()
 
         st.markdown(f"""
             <style>
@@ -26,13 +24,20 @@ def add_custom_font():
                     src: url("data:font/ttf;base64,{font_b64}") format("truetype");
                 }}
 
+                /* Apply font to all Streamlit elements */
                 html, body, [class*="css"] {{
+                    font-family: "PPNeueMachina" !important;
+                }}
+
+                /* Also apply to buttons + inputs */
+                button, input, textarea, select {{
                     font-family: "PPNeueMachina" !important;
                 }}
             </style>
         """, unsafe_allow_html=True)
 
 add_custom_font()
+
 
 
 # ---------------- PAGE CONFIG ----------------
