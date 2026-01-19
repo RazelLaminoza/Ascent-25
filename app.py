@@ -312,6 +312,7 @@ if st.session_state.page == "landing":
     html, body { overflow: hidden !important; height: 100% !important; }
 
     .landing {
+        position: relative;
         height: 100vh;
         display: flex;
         flex-direction: column;
@@ -323,8 +324,7 @@ if st.session_state.page == "landing":
 
     /* Style the Streamlit button */
     div[data-testid="stButton"] > button {
-        width: 100% !important;
-        max-width: 360px !important;
+        width: 360px !important;
         height: 55px !important;
         font-size: 16px !important;
         font-weight: 700 !important;
@@ -332,7 +332,14 @@ if st.session_state.page == "landing":
         color: black !important;
         border: none !important;
         border-radius: 8px !important;
-        margin-top: 20px !important;
+    }
+
+    /* Position by X and Y */
+    #landing-button {
+        position: absolute;
+        left: 50%;   /* X axis */
+        top: 70%;    /* Y axis */
+        transform: translate(-50%, -50%);
     }
     </style>
     """, unsafe_allow_html=True)
@@ -351,7 +358,7 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
-    # Streamlit button below the landing section
+    # Streamlit button with id for positioning
     st.button(
         "Pre-register",
         on_click=go_to,
@@ -359,6 +366,7 @@ if st.session_state.page == "landing":
         type="primary",
         key="landing_register_1"
     )
+
 
 
 # ---------------- REGISTER ----------------
