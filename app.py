@@ -352,7 +352,7 @@ if st.session_state.page == "landing":
                 div[data-testid="stButton"] > button {
                     width: 90% !important;
                     max-width: 420px !important;
-                    height: 70px !important;
+                    height: 90px !important;
                 }
             }
         </style>
@@ -374,7 +374,7 @@ if st.session_state.page == "landing":
     )
 
     # BUTTON BELOW THE IMAGES (CENTERED)
-    col1, col2, col3 = st.columns([5.5, 2, 5])
+    col1, col2, col3 = st.columns([5.5, 2, 1])
     with col2:
         st.button(
             "Pre-register",
