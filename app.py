@@ -291,10 +291,15 @@ if st.session_state.page == "landing":
                 justify-content: center;
                 align-items: center;
                 text-align: center;
-                margin-top: -90px;
+                gap: 18px;
             }
 
             /* ===== CENTERED OBLONG BUTTON ===== */
+            div[data-testid="stButton"] {
+                display: flex !important;
+                justify-content: center !important;
+            }
+
             div[data-testid="stButton"] > button {
                 width: 520px !important;
                 height: 70px !important;
@@ -304,8 +309,7 @@ if st.session_state.page == "landing":
                 color: black !important;
                 border: none !important;
                 border-radius: 999px !important;
-                margin: 20px auto 0 auto !important;
-                display: block !important;
+                margin-top: 20px !important;
             }
 
             div[data-testid="stButton"] > button span,
@@ -317,11 +321,8 @@ if st.session_state.page == "landing":
             @media (max-width: 600px) {
                 div[data-testid="stButton"] > button {
                     width: 90% !important;
-                    max-width: 420px !important;
                     height: 60px !important;
                     font-size: 20px !important;
-                    border-radius: 999px !important;
-                    margin: 16px auto 0 auto !important;
                 }
             }
         </style>
@@ -330,9 +331,9 @@ if st.session_state.page == "landing":
     st.markdown(
         f"""
         <div class="landing">
-            <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' width='160'/>
-            <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}'
-                 style='width:70%; max-width:900px; margin-top:20px;'/>
+            <img src="data:image/png;base64,{base64.b64encode(open('2.png','rb').read()).decode()}" width="160"/>
+            <img src="data:image/png;base64,{base64.b64encode(open('1.png','rb').read()).decode()}"
+                 style="width:70%; max-width:900px;"/>
             <p style="font-size:18px; line-height:1.3;">
                 PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
                 <span style="font-size:16px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
@@ -342,17 +343,14 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
-    # ✅ SIMPLE CENTERING (NO FIGHTING GRID)
-    col1, col2, col3 = st.columns([1, 2, 1])
-
-    with col2:
-        st.button(
-            "Pre-register",
-            on_click=go_to,
-            args=("register",),
-            type="primary",
-            key="landing_register_1"
-        )
+    # ✅ TRUE CENTER (NO COLUMNS)
+    st.button(
+        "Pre-register",
+        on_click=go_to,
+        args=("register",),
+        type="primary",
+        key="landing_register_1"
+    )
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
