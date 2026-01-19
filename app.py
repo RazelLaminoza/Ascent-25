@@ -328,8 +328,8 @@ if st.session_state.page == "landing":
                 margin-top: -90px;
             }
 
-            /* ===== BUTTON STYLE (Same as Admin) ===== */
-            div[data-testid="stButton"] > button {
+            /* ===== CENTER BUTTON UNDER IMAGES ===== */
+            .landing .stButton button {
                 width: 100% !important;
                 max-width: 360px !important;
                 height: 55px !important;
@@ -339,25 +339,24 @@ if st.session_state.page == "landing":
                 color: black !important;
                 border: none !important;
                 border-radius: 8px !important;
-                margin: 0 auto !important;
+                margin: 20px auto 0 auto !important;
+                white-space: nowrap !important;
             }
 
-            div[data-testid="stButton"] > button span,
-            div[data-testid="stButton"] > button span * {
+            .landing .stButton button span,
+            .landing .stButton button span * {
                 color: black !important;
             }
 
-            /* ===== MOBILE ===== */
+            /* MOBILE */
             @media (max-width: 600px) {
-                div[data-testid="stButton"] > button {
-                    width: 90% !important;
-                    max-width: 420px !important;
-                    height: 70px !important;
+                .landing .stButton button {
+                    max-width: 320px !important;
+                    font-size: 15px !important;
                 }
             }
         </style>
     """, unsafe_allow_html=True)
-
 
     st.markdown(
         f"""
@@ -368,22 +367,16 @@ if st.session_state.page == "landing":
                 PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
                 <span style="font-size:16px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
             </p>
+
+            <!-- BUTTON HERE -->
+            <div>
+                <!-- streamlit button -->
+                {st.button("Pre-register", on_click=go_to, args=("register",), type="primary", key="landing_register_1")}
+            </div>
         </div>
         """,
         unsafe_allow_html=True
     )
-
-    # BUTTON BELOW THE IMAGES (CENTERED)
-    col1, col2, col3 = st.columns([5.5, 2, 1])
-    with col2:
-        st.button(
-            "Pre-register",
-            on_click=go_to,
-            args=("register",),
-            type="primary",
-            key="landing_register_1",
-        )
-
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
