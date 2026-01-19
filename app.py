@@ -328,8 +328,8 @@ if st.session_state.page == "landing":
                 margin-top: -90px;
             }
 
-            /* ===== CENTER BUTTON UNDER IMAGES ===== */
-            .landing .stButton button {
+            /* BUTTON STYLE (same as admin) */
+            div[data-testid="stButton"] > button {
                 width: 100% !important;
                 max-width: 360px !important;
                 height: 55px !important;
@@ -340,17 +340,15 @@ if st.session_state.page == "landing":
                 border: none !important;
                 border-radius: 8px !important;
                 margin: 20px auto 0 auto !important;
-                white-space: nowrap !important;
             }
 
-            .landing .stButton button span,
-            .landing .stButton button span * {
+            div[data-testid="stButton"] > button span,
+            div[data-testid="stButton"] > button span * {
                 color: black !important;
             }
 
-            /* MOBILE */
             @media (max-width: 600px) {
-                .landing .stButton button {
+                div[data-testid="stButton"] > button {
                     max-width: 320px !important;
                     font-size: 15px !important;
                 }
@@ -358,6 +356,7 @@ if st.session_state.page == "landing":
         </style>
     """, unsafe_allow_html=True)
 
+    # ---- HTML CONTENT ----
     st.markdown(
         f"""
         <div class="landing">
@@ -367,16 +366,21 @@ if st.session_state.page == "landing":
                 PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
                 <span style="font-size:16px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
             </p>
-
-            <!-- BUTTON HERE -->
-            <div>
-                <!-- streamlit button -->
-                {st.button("Pre-register", on_click=go_to, args=("register",), type="primary", key="landing_register_1")}
-            </div>
         </div>
         """,
         unsafe_allow_html=True
     )
+
+    # ---- STREAMLIT BUTTON (separate, NOT inside markdown) ----
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        st.button(
+            "Pre-register",
+            on_click=go_to,
+            args=("register",),
+            type="primary",
+            key="landing_register_1"
+        )
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
