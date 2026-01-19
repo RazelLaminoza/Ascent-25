@@ -336,7 +336,7 @@ if st.session_state.page == "landing":
                 margin-top: 20px;
             }
 
-            /* BUTTON STYLE (same as admin) */
+            /* BUTTON STYLE */
             div[data-testid="stButton"] > button {
                 width: 100% !important;
                 max-width: 360px !important;
@@ -347,11 +347,6 @@ if st.session_state.page == "landing":
                 color: black !important;
                 border: none !important;
                 border-radius: 8px !important;
-            }
-
-            div[data-testid="stButton"] > button span,
-            div[data-testid="stButton"] > button span * {
-                color: black !important;
             }
         </style>
     """, unsafe_allow_html=True)
@@ -366,18 +361,17 @@ if st.session_state.page == "landing":
                 <span style="font-size:16px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
             </p>
 
-            <!-- this div will align the button to the right -->
+            <!-- THIS IS THE RIGHT-ALIGNED BUTTON CONTAINER -->
             <div class="btn-right">
-                <!-- Streamlit button placeholder -->
-                <div id="st_button_placeholder"></div>
+                <!-- Button will be placed here using Streamlit columns -->
             </div>
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    # ---- STREAMLIT BUTTON (put inside the placeholder) ----
-    # Use columns to move it to the right inside the placeholder
+    # ------------- STREAMLIT BUTTON -------------
+    # Place the button inside a column to align it right
     col1, col2 = st.columns([5, 1])
     with col2:
         st.button(
@@ -387,6 +381,7 @@ if st.session_state.page == "landing":
             type="primary",
             key="landing_register_1"
         )
+
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
