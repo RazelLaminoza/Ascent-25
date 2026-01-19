@@ -9,9 +9,6 @@ import time
 import os
 from PIL import Image, ImageDraw, ImageFont
 
-params = st.experimental_get_query_params()
-if params.get("page") == ["register"]:
-    st.session_state.page = "register"
 
 
 # ---------------- PAGE CONFIG ----------------
@@ -297,27 +294,34 @@ if st.session_state.page == "landing":
                 margin-top: -90px;
             }
 
-            /* ===== IMAGE BUTTON ===== */
-            .pre-reg-btn {
-                width: 600px !important;
-                height: 90px !important;
-                margin: 20px auto 0 auto;
+            /* ===== CENTERED OBLONG BUTTON ===== */
+            div[data-testid="stButton"] > button {
+                width: 520px !important;
+                height: 70px !important;
+                font-size: 22px !important;
+                font-weight: 800 !important;
+                background-color: #FFD700 !important;
+                color: black !important;
+                border: none !important;
+                border-radius: 999px !important;
+                margin: 20px auto 0 auto !important;
+                display: block !important;
             }
 
-            .pre-reg-btn img {
-                width: 100%;
-                height: 100%;
-                object-fit: contain;
-                cursor: pointer;
-                border-radius: 999px;
+            div[data-testid="stButton"] > button span,
+            div[data-testid="stButton"] > button span * {
+                color: black !important;
             }
 
             /* ===== MOBILE ===== */
             @media (max-width: 600px) {
-                .pre-reg-btn {
+                div[data-testid="stButton"] > button {
                     width: 90% !important;
                     max-width: 420px !important;
-                    height: 70px !important;
+                    height: 60px !important;
+                    font-size: 20px !important;
+                    border-radius: 999px !important;
+                    margin: 16px auto 0 auto !important;
                 }
             }
         </style>
@@ -327,8 +331,7 @@ if st.session_state.page == "landing":
         f"""
         <div class="landing">
             <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' width='160'/>
-            <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}'
-                 style='width:70%; max-width:900px; margin-top:20px;'/>
+            <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' style='width:70%; max-width:900px; margin-top:20px;'/>
             <p style="font-size:18px; line-height:1.3;">
                 PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
                 <span style="font-size:16px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
@@ -338,21 +341,17 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
-    # ---------- CLICKABLE IMAGE (NO BUTTON) ----------
+    # ✅ SIMPLE CENTERING (NO FIGHTING GRID)
     col1, col2, col3 = st.columns([1, 2, 1])
 
     with col2:
-        st.markdown(
-            f"""
-            <div class="pre-reg-btn">
-                <a href="?page=register">
-                    <img src="data:image/png;base64,{base64.b64encode(open('pre-reg.png','rb').read()).decode()}"/>
-                </a>
-            </div>
-            """,
-            unsafe_allow_html=True
+        st.button(
+            "Pre-register",
+            on_click=go_to,
+            args=("register",),
+            type="primary",
+            key="landing_register_1"
         )
-
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
