@@ -305,6 +305,7 @@ def export_csv():
 
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
+
     st.markdown("""
     <style>
     .block-container { padding: 0 !important; max-width: 100% !important; }
@@ -320,17 +321,17 @@ if st.session_state.page == "landing":
         margin-top: -90px;
     }
 
-    div[data-testid="stButton"] > button {
-        width: 100% !important;
-        max-width: 360px !important;
-        height: 55px !important;
-        font-size: 16px !important;
-        font-weight: 700 !important;
-        background-color: #FFD700 !important;
-        color: black !important;
-        border: none !important;
-        border-radius: 8px !important;
-        margin-top: 20px !important;
+    .landing-btn {
+        width: 100%;
+        max-width: 360px;
+        height: 55px;
+        font-size: 16px;
+        font-weight: 700;
+        background: #FFD700;
+        color: black;
+        border: none;
+        border-radius: 8px;
+        margin-top: 20px;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -344,10 +345,12 @@ if st.session_state.page == "landing":
                 PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
                 <span style="font-size:16px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
             </p>
+            <button class="landing-btn" onclick="window.location.href='#'">Pre-register</button>
         </div>
         """,
         unsafe_allow_html=True
     )
+
 
     # Streamlit button placed right after the HTML content
     st.button(
