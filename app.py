@@ -328,14 +328,6 @@ if st.session_state.page == "landing":
                 margin-top: -90px;
             }
 
-            .btn-right {
-                width: 70%;
-                max-width: 900px;
-                display: flex;
-                justify-content: flex-end;
-                margin-top: 20px;
-            }
-
             /* BUTTON STYLE */
             div[data-testid="stButton"] > button {
                 width: 100% !important;
@@ -347,10 +339,12 @@ if st.session_state.page == "landing":
                 color: black !important;
                 border: none !important;
                 border-radius: 8px !important;
+                margin-top: 20px;
             }
         </style>
     """, unsafe_allow_html=True)
 
+    # ---- HTML CONTENT (NO BUTTON) ----
     st.markdown(
         f"""
         <div class="landing">
@@ -360,15 +354,24 @@ if st.session_state.page == "landing":
                 PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
                 <span style="font-size:16px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
             </p>
-
-            <!-- THIS IS THE RIGHT-ALIGNED BUTTON CONTAINER -->
-            <div class="btn-right">
-                <!-- Button will be placed here using Streamlit columns -->
-            </div>
         </div>
         """,
         unsafe_allow_html=True
     )
+
+    # ---- STREAMLIT BUTTON (RIGHT ALIGNED, inside landing) ----
+    # This keeps the button inside the same center area
+    st.markdown("<div style='height: 20px'></div>", unsafe_allow_html=True)
+
+    col1, col2 = st.columns([4, 1])
+    with col2:
+        st.button(
+            "Pre-register",
+            on_click=go_to,
+            args=("register",),
+            type="primary",
+            key="landing_register_1"
+        )
 
     # ------------- STREAMLIT BUTTON -------------
     # Place the button inside a column to align it right
