@@ -294,12 +294,12 @@ if st.session_state.page == "landing":
                 margin-top: -90px;
             }
 
-            /* ===== CLICKABLE IMAGE BUTTON ===== */
+            /* ===== IMAGE BUTTON ===== */
             .pre-reg-btn {
-                width: 600px !important;     /* bigger width */
-                height: 90px !important;     /* bigger height */
+                width: 600px !important;
+                height: 90px !important;
                 margin: 20px auto 0 auto;
-                display: block;
+                position: relative;
             }
 
             .pre-reg-btn img {
@@ -310,13 +310,22 @@ if st.session_state.page == "landing":
                 border-radius: 999px;
             }
 
+            .pre-reg-btn button {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                opacity: 0;
+                cursor: pointer;
+            }
+
             /* ===== MOBILE ===== */
             @media (max-width: 600px) {
                 .pre-reg-btn {
                     width: 90% !important;
                     max-width: 420px !important;
-                    height: 70px !important;   /* bigger mobile height */
-                    margin: 16px auto 0 auto !important;
+                    height: 70px !important;
                 }
             }
         </style>
@@ -337,37 +346,22 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
-    # ---------- CLICKABLE IMAGE BUTTON (calls go_to("register")) ----------
     col1, col2, col3 = st.columns([1, 2, 1])
 
     with col2:
-        # Hidden original button
-        st.button(
-            "Pre-register",
-            on_click=go_to,
-            args=("register",),
-            key="landing_register_1"
-        )
+        # This button will be invisible, but will still trigger go_to()
+        if st.button("Pre-register", on_click=go_to, args=("register",), key="landing_register_1"):
+            pass
 
+        # This is the visible image
         st.markdown(
             f"""
-            <style>
-                /* Hide the original button */
-                div[data-testid="stButton"] > button#{st.session_state.page}_landing_register_1 {{
-                    display: none;
-                }}
-            </style>
-
             <div class="pre-reg-btn">
-                <img
-                    src="data:image/png;base64,{base64.b64encode(open('pre-reg.png','rb').read()).decode()}"
-                    onclick="document.querySelector('button[kind=\"primary\"]').click()"
-                />
+                <img src="data:image/png;base64,{base64.b64encode(open('pre-reg.png','rb').read()).decode()}" />
             </div>
             """,
             unsafe_allow_html=True
         )
-
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
