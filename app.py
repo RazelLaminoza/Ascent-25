@@ -299,7 +299,6 @@ if st.session_state.page == "landing":
                 width: 600px !important;
                 height: 90px !important;
                 margin: 20px auto 0 auto;
-                position: relative;
             }
 
             .pre-reg-btn img {
@@ -310,14 +309,9 @@ if st.session_state.page == "landing":
                 border-radius: 999px;
             }
 
-            .pre-reg-btn button {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                opacity: 0;
-                cursor: pointer;
+            /* Hide the real button */
+            #real-button {
+                display: none;
             }
 
             /* ===== MOBILE ===== */
@@ -349,15 +343,18 @@ if st.session_state.page == "landing":
     col1, col2, col3 = st.columns([1, 2, 1])
 
     with col2:
-        # This button will be invisible, but will still trigger go_to()
-        if st.button("Pre-register", on_click=go_to, args=("register",), key="landing_register_1"):
+        # 1️⃣ Hidden real button that triggers go_to("register")
+        if st.button("Pre-register", key="real-button", on_click=go_to, args=("register",)):
             pass
 
-        # This is the visible image
+        # 2️⃣ Visible image that clicks the hidden button
         st.markdown(
             f"""
             <div class="pre-reg-btn">
-                <img src="data:image/png;base64,{base64.b64encode(open('pre-reg.png','rb').read()).decode()}" />
+                <img
+                    src="data:image/png;base64,{base64.b64encode(open('pre-reg.png','rb').read()).decode()}"
+                    onclick="document.querySelector('button[kind=\"primary\"]').click()"
+                />
             </div>
             """,
             unsafe_allow_html=True
