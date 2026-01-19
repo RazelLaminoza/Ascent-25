@@ -296,8 +296,8 @@ if st.session_state.page == "landing":
 
             /* ===== CLICKABLE IMAGE BUTTON ===== */
             .pre-reg-btn {
-                width: 520px !important;
-                height: 70px !important;
+                width: 600px !important;     /* bigger width */
+                height: 90px !important;     /* bigger height */
                 margin: 20px auto 0 auto;
                 display: block;
             }
@@ -315,7 +315,7 @@ if st.session_state.page == "landing":
                 .pre-reg-btn {
                     width: 90% !important;
                     max-width: 420px !important;
-                    height: 60px !important;
+                    height: 70px !important;   /* bigger mobile height */
                     margin: 16px auto 0 auto !important;
                 }
             }
@@ -337,16 +337,32 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
-    # ---------- CLICKABLE IMAGE BUTTON (instead of st.button) ----------
+    # ---------- CLICKABLE IMAGE BUTTON (calls go_to("register")) ----------
     col1, col2, col3 = st.columns([1, 2, 1])
 
     with col2:
+        # Hidden original button
+        st.button(
+            "Pre-register",
+            on_click=go_to,
+            args=("register",),
+            key="landing_register_1"
+        )
+
         st.markdown(
             f"""
+            <style>
+                /* Hide the original button */
+                div[data-testid="stButton"] > button#{st.session_state.page}_landing_register_1 {{
+                    display: none;
+                }}
+            </style>
+
             <div class="pre-reg-btn">
-                <a href="javascript:void(0)" onclick="window.location.href='?page=register'">
-                    <img src="data:image/png;base64,{base64.b64encode(open('pre-reg.png','rb').read()).decode()}"/>
-                </a>
+                <img
+                    src="data:image/png;base64,{base64.b64encode(open('pre-reg.png','rb').read()).decode()}"
+                    onclick="document.querySelector('button[kind=\"primary\"]').click()"
+                />
             </div>
             """,
             unsafe_allow_html=True
