@@ -321,22 +321,18 @@ if st.session_state.page == "landing":
         margin-top: -90px;
     }
 
-    .landing-btn {
-        width: 100%;
-        max-width: 360px;
-        height: 55px;
-        font-size: 16px;
-        font-weight: 700;
-        background: #FFD700;
-        color: black;
-        border: none;
-        border-radius: 8px;
-        margin-top: 20px;
-    }
-
-    /* hide the streamlit button */
-    #hidden-btn {
-        display: none;
+    /* Style the Streamlit button */
+    div[data-testid="stButton"] > button {
+        width: 100% !important;
+        max-width: 360px !important;
+        height: 55px !important;
+        font-size: 16px !important;
+        font-weight: 700 !important;
+        background-color: #FFD700 !important;
+        color: black !important;
+        border: none !important;
+        border-radius: 8px !important;
+        margin-top: 20px !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -350,21 +346,18 @@ if st.session_state.page == "landing":
                 PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
                 <span style="font-size:16px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
             </p>
-
-            <button class="landing-btn" onclick="document.getElementById('hidden-btn').click()">
-                Pre-register
-            </button>
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    # hidden Streamlit button
+    # Streamlit button below the landing section
     st.button(
-        "hidden",
-        key="hidden-btn",
+        "Pre-register",
         on_click=go_to,
-        args=("register",)
+        args=("register",),
+        type="primary",
+        key="landing_register_1"
     )
 
 
