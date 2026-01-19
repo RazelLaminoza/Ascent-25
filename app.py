@@ -374,7 +374,7 @@ if st.session_state.page == "landing":
     )
 
     # BUTTON BELOW THE IMAGES (CENTERED)
-    col1, col2, col3 = st.columns([1, 2, 1])
+    col1, col2, col3 = st.columns([5.5, 2, 5])
     with col2:
         st.button(
             "Pre-register",
