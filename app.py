@@ -294,38 +294,44 @@ if st.session_state.page == "landing":
                 margin-top: -90px;
             }
 
-            /* ===== CENTERED OBLONG BUTTON ===== */
-            div[data-testid="stButton"] > button {
-                width: 520px !important;
-                height: 70px !important;
-                font-size: 22px !important;
-                font-weight: 800 !important;
-                background-color: #FFD700 !important;
-                color: black !important;
-                border: none !important;
+            /* ===== IMAGE BUTTON ===== */
+            .img-btn button {
+                width: 600px !important;
+                height: 90px !important;
                 border-radius: 999px !important;
-                margin: 20px auto 0 auto !important;
-                display: block !important;
+                background: transparent !important;
+                border: none !important;
+                padding: 0 !important;
             }
 
-            div[data-testid="stButton"] > button span,
-            div[data-testid="stButton"] > button span * {
-                color: black !important;
+            /* hide default button text */
+            .img-btn button > span {
+                display: none !important;
+            }
+
+            /* insert your image as button background */
+            .img-btn button::before {
+                content: "";
+                display: block;
+                width: 100%;
+                height: 100%;
+                background-image: url("data:image/png;base64,REPLACE_WITH_BASE64");
+                background-size: cover;
+                background-position: center;
+                border-radius: 999px;
             }
 
             /* ===== MOBILE ===== */
             @media (max-width: 600px) {
-                div[data-testid="stButton"] > button {
+                .img-btn button {
                     width: 90% !important;
                     max-width: 420px !important;
-                    height: 60px !important;
-                    font-size: 20px !important;
-                    border-radius: 999px !important;
-                    margin: 16px auto 0 auto !important;
+                    height: 70px !important;
                 }
             }
         </style>
     """, unsafe_allow_html=True)
+
 
     st.markdown(
         f"""
@@ -341,17 +347,17 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
-    # ✅ SIMPLE CENTERING (NO FIGHTING GRID)
+    # BUTTON BELOW THE IMAGES (CENTERED)
     col1, col2, col3 = st.columns([1, 2, 1])
-
     with col2:
         st.button(
             "Pre-register",
             on_click=go_to,
             args=("register",),
             type="primary",
-            key="landing_register_1"
+            key="landing_register_1",
         )
+
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
