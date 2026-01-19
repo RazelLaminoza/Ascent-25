@@ -305,46 +305,52 @@ def export_csv():
 
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
-
     st.markdown("""
-        <style>
-            .block-container {
-                padding: 0 !important;
-                max-width: 100% !important;
-            }
-
-            html, body {
-                overflow: hidden !important;
-                height: 100% !important;
-            }
-
-            .landing {
-                height: 100vh;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                text-align: center;
-                margin-top: -90px;
-            }
-
-            /* BUTTON STYLE */
-            div[data-testid="stButton"] > button {
-                width: 100% !important;
-                max-width: 360px !important;
-                height: 55px !important;
-                font-size: 16px !important;
-                font-weight: 700 !important;
-                background-color: #FFD700 !important;
-                color: black !important;
-                border: none !important;
-                border-radius: 8px !important;
-                margin-top: 20px;
-            }
-        </style>
+    <style>
+    .block-container {
+        padding: 0 !important;
+        max-width: 100% !important;
+    }
+    html, body {
+        overflow: hidden !important;
+        height: 100% !important;
+    }
+    .landing {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        margin-top: -90px;
+    }
+    /* BUTTON STYLE (same as admin) */
+    div[data-testid="stButton"] > button {
+        width: 100% !important;
+        max-width: 360px !important;
+        height: 55px !important;
+        font-size: 16px !important;
+        font-weight: 700 !important;
+        background-color: #FFD700 !important;
+        color: black !important;
+        border: none !important;
+        border-radius: 8px !important;
+        margin: 20px auto 0 auto !important;
+    }
+    div[data-testid="stButton"] > button span,
+    div[data-testid="stButton"] > button span * {
+        color: black !important;
+    }
+    @media (max-width: 600px) {
+        div[data-testid="stButton"] > button {
+            max-width: 320px !important;
+            font-size: 15px !important;
+        }
+    }
+    </style>
     """, unsafe_allow_html=True)
 
-    # ---- HTML CONTENT (NO BUTTON) ----
+    # ---- HTML CONTENT ----
     st.markdown(
         f"""
         <div class="landing">
@@ -359,11 +365,8 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
-    # ---- STREAMLIT BUTTON (RIGHT ALIGNED, inside landing) ----
-    # This keeps the button inside the same center area
-    st.markdown("<div style='height: 20px'></div>", unsafe_allow_html=True)
-
-    col1, col2 = st.columns([4, 1])
+    # ---- STREAMLIT BUTTON (separate, NOT inside markdown) ----
+    col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         st.button(
             "Pre-register",
@@ -373,17 +376,6 @@ if st.session_state.page == "landing":
             key="landing_register_1"
         )
 
-    # ------------- STREAMLIT BUTTON -------------
-    # Place the button inside a column to align it right
-    col1, col2 = st.columns([5, 1])
-    with col2:
-        st.button(
-            "Pre-register",
-            on_click=go_to,
-            args=("register",),
-            type="primary",
-            key="landing_register_1"
-        )
 
 
 # ---------------- REGISTER ----------------
