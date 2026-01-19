@@ -325,7 +325,7 @@ if st.session_state.page == "landing":
     /* Style the Streamlit button */
     div[data-testid="stButton"] > button {
         width: 360px !important;
-        height: 55px !important;
+        height: 99px !important;
         font-size: 16px !important;
         font-weight: 700 !important;
         background-color: #FFD700 !important;
