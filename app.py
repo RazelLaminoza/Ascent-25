@@ -485,158 +485,166 @@ elif st.session_state.page == "register":
 
 
 
+st.set_page_config(page_title="Raffle System", layout="centered")
+
+# ---------------- SESSION STATE ----------------
+if "page" not in st.session_state:
+    st.session_state.page = "landing"
+
+if "admin" not in st.session_state:
+    st.session_state.admin = False
+
+if "entries" not in st.session_state:
+    st.session_state.entries = []
+
+if "winner" not in st.session_state:
+    st.session_state.winner = None
+
+
+# ---------------- CREDENTIALS ----------------
+USERNAME = "admin"
+PASSWORD = "1234"
+
+
+# ---------------- FUNCTIONS ----------------
+def go_to(page):
+    st.session_state.page = page
+    st.rerun()
+
+
+def login_admin():
+    if (
+        st.session_state.user == USERNAME
+        and st.session_state.pwd == PASSWORD
+    ):
+        st.session_state.admin = True
+        return True
+    return False
+
+
+def logout():
+    st.session_state.admin = False
+    st.session_state.entries = []
+    st.session_state.winner = None
+    st.session_state.page = "landing"
+    st.rerun()
+
+
+def run_raffle():
+    if st.session_state.entries:
+        st.session_state.winner = random.choice(
+            st.session_state.entries
+        )
+
+
+# ---------------- LANDING ----------------
+if st.session_state.page == "landing":
+    st.markdown("<h1 style='text-align:center;'>🎉 Welcome</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align:center;'>Employee Raffle System</p>", unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.button("🔐 Admin Login", on_click=go_to, args=("admin",), type="primary")
+
+
 # ---------------- ADMIN ----------------
 elif st.session_state.page == "admin":
+
     st.markdown("<h1>Admin Panel</h1>", unsafe_allow_html=True)
 
-    # ---------- LOGIN BUTTON STYLE ----------
-    st.markdown(
-        """
-        <style>
-        /* Login button inside admin form */
-        div[data-testid="stFormSubmitButton"] > button {
-            width: 100% !important;
-            max-width: 360px !important;
-            height: 55px !important;
-            font-size: 16px !important;
-            font-weight: 700 !important;
-            background-color: #FFD700 !important;
-            color: black !important;
-            border: none !important;
-            border-radius: 8px !important;
-            margin: 0 auto !important;
-        }
-
-        div[data-testid="stFormSubmitButton"] > button span,
-        div[data-testid="stFormSubmitButton"] > button span * {
-            color: black !important;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
-    # --- Centered form style ---
-    st.markdown(
-        """
-        <div style='display:flex; justify-content:center; margin-top:20px;'>
-            <div style='max-width:360px; width:100%;'>
-        """,
-        unsafe_allow_html=True
-    )
-
     with st.form("admin_form"):
-        uploaded_file = st.file_uploader("Upload Employee List (Excel)", type=["xlsx"])
+        uploaded_file = st.file_uploader(
+            "Upload Employee List (Excel)",
+            type=["xlsx"]
+        )
 
         st.text_input("Username", key="user")
         st.text_input("Password", type="password", key="pwd")
 
-        submit_admin = st.form_submit_button("Login", type="primary")
+        submit = st.form_submit_button("Login", type="primary")
 
-        if submit_admin:
+        if submit:
             if uploaded_file:
-                df_emp = pd.read_excel(uploaded_file)
-                st.session_state.valid_employees = df_emp.set_index("EMP ID")["Full Name"].to_dict()
-                save_employees()
-                st.success("Employee list loaded and saved!")
+                df = pd.read_excel(uploaded_file)
 
-            login_admin()
+                df = df.rename(columns={
+                    "employee id": "Employee ID",
+                    "Emp ID": "Employee ID",
+                    "emp_id": "Employee ID",
+                    "Full name": "Full Name",
+                    "Name": "Full Name"
+                })
 
-    st.markdown(
-        """
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+                if "Employee ID" not in df.columns or "Full Name" not in df.columns:
+                    st.error("Excel must contain 'Employee ID' and 'Full Name'")
+                    st.stop()
 
-    if st.session_state.get("login_error", False):
-        st.error("Invalid login")
-        st.session_state.login_error = False
+                df = df.drop_duplicates("Employee ID")
+                st.session_state.entries = df[["Employee ID", "Full Name"]].to_dict("records")
 
-    st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
+            if login_admin():
+                st.success("Login successful")
+            else:
+                st.error("Invalid login")
+
+    # ---- POST LOGIN ACTIONS ----
+    if st.session_state.admin:
+
+        st.markdown("---")
+
+        if st.session_state.entries:
+            df = pd.DataFrame(st.session_state.entries)
+            csv = df.to_csv(index=False).encode("utf-8-sig")
+
+            st.download_button(
+                "⬇️ Download CSV",
+                csv,
+                "entries.csv",
+                "text/csv"
+            )
+
+        st.button(
+            "🎰 Enter Raffle",
+            on_click=go_to,
+            args=("raffle",),
+            type="primary"
+        )
+
+        st.button("Logout", on_click=logout)
+        st.button("Back to Landing", on_click=go_to, args=("landing",))
 
 
 # ---------------- RAFFLE ----------------
 elif st.session_state.page == "raffle":
+
     if not st.session_state.admin:
+        st.warning("Unauthorized access")
+        go_to("admin")
+
+    st.markdown("<h1>🎰 Raffle Draw</h1>", unsafe_allow_html=True)
+
+    if not st.session_state.entries:
+        st.info("No entries available")
+        st.button("Back to Admin", on_click=go_to, args=("admin",))
         st.stop()
 
-    st.markdown("<h1>Raffle Draw</h1>", unsafe_allow_html=True)
+    df = pd.DataFrame(st.session_state.entries)
+    st.data_editor(df, key="raffle_editor")
 
-    # ---- EXCEL IMPORT ----
-    uploaded_file = st.file_uploader("Upload Excel (.xlsx)", type=["xlsx"])
+    st.button("🎰 Run Raffle", on_click=run_raffle, type="primary")
 
-    if uploaded_file:
-        df_excel = pd.read_excel(uploaded_file)
-
-        # Rename columns to required output
-        df_excel = df_excel.rename(columns={
-            "Employee ID": "Employee ID",
-            "employee id": "Employee ID",
-            "Emp ID": "Employee ID",
-            "emp_id": "Employee ID",
-            "Full Name": "Full Name",
-            "Full name": "Full Name",
-            "Name": "Full Name"
-        })
-
-        # Check if Employee ID exists
-        if "Employee ID" not in df_excel.columns:
-            st.error("Please include 'Employee ID' column.")
-            st.stop()
-
-        # Remove duplicates based on Employee ID
-        df_excel = df_excel.drop_duplicates(subset=["Employee ID"])
-
-        # Keep only required columns
-        df_excel = df_excel[["Employee ID", "Full Name"]]
-
-        st.session_state.entries = df_excel.to_dict("records")
-
-    # ---- SHOW TABLE ----
-    if st.session_state.entries:
-        df = pd.DataFrame(st.session_state.entries)
-
-        st.data_editor(df, key="raffle_editor")
-
-        # ---- RUN RAFFLE BUTTON ----
-        st.button("🎰 Run Raffle", on_click=run_raffle, key="run_raffle_btn", type="primary")
-
-        # ---- DOWNLOAD BUTTON ----
-        csv_bytes = df.to_csv(index=False).encode("utf-8-sig")
-        st.download_button(
-            label="⬇️ Download CSV",
-            data=csv_bytes,
-            file_name="entries.csv",
-            mime="text/csv",
-            key="download_csv_btn"
+    if st.session_state.winner:
+        st.markdown(
+            f"""
+            <div style="text-align:center;margin-top:40px;">
+                <h2>🎉 WINNER 🎉</h2>
+                <h1 style="color:gold;font-size:70px;">
+                    {st.session_state.winner['Full Name']}
+                </h1>
+            </div>
+            """,
+            unsafe_allow_html=True
         )
 
-        # ---- WINNER DISPLAY ----
-        if st.session_state.winner is not None:
-            winner_name = (
-                st.session_state.winner.get("Full Name")
-                if isinstance(st.session_state.winner, dict)
-                else st.session_state.winner
-            )
-
-            st.markdown(
-                f"""
-                <div style="text-align:center;margin-top:40px;">
-                    <h2 style="color:white;">🎉 WINNER 🎉</h2>
-                    <h1 style="color:gold;font-size:80px;">
-                        {winner_name}
-                    </h1>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-
-        st.button("Logout", on_click=logout, type="secondary")
-        st.button("Delete All Entries", on_click=delete_all, type="secondary")
-
-    else:
-        st.info("No registrations yet")
-
-    st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
+    st.markdown("---")
+    st.button("Logout", on_click=logout)
+    st.button("Back to Landing", on_click=go_to, args=("landing",))
