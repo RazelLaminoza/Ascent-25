@@ -337,8 +337,8 @@ if st.session_state.page == "landing":
     /* Position by X and Y */
     #landing-button {
         position: absolute;
-        left: 50%;   /* X axis */
-        top: 70%;    /* Y axis */
+        left: 90%;   /* X axis */
+        top: 90%;    /* Y axis */
         transform: translate(-50%, -50%);
     }
     </style>
