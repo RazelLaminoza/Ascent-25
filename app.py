@@ -325,7 +325,7 @@ if st.session_state.page == "landing":
     /* Style the Streamlit button */
     div[data-testid="stButton"] > button {
         width: 360px !important;
-        height: 99px !important;
+        height: 55px !important;
         font-size: 16px !important;
         font-weight: 700 !important;
         background-color: #FFD700 !important;
@@ -337,8 +337,8 @@ if st.session_state.page == "landing":
     /* Position by X and Y */
     #landing-button {
         position: absolute;
-        left: 90%;   /* X axis */
-        top: 90%;    /* Y axis */
+        left: 10%;   /* X axis */
+        top: 20%;    /* Y axis */
         transform: translate(-50%, -50%);
     }
     </style>
