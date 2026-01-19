@@ -359,6 +359,14 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
+    # hidden Streamlit button
+    st.button(
+        "hidden",
+        key="hidden-btn",
+        on_click=go_to,
+        args=("register",)
+    )
+
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
