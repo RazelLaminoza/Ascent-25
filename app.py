@@ -307,14 +307,9 @@ def export_csv():
 if st.session_state.page == "landing":
     st.markdown("""
     <style>
-    .block-container {
-        padding: 0 !important;
-        max-width: 100% !important;
-    }
-    html, body {
-        overflow: hidden !important;
-        height: 100% !important;
-    }
+    .block-container { padding: 0 !important; max-width: 100% !important; }
+    html, body { overflow: hidden !important; height: 100% !important; }
+
     .landing {
         height: 100vh;
         display: flex;
@@ -324,7 +319,7 @@ if st.session_state.page == "landing":
         text-align: center;
         margin-top: -90px;
     }
-    /* BUTTON STYLE (same as admin) */
+
     div[data-testid="stButton"] > button {
         width: 100% !important;
         max-width: 360px !important;
@@ -335,22 +330,11 @@ if st.session_state.page == "landing":
         color: black !important;
         border: none !important;
         border-radius: 8px !important;
-        margin: 20px auto 0 auto !important;
-    }
-    div[data-testid="stButton"] > button span,
-    div[data-testid="stButton"] > button span * {
-        color: black !important;
-    }
-    @media (max-width: 600px) {
-        div[data-testid="stButton"] > button {
-            max-width: 320px !important;
-            font-size: 15px !important;
-        }
+        margin-top: 20px !important;
     }
     </style>
     """, unsafe_allow_html=True)
 
-    # ---- HTML CONTENT ----
     st.markdown(
         f"""
         <div class="landing">
@@ -365,16 +349,15 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
-    # ---- STREAMLIT BUTTON (separate, NOT inside markdown) ----
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        st.button(
-            "Pre-register",
-            on_click=go_to,
-            args=("register",),
-            type="primary",
-            key="landing_register_1"
-        )
+    # Streamlit button placed right after the HTML content
+    st.button(
+        "Pre-register",
+        on_click=go_to,
+        args=("register",),
+        type="primary",
+        key="landing_register_1"
+    )
+
 
 
 
