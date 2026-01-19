@@ -294,33 +294,28 @@ if st.session_state.page == "landing":
                 margin-top: -90px;
             }
 
-            /* ===== CENTERED OBLONG BUTTON ===== */
-            div[data-testid="stButton"] > button {
+            /* ===== CLICKABLE IMAGE BUTTON ===== */
+            .pre-reg-btn {
                 width: 520px !important;
                 height: 70px !important;
-                font-size: 22px !important;
-                font-weight: 800 !important;
-                background-color: #FFD700 !important;
-                color: black !important;
-                border: none !important;
-                border-radius: 999px !important;
-                margin: 20px auto 0 auto !important;
-                display: block !important;
+                margin: 20px auto 0 auto;
+                display: block;
             }
 
-            div[data-testid="stButton"] > button span,
-            div[data-testid="stButton"] > button span * {
-                color: black !important;
+            .pre-reg-btn img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+                cursor: pointer;
+                border-radius: 999px;
             }
 
             /* ===== MOBILE ===== */
             @media (max-width: 600px) {
-                div[data-testid="stButton"] > button {
+                .pre-reg-btn {
                     width: 90% !important;
                     max-width: 420px !important;
                     height: 60px !important;
-                    font-size: 20px !important;
-                    border-radius: 999px !important;
                     margin: 16px auto 0 auto !important;
                 }
             }
@@ -342,16 +337,19 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
-    # ✅ SIMPLE CENTERING (NO FIGHTING GRID)
+    # ---------- CLICKABLE IMAGE BUTTON (instead of st.button) ----------
     col1, col2, col3 = st.columns([1, 2, 1])
 
     with col2:
-        st.button(
-            "Pre-register",
-            on_click=go_to,
-            args=("register",),
-            type="primary",
-            key="landing_register_1"
+        st.markdown(
+            f"""
+            <div class="pre-reg-btn">
+                <a href="javascript:void(0)" onclick="window.location.href='?page=register'">
+                    <img src="data:image/png;base64,{base64.b64encode(open('pre-reg.png','rb').read()).decode()}"/>
+                </a>
+            </div>
+            """,
+            unsafe_allow_html=True
         )
 
 
