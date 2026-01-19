@@ -352,7 +352,7 @@ if st.session_state.page == "landing":
                 div[data-testid="stButton"] > button {
                     width: 90% !important;
                     max-width: 420px !important;
-                    height: 90px !important;
+                    height: 70px !important;
                 }
             }
         </style>
