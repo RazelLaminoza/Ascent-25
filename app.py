@@ -9,6 +9,9 @@ import time
 import os
 from PIL import Image, ImageDraw, ImageFont
 
+params = st.experimental_get_query_params()
+if params.get("page") == ["register"]:
+    st.session_state.page = "register"
 
 
 # ---------------- PAGE CONFIG ----------------
@@ -309,11 +312,6 @@ if st.session_state.page == "landing":
                 border-radius: 999px;
             }
 
-            /* Hide the real button */
-            #real-button {
-                display: none;
-            }
-
             /* ===== MOBILE ===== */
             @media (max-width: 600px) {
                 .pre-reg-btn {
@@ -340,25 +338,21 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
+    # ---------- CLICKABLE IMAGE (NO BUTTON) ----------
     col1, col2, col3 = st.columns([1, 2, 1])
 
     with col2:
-        # 1️⃣ Hidden real button that triggers go_to("register")
-        if st.button("Pre-register", key="real-button", on_click=go_to, args=("register",)):
-            pass
-
-        # 2️⃣ Visible image that clicks the hidden button
         st.markdown(
             f"""
             <div class="pre-reg-btn">
-                <img
-                    src="data:image/png;base64,{base64.b64encode(open('pre-reg.png','rb').read()).decode()}"
-                    onclick="document.querySelector('button[kind=\"primary\"]').click()"
-                />
+                <a href="?page=register">
+                    <img src="data:image/png;base64,{base64.b64encode(open('pre-reg.png','rb').read()).decode()}"/>
+                </a>
             </div>
             """,
             unsafe_allow_html=True
         )
+
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
