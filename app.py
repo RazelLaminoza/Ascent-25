@@ -574,12 +574,19 @@ if st.session_state.page == "admin":
 
        df = pd.DataFrame(st.session_state.entries)
 
-# ---- FORCE ONLY THESE COLUMNS ----
-if "name" in df.columns:
-    df["Full Name"] = df["name"]
-    df.drop(columns=["name"], inplace=True)
+        st.markdown("### Employee List")
+        df = pd.DataFrame(st.session_state.entries)
 
-df = df[["emp", "Full Name"]]
+        # ---- FORCE ONLY THESE COLUMNS ----
+        if "name" in df.columns:
+            df["Full Name"] = df["name"]
+            df.drop(columns=["name"], inplace=True)
+
+        df = df[["emp", "Full Name"]]
+
+        st.dataframe(df, use_container_width=True)
+
+        csv = df.to_csv(index=False).encode("utf-8-sig")
 
         st.download_button(
             "⬇️ Download CSV",
@@ -588,6 +595,7 @@ df = df[["emp", "Full Name"]]
             "text/csv",
             key="download_csv"
         )
+
 
         st.button(
             "🗑️ Delete All Entries",
