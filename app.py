@@ -589,32 +589,24 @@ if st.session_state.page == "admin":
 
         if submit:
             if uploaded_file:
-                df = pd.read_excel(uploaded_file)
-
-                df = df.rename(columns={
-                    "employee id": "Employee ID",
-                    "Emp ID": "Employee ID",
-                    "emp_id": "Employee ID",
-                    "Full name": "Full Name",
-                    "Name": "Full Name"
-                })
-
-                if "Employee ID" not in df.columns or "Full Name" not in df.columns:
-                    st.error("Excel must contain 'Employee ID' and 'Full Name'")
-                else:
-                    df = df.drop_duplicates("Employee ID")
-                    st.session_state.entries = df[["Employee ID", "Full Name"]].to_dict("records")
-                    save_entries()
+                # your file upload logic here
+                pass
 
             if login_admin():
                 st.success("Login successful")
             else:
                 st.error("Invalid login")
 
+    # ---------- SHOW BACK BUTTON ONLY WHEN NOT LOGGED IN ----------
+    if not st.session_state.admin:
+        st.button(
+            "Back to Landing",
+            on_click=go_to,
+            args=("landing",),
+            key="back_to_landing_admin"
+        )
 
-        
-
-    # ---- SHOW TABLE (ADMIN ONLY) ----
+    # ---------- SHOW ADMIN CONTROLS ONLY WHEN LOGGED IN ----------
     if st.session_state.admin and st.session_state.entries:
 
         st.markdown("### Employee List")
@@ -629,12 +621,14 @@ if st.session_state.page == "admin":
             "text/csv",
             key="download_csv"
         )
+
         st.button(
-        "🗑️ Delete All Entries",
-        on_click=delete_all_entries,
-        type="secondary",
-        key="delete_entries"
+            "🗑️ Delete All Entries",
+            on_click=delete_all_entries,
+            type="secondary",
+            key="delete_entries"
         )
+
         st.button(
             "🎰 Enter Raffle",
             on_click=go_to,
@@ -646,11 +640,6 @@ if st.session_state.page == "admin":
     if st.session_state.admin:
         st.markdown("---")
         st.button("Logout", on_click=logout, key="logout_admin")
-        st.button(
-    "Back to Landing",
-    on_click=logout,
-    key="back_to_landing_admin"
-)
 
 
 # ---------------- RAFFLE PAGE ----------------
