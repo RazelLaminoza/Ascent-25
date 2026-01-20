@@ -527,6 +527,66 @@ def run_raffle():
         st.session_state.winner = random.choice(st.session_state.entries)
 
 
+# ---------------- FILE STORAGE ----------------
+FILE_PATH = "entries.csv"
+
+# ---------------- SESSION STATE ----------------
+if "page" not in st.session_state:
+    st.session_state.page = "admin"
+
+if "admin" not in st.session_state:
+    st.session_state.admin = False
+
+if "entries" not in st.session_state:
+    st.session_state.entries = []
+
+if "winner" not in st.session_state:
+    st.session_state.winner = None
+
+
+# ---------------- CREDENTIALS ----------------
+USERNAME = "admin"
+PASSWORD = "admin123"
+
+
+# ---------------- FUNCTIONS ----------------
+def load_entries():
+    if os.path.exists(FILE_PATH):
+        df = pd.read_csv(FILE_PATH)
+        st.session_state.entries = df.to_dict("records")
+
+
+def save_entries():
+    df = pd.DataFrame(st.session_state.entries)
+    df.to_csv(FILE_PATH, index=False)
+
+
+def go_to(page):
+    st.session_state.page = page
+
+
+def login_admin():
+    if st.session_state.user == USERNAME and st.session_state.pwd == PASSWORD:
+        st.session_state.admin = True
+        return True
+    return False
+
+
+def logout():
+    st.session_state.admin = False
+    st.session_state.winner = None
+    st.session_state.page = "admin"
+
+
+def run_raffle():
+    if st.session_state.entries:
+        st.session_state.winner = random.choice(st.session_state.entries)
+
+
+# ---------------- LOAD ENTRIES ON START ----------------
+load_entries()
+
+
 # ---------------- ADMIN PAGE ----------------
 if st.session_state.page == "admin":
 
@@ -560,13 +620,14 @@ if st.session_state.page == "admin":
                 else:
                     df = df.drop_duplicates("Employee ID")
                     st.session_state.entries = df[["Employee ID", "Full Name"]].to_dict("records")
+                    save_entries()
 
             if login_admin():
                 st.success("Login successful")
             else:
                 st.error("Invalid login")
 
-    # ---- ADMIN VIEW (TABLE ONLY HERE) ----
+    # ---- SHOW TABLE (ADMIN ONLY) ----
     if st.session_state.admin and st.session_state.entries:
 
         st.markdown("### Employee List")
@@ -588,6 +649,7 @@ if st.session_state.page == "admin":
             type="primary"
         )
 
+    if st.session_state.admin:
         st.markdown("---")
         st.button("Logout", on_click=logout)
 
@@ -603,17 +665,25 @@ elif st.session_state.page == "raffle":
     st.button("🎰 Run Raffle", on_click=run_raffle, type="primary")
 
     if st.session_state.winner:
+        winner_name = (
+            st.session_state.winner.get("Full Name")
+            if isinstance(st.session_state.winner, dict)
+            else st.session_state.winner
+        )
+
         st.markdown(
             f"""
             <div style="text-align:center;margin-top:40px;">
                 <h2>🎉 WINNER 🎉</h2>
                 <h1 style="color:gold;font-size:70px;">
-                    {st.session_state.winner['Full Name']}
+                    {winner_name}
                 </h1>
             </div>
             """,
             unsafe_allow_html=True
         )
 
+    st.markdown("---")
+    st.button("Logout", on_click=logout)
     st.markdown("---")
     st.button("Logout", on_click=logout)
