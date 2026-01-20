@@ -365,11 +365,10 @@ col1, col2, col3 = st.columns([5.2, 1, 5])
 
 with col2:
     st.button(
-        "Pre-register",
+        "Back to Landing",
         on_click=go_to,
-        args=("register",),
-        type="primary",
-        key="landing_register_1"
+        args=("landing",),
+        type="secondary"
     )
 
 
