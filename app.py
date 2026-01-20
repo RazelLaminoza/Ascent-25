@@ -484,49 +484,6 @@ elif st.session_state.page == "register":
         st.button("Admin Login", on_click=go_to, args=("admin",), type="secondary")
 
 #-----------------admin----------------
-# ---------------- SESSION STATE ----------------
-if "page" not in st.session_state:
-    st.session_state.page = "admin"   # 👈 START DIRECTLY HERE
-
-if "admin" not in st.session_state:
-    st.session_state.admin = False
-
-if "entries" not in st.session_state:
-    st.session_state.entries = []
-
-if "winner" not in st.session_state:
-    st.session_state.winner = None
-
-
-# ---------------- CREDENTIALS ----------------
-USERNAME = "admin"
-PASSWORD = "admin123"
-
-
-# ---------------- FUNCTIONS ----------------
-def go_to(page):
-    st.session_state.page = page
-
-
-def login_admin():
-    if st.session_state.user == USERNAME and st.session_state.pwd == PASSWORD:
-        st.session_state.admin = True
-        return True
-    return False
-
-
-def logout():
-    st.session_state.admin = False
-    st.session_state.entries = []
-    st.session_state.winner = None
-    st.session_state.page = "admin"
-
-
-def run_raffle():
-    if st.session_state.entries:
-        st.session_state.winner = random.choice(st.session_state.entries)
-
-
 # ---------------- FILE STORAGE ----------------
 FILE_PATH = "entries.csv"
 
@@ -543,6 +500,8 @@ if "entries" not in st.session_state:
 if "winner" not in st.session_state:
     st.session_state.winner = None
 
+if "shuffling" not in st.session_state:
+    st.session_state.shuffling = False
 
 # ---------------- CREDENTIALS ----------------
 USERNAME = "admin"
@@ -581,6 +540,17 @@ def logout():
 def run_raffle():
     if st.session_state.entries:
         st.session_state.winner = random.choice(st.session_state.entries)
+
+
+def shuffle_effect():
+    st.session_state.shuffling = True
+    for _ in range(15):
+        temp = random.choice(st.session_state.entries)
+        st.session_state.winner = temp
+        time.sleep(0.1)
+        st.experimental_rerun()
+    st.session_state.shuffling = False
+    run_raffle()
 
 
 # ---------------- LOAD ENTRIES ON START ----------------
@@ -639,19 +609,21 @@ if st.session_state.page == "admin":
             "⬇️ Download CSV",
             csv,
             "entries.csv",
-            "text/csv"
+            "text/csv",
+            key="download_csv"
         )
 
         st.button(
             "🎰 Enter Raffle",
             on_click=go_to,
             args=("raffle",),
-            type="primary"
+            type="primary",
+            key="enter_raffle"
         )
 
     if st.session_state.admin:
         st.markdown("---")
-        st.button("Logout", on_click=logout)
+        st.button("Logout", on_click=logout, key="logout_admin")
 
 
 # ---------------- RAFFLE PAGE ----------------
@@ -662,7 +634,7 @@ elif st.session_state.page == "raffle":
 
     st.markdown("<h1>🎰 Raffle Draw</h1>", unsafe_allow_html=True)
 
-    st.button("🎰 Run Raffle", on_click=run_raffle, type="primary")
+    st.button("🎰 Run Raffle", on_click=shuffle_effect, type="primary", key="run_raffle")
 
     if st.session_state.winner:
         winner_name = (
@@ -684,6 +656,4 @@ elif st.session_state.page == "raffle":
         )
 
     st.markdown("---")
-    st.button("Logout", on_click=logout)
-    st.markdown("---")
-    st.button("Logout", on_click=logout)
+    st.button("Logout", on_click=logout, key="logout_raffle")
