@@ -471,9 +471,9 @@ if st.session_state.get("go_admin", False):
     go_to("admin")
 
 # ------------------ BACK + ADMIN BUTTONS (OUTSIDE FORM) ------------------
-col1, col2 = st.columns(2)
-with col1:
-    st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
 
 
 #-----------------admin----------------
