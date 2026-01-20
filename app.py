@@ -412,7 +412,7 @@ elif st.session_state.page == "register":
     )
 
     # ------------------ FORM ------------------
-        if submit:
+if submit:
 
     # ---- ADMIN SECRET CODE ----
     if emp == "admin123":
@@ -444,6 +444,8 @@ elif st.session_state.page == "register":
             pass_bytes = buf.getvalue()
 
             st.success("Registered and VERIFIED ✔️")
+
+
 
             img_b64 = base64.b64encode(pass_bytes).decode()
                     st.markdown(
