@@ -394,7 +394,7 @@ if st.session_state.page == "register":
         unsafe_allow_html=True
     )
     # ------------------ FORM ------------------
- with st.form("form"):
+with st.form("form"):
     emp = st.text_input("Employee ID")
     submit = st.form_submit_button("Submit", type="primary")
 
@@ -465,18 +465,15 @@ if st.session_state.get("pass_bytes"):
         type="primary"
     )
 
+# ---- REDIRECT AFTER FORM ----
+if st.session_state.get("go_admin", False):
+    st.session_state.go_admin = False
+    go_to("admin")
 
-    # ---- REDIRECT AFTER FORM ----
-    if st.session_state.get("go_admin", False):
-        st.session_state.go_admin = False
-        go_to("admin")
-
-    # ------------------ BACK + ADMIN BUTTONS (OUTSIDE FORM) ------------------
-    col1, col2 = st.columns(2)
-    with col1:
-        st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
-   
-   
+# ------------------ BACK + ADMIN BUTTONS (OUTSIDE FORM) ------------------
+col1, col2 = st.columns(2)
+with col1:
+    st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
 
 
 #-----------------admin----------------
