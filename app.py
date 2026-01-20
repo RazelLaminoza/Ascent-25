@@ -23,17 +23,14 @@ def add_custom_font():
                     src: url("data:font/ttf;base64,{font_b64}") format("truetype");
                 }}
 
-                /* Apply font everywhere in Streamlit */
                 * {{
                     font-family: "PPNeueMachina" !important;
                 }}
 
-                /* Extra strong override for Streamlit internal elements */
                 [class*="css"] {{
                     font-family: "PPNeueMachina" !important;
                 }}
 
-                /* Buttons and Inputs */
                 button, input, textarea, select {{
                     font-family: "PPNeueMachina" !important;
                 }}
@@ -41,9 +38,6 @@ def add_custom_font():
         """, unsafe_allow_html=True)
 
 add_custom_font()
-
-
-
 
 # ---------------- PAGE CONFIG ----------------
 st.set_page_config(
@@ -55,30 +49,25 @@ st.set_page_config(
 # ---------------- STORAGE ----------------
 DATA_FILE = "raffle_data.json"
 EMPLOYEE_FILE = "employees.json"
+FILE_PATH = "entries.csv"
 
-# Load raffle entries
-if os.path.exists(DATA_FILE):
-    with open(DATA_FILE, "r") as f:
-        data = json.load(f)
-        st.session_state.entries = data.get("entries", [])
-else:
-    st.session_state.entries = []
-
-# Load employee list (persisted)
-if os.path.exists(EMPLOYEE_FILE):
-    with open(EMPLOYEE_FILE, "r") as f:
-        st.session_state.valid_employees = json.load(f)
-else:
-    st.session_state.valid_employees = {}
-
+# ---------------- SESSION STATE (ONE TIME ONLY) ----------------
 if "page" not in st.session_state:
     st.session_state.page = "landing"
+
 if "admin" not in st.session_state:
     st.session_state.admin = False
+
 if "winner" not in st.session_state:
     st.session_state.winner = None
 
-# ---------------- FUNCTIONS ----------------
+if "entries" not in st.session_state:
+    st.session_state.entries = []
+
+if "go_admin" not in st.session_state:
+    st.session_state.go_admin = False
+
+# ---------------- FUNCTIONS (KEEP ORIGINAL) ----------------
 def save_data():
     with open(DATA_FILE, "w") as f:
         json.dump({"entries": st.session_state.entries}, f)
@@ -93,7 +82,6 @@ def generate_qr(data):
     qr.make(fit=True)
     return qr.make_image(fill_color="black", back_color="white")
 
-# ---- ADD THIS FUNCTION HERE ----
 def wrap_text(text, font, max_width):
     words = text.split(" ")
     lines = []
@@ -111,7 +99,6 @@ def wrap_text(text, font, max_width):
         lines.append(current_line)
 
     return lines
-# -------------------------------
 
 def resize_keep_aspect(img, max_size):
     img = img.convert("RGBA")
@@ -119,7 +106,6 @@ def resize_keep_aspect(img, max_size):
     return img
 
 def create_pass_image(name, emp, qr_img):
-    # Load background image
     bg = Image.open("bgna.png").convert("RGBA")
     bg = bg.resize((900, 500))
 
@@ -128,7 +114,6 @@ def create_pass_image(name, emp, qr_img):
 
     draw = ImageDraw.Draw(img)
 
-    # Load fonts (regular)
     try:
         font_big = ImageFont.truetype("CourierPrime-Bold.ttf", 42)
         font_small = ImageFont.truetype("CourierPrime-Bold.ttf", 26)
@@ -137,7 +122,6 @@ def create_pass_image(name, emp, qr_img):
 
     text_color = (255, 255, 255, 255)
 
-    # Add 1.png and 2.png at the top-right (no stretching)
     logo1 = Image.open("1.png").convert("RGBA")
     logo2 = Image.open("2.png").convert("RGBA")
 
@@ -147,7 +131,6 @@ def create_pass_image(name, emp, qr_img):
     img.paste(logo1, (620, 30), logo1)
     img.paste(logo2, (760, 30), logo2)
 
-    # Text
     draw.text((40, 40), "ASCENT APAC 2026", fill=text_color, font=font_big)
     draw.text((40, 120), "FULL NAME:", fill=text_color, font=font_big)
     draw.text((40, 160), name, fill=text_color, font=font_small)
@@ -166,11 +149,6 @@ def create_pass_image(name, emp, qr_img):
     img.paste(qr_img, (620, 140), qr_img.convert("RGBA"))
 
     return img.convert("RGB")
-
-
-
-
-
 
 def set_bg(image):
     with open(image, "rb") as f:
@@ -198,7 +176,6 @@ def set_bg(image):
         height: 0px;
     }}
 
-    /* Minimal button style */
     button {{
         min-height: 48px;
         font-size: 18px;
@@ -212,21 +189,18 @@ def set_bg(image):
         cursor: pointer;
     }}
 
-    /* Yellow primary */
     button[kind="primary"] {{
         background-color: #FFD400 !important;
         color: black !important;
         font-weight: 700;
     }}
 
-    /* Black secondary */
     button[kind="secondary"] {{
         background-color: #000000 !important;
         color: white !important;
         font-weight: 500;
     }}
 
-    /* Minimal form inputs */
     .stTextInput > div > input {{
         max-width: 320px;
         margin: 0 auto;
@@ -287,7 +261,6 @@ def run_raffle():
     st.session_state.winner = random.choice(st.session_state.entries)
     placeholder.empty()
 
-
 def logout():
     st.session_state.admin = False
     st.session_state.page = "landing"
@@ -295,12 +268,10 @@ def logout():
 
 def delete_all_entries():
     st.session_state.entries = []
-    # also delete the CSV file
     if os.path.exists(FILE_PATH):
         os.remove(FILE_PATH)
     st.success("All entries deleted.")
 
-    
 def export_csv():
     df = pd.DataFrame(st.session_state.entries)
     df.to_csv("entries.csv", index=False)
@@ -308,7 +279,6 @@ def export_csv():
 
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
-
     st.markdown("""
     <style>
     .block-container { padding: 0 !important; max-width: 100% !important; }
@@ -353,7 +323,6 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
-    # <-- MOVE IT HERE -->
     col1, col2, col3 = st.columns([5.2, 1, 5])
     with col2:
         st.button(
@@ -362,203 +331,107 @@ if st.session_state.page == "landing":
             args=("register",),
             type="primary",
             key="landing_register_1"
-                        )
+        )
 
 # ---------------- REGISTER ----------------
-if st.session_state.page == "register":
+elif st.session_state.page == "register":
     st.markdown("<h1 style='color:white;'>Register Here</h1>", unsafe_allow_html=True)
 
-    st.markdown(
-        """
-        <style>
-        div[data-testid="stFormSubmitButton"] > button {
-            width: 100% !important;
-            max-width: 520px !important;
-            height: 55px !important;
-            font-size: 16px !important;
-            font-weight: 700 !important;
-            background-color: #FFD700 !important;
-            color: black !important;
-            border: none !important;
-            border-radius: 8px !important;
-            margin: 0 auto !important;
-            padding: 0 !important;
-        }
+    st.markdown("""
+    <style>
+    div[data-testid="stFormSubmitButton"] > button {
+        width: 100% !important;
+        max-width: 520px !important;
+        height: 55px !important;
+        font-size: 16px !important;
+        font-weight: 700 !important;
+        background-color: #FFD700 !important;
+        color: black !important;
+        border: none !important;
+        border-radius: 8px !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+    }
 
-        div[data-testid="stFormSubmitButton"] > button span,
-        div[data-testid="stFormSubmitButton"] > button span * {
-            color: black !important;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-    # ------------------ FORM ------------------
-with st.form("form"):
-    emp = st.text_input("Employee ID")
-    submit = st.form_submit_button("Submit", type="primary")
+    div[data-testid="stFormSubmitButton"] > button span,
+    div[data-testid="stFormSubmitButton"] > button span * {
+        color: black !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
-    if submit:
+    with st.form("form"):
+        emp = st.text_input("Employee ID")
+        submit = st.form_submit_button("Submit", type="primary")
 
-        # ---- ADMIN SECRET CODE ----
-        if emp == "admin123":
-            st.session_state.go_admin = True  # <-- redirect flag
+        if submit:
+            if emp == "admin123":
+                st.session_state.go_admin = True
 
-        # ---- VALIDATION ----
-        elif not emp:
-            st.error("Employee ID NOT VERIFIED ❌")
+            elif not emp:
+                st.error("Employee ID NOT VERIFIED ❌")
 
-        elif any(e["emp"] == emp for e in st.session_state.entries):
-            st.error("You already registered ❌")
+            elif any(e["emp"] == emp for e in st.session_state.entries):
+                st.error("You already registered ❌")
 
-        elif emp not in st.session_state.valid_employees:
-            st.error("Employee ID NOT VERIFIED ❌")
+            elif emp not in st.session_state.valid_employees:
+                st.error("Employee ID NOT VERIFIED ❌")
 
-        else:
-            name = st.session_state.valid_employees.get(emp, "Unknown")
-            st.session_state.entries.append({"emp": emp, "name": name})
-            save_data()
+            else:
+                name = st.session_state.valid_employees.get(emp, "Unknown")
+                st.session_state.entries.append({"emp": emp, "Full Name": name})
+                save_data()
 
-            qr_img = generate_qr(f"{name} | {emp}")
-            pass_img = create_pass_image(name, emp, qr_img)
+                qr_img = generate_qr(f"{name} | {emp}")
+                pass_img = create_pass_image(name, emp, qr_img)
 
-            buf = io.BytesIO()
-            pass_img.save(buf, format="PNG")
-            pass_bytes = buf.getvalue()
+                buf = io.BytesIO()
+                pass_img.save(buf, format="PNG")
+                pass_bytes = buf.getvalue()
 
-            # 🔥 IMPORTANT: save to session_state
-            st.session_state.pass_bytes = pass_bytes
-            st.session_state.pass_emp = emp
+                st.session_state.pass_bytes = pass_bytes
+                st.session_state.pass_emp = emp
 
-            st.success("Registered and VERIFIED ✔️")
-            img_b64 = base64.b64encode(pass_bytes).decode()
+                st.success("Registered and VERIFIED ✔️")
+                img_b64 = base64.b64encode(pass_bytes).decode()
 
-            st.markdown(
-                f"""
-                <div style="display:flex; justify-content:center; margin-top: 20px;">
-                    <div style="
-                        background: #FFD700;
-                        color: #000000;
-                        border: 1px solid rgba(0, 0, 0, 0.25);
-                        border-radius: 18px;
-                        padding: 16px;
-                        backdrop-filter: blur(8px);
-                        -webkit-backdrop-filter: blur(8px);
-                        box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-                        max-width: 520px;
-                        width: 100%;
-                    ">
-                        <img src="data:image/png;base64,{img_b64}" style="width:100%; border-radius: 12px;" />
+                st.markdown(
+                    f"""
+                    <div style="display:flex; justify-content:center; margin-top: 20px;">
+                        <div style="
+                            background: #FFD700;
+                            color: #000000;
+                            border: 1px solid rgba(0, 0, 0, 0.25);
+                            border-radius: 18px;
+                            padding: 16px;
+                            backdrop-filter: blur(8px);
+                            -webkit-backdrop-filter: blur(8px);
+                            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+                            max-width: 520px;
+                            width: 100%;
+                        ">
+                            <img src="data:image/png;base64,{img_b64}" style="width:100%; border-radius: 12px;" />
+                        </div>
                     </div>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+                    """,
+                    unsafe_allow_html=True
+                )
 
-# ------------------ DOWNLOAD BUTTON (OUTSIDE FORM) ------------------
-if st.session_state.get("pass_bytes"):
-    st.download_button(
-        "📥 Download Pass (PNG)",
-        st.session_state.pass_bytes,
-        file_name=f"{st.session_state.pass_emp}_event_pass.png",
-        mime="image/png",
-        type="primary"
-    )
-
-# ---- REDIRECT AFTER FORM ----
-if st.session_state.get("go_admin", False):
-    st.session_state.go_admin = False
-    go_to("admin")
-
-#-----------------admin----------------
-# ---------------- FILE STORAGE ----------------
-FILE_PATH = "entries.csv"
-
-# ---------------- SESSION STATE ----------------
-if "page" not in st.session_state:
-    st.session_state.page = "admin"
-
-if "admin" not in st.session_state:
-    st.session_state.admin = False
-
-if "entries" not in st.session_state:
-    st.session_state.entries = []
-
-if "winner" not in st.session_state:
-    st.session_state.winner = None
-
-# ---------------- CREDENTIALS ----------------
-USERNAME = "admin"
-PASSWORD = "admin123"
-
-
-# ---------------- FUNCTIONS ----------------
-def load_entries():
-    if os.path.exists(FILE_PATH):
-        df = pd.read_csv(FILE_PATH)
-        st.session_state.entries = df.to_dict("records")
-
-
-def save_entries():
-    df = pd.DataFrame(st.session_state.entries)
-    df.to_csv(FILE_PATH, index=False)
-
-
-def go_to(page):
-    st.session_state.page = page
-
-
-def login_admin():
-    if st.session_state.user == USERNAME and st.session_state.pwd == PASSWORD:
-        st.session_state.admin = True
-        return True
-    return False
-
-
-def logout():
-    st.session_state.admin = False
-    st.session_state.winner = None
-    st.session_state.page = "admin"
-
-
-def run_raffle():
-    if st.session_state.entries:
-        st.session_state.winner = random.choice(st.session_state.entries)
-
-
-def shuffle_effect():
-    if not st.session_state.entries:
-        return
-
-    placeholder = st.empty()
-
-    # Shuffle effect
-    for _ in range(15):
-        temp = random.choice(st.session_state.entries)
-        placeholder.markdown(
-            f"""
-            <div style="text-align:center;margin-top:40px;">
-                <h2>🎉 SHUFFLING 🎉</h2>
-                <h1 style="color:gold;font-size:70px;">
-                    {temp["Full Name"]}
-                </h1>
-            </div>
-            """,
-            unsafe_allow_html=True
+    if st.session_state.get("pass_bytes"):
+        st.download_button(
+            "📥 Download Pass (PNG)",
+            st.session_state.pass_bytes,
+            file_name=f"{st.session_state.pass_emp}_event_pass.png",
+            mime="image/png",
+            type="primary"
         )
-        time.sleep(0.08)
 
-    # Final winner
-    st.session_state.winner = random.choice(st.session_state.entries)
-    placeholder.empty()
+    if st.session_state.get("go_admin"):
+        st.session_state.go_admin = False
+        go_to("admin")
 
-
-# ---------------- LOAD ENTRIES ON START ----------------
-load_entries()
-
-
-# ---------------- ADMIN PAGE ----------------
-if st.session_state.page == "admin":
+# ---------------- ADMIN ----------------
+elif st.session_state.page == "admin":
 
     st.markdown("<h1>🔐 Admin Panel</h1>", unsafe_allow_html=True)
 
@@ -574,61 +447,30 @@ if st.session_state.page == "admin":
         submit = st.form_submit_button("Login", type="primary")
 
         if submit:
-            if uploaded_file:
-                # your file upload logic here
-                pass
-
             if login_admin():
                 st.success("Login successful")
             else:
                 st.error("Invalid login")
 
-    # ---------- SHOW BACK BUTTON ONLY WHEN NOT LOGGED IN ----------
     if not st.session_state.admin:
-        st.button(
-            "Back to Landing",
-            on_click=go_to,
-            args=("landing",),
-            key="back_to_landing_admin"
-        )
+        st.button("Back to Landing", on_click=go_to, args=("landing",), key="back_to_landing_admin")
 
-    # ---------- SHOW ADMIN CONTROLS ONLY WHEN LOGGED IN ----------
     if st.session_state.admin and st.session_state.entries:
-
         st.markdown("### Employee List")
         df = pd.DataFrame(st.session_state.entries)
         st.dataframe(df, use_container_width=True)
 
         csv = df.to_csv(index=False).encode("utf-8-sig")
-        st.download_button(
-            "⬇️ Download CSV",
-            csv,
-            "entries.csv",
-            "text/csv",
-            key="download_csv"
-        )
+        st.download_button("⬇️ Download CSV", csv, "entries.csv", "text/csv")
 
-        st.button(
-            "🗑️ Delete All Entries",
-            on_click=delete_all_entries,
-            type="secondary",
-            key="delete_entries"
-        )
-
-        st.button(
-            "🎰 Enter Raffle",
-            on_click=go_to,
-            args=("raffle",),
-            type="primary",
-            key="enter_raffle"
-        )
+        st.button("🗑️ Delete All Entries", on_click=delete_all_entries, type="secondary")
+        st.button("🎰 Enter Raffle", on_click=go_to, args=("raffle",), type="primary")
 
     if st.session_state.admin:
         st.markdown("---")
-        st.button("Logout", on_click=logout, key="logout_admin")
+        st.button("Logout", on_click=logout)
 
-
-# ---------------- RAFFLE PAGE ----------------
+# ---------------- RAFFLE ----------------
 elif st.session_state.page == "raffle":
 
     if not st.session_state.admin:
@@ -636,15 +478,10 @@ elif st.session_state.page == "raffle":
 
     st.markdown("<h1>🎰 Raffle Draw</h1>", unsafe_allow_html=True)
 
-    st.button("🎰 Run Raffle", on_click=shuffle_effect, type="primary", key="run_raffle")
+    st.button("🎰 Run Raffle", on_click=shuffle_effect, type="primary")
 
     if st.session_state.winner:
-        winner_name = (
-            st.session_state.winner.get("Full Name")
-            if isinstance(st.session_state.winner, dict)
-            else st.session_state.winner
-        )
-
+        winner_name = st.session_state.winner.get("Full Name")
         st.markdown(
             f"""
             <div style="text-align:center;margin-top:40px;">
@@ -658,4 +495,4 @@ elif st.session_state.page == "raffle":
         )
 
     st.markdown("---")
-    st.button("Logout", on_click=logout, key="logout_raffle")
+    st.button("Logout", on_click=logout)
