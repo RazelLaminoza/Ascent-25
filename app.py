@@ -373,6 +373,7 @@ if st.session_state.page == "landing":
 
 
 # ---------------- REGISTER ----------------
+# ---------- REGISTER PAGE ----------
 if st.session_state.page == "register":
     st.markdown("<h1 style='color:white;'>Register Here</h1>", unsafe_allow_html=True)
 
@@ -403,9 +404,9 @@ if st.session_state.page == "register":
     )
 
     # ------------------ FORM ------------------
-    with st.form("form"):
-        emp = st.text_input("Employee ID")
-        submit = st.form_submit_button("Submit", type="primary")
+    with st.form("form_register"):
+        emp = st.text_input("Employee ID", key="emp_input")
+        submit = st.form_submit_button("Submit", type="primary", key="submit_register")
 
         if submit:
             if emp == "admin123":
@@ -437,15 +438,16 @@ if st.session_state.page == "register":
 
                 st.success("Registered and VERIFIED ✔️")
 
-                # <-- CLEAR EMPLOYEE ID AFTER SUCCESS
-                st.session_state.emp = ""
+                # CLEAR EMPLOYEE ID AFTER SUCCESS
+                st.session_state.emp_input = ""
 
-# <-- Add this outside the form
+# ---------- REDIRECT TO ADMIN ----------
 if st.session_state.get("go_admin", False):
     st.session_state.go_admin = False
-    st.session_state.emp = ""      # <-- CLEAR EMPLOYEE ID
+    st.session_state.emp_input = ""   # CLEAR EMPLOYEE ID
     go_to("admin")
 
+# ---------- SHOW PASS ----------
 if st.session_state.get("pass_bytes"):
     st.image(st.session_state.pass_bytes, caption="✅ Your Pass Preview", use_column_width=True)
 
@@ -454,9 +456,9 @@ if st.session_state.get("pass_bytes"):
         st.session_state.pass_bytes,
         file_name=f"{st.session_state.pass_emp}_event_pass.png",
         mime="image/png",
-        type="primary"
+        type="primary",
+        key="download_pass"
     )
-
 
 #-----------------admin----------------
 # ---------------- FILE STORAGE ----------------
