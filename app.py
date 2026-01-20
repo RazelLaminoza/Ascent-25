@@ -295,7 +295,11 @@ def logout():
 
 def delete_all_entries():
     st.session_state.entries = []
+    # also delete the CSV file
+    if os.path.exists(FILE_PATH):
+        os.remove(FILE_PATH)
     st.success("All entries deleted.")
+
     
 def export_csv():
     df = pd.DataFrame(st.session_state.entries)
