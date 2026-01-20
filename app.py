@@ -362,7 +362,7 @@ if st.session_state.page == "landing":
             args=("register",),
             type="primary",
             key="landing_register_1"
-        )
+                        )
 
 # ---------------- REGISTER ----------------
 if st.session_state.page == "register":
