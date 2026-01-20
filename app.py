@@ -481,7 +481,7 @@ elif st.session_state.page == "register":
         st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
 
     with col2:
-    st.markdown(
+        st.markdown(
         """
         <style>
         #admin_login_btn button {
