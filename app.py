@@ -374,7 +374,7 @@ if st.session_state.page == "landing":
 
 # ---------------- REGISTER ----------------
 elif st.session_state.page == "register":
-    st.markdown("<h1>Register Here</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='color:white;'>Register Here</h1>", unsafe_allow_html=True)
 
     # ---------- BUTTON STYLE ----------
     st.markdown(
