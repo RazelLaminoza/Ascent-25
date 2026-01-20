@@ -565,16 +565,7 @@ if st.session_state.page == "admin":
     if st.session_state.admin and st.session_state.entries:
 
         st.markdown("### Employee List")
-        df = pd.DataFrame(st.session_state.entries)
 
-        # 👉 IMPORTANT: This is the table that will be used in raffle
-        st.session_state.current_table = df.to_dict("records")
-
-        st.dataframe(df, use_container_width=True)
-
-       df = pd.DataFrame(st.session_state.entries)
-
-        st.markdown("### Employee List")
         df = pd.DataFrame(st.session_state.entries)
 
         # ---- FORCE ONLY THESE COLUMNS ----
@@ -583,6 +574,9 @@ if st.session_state.page == "admin":
             df.drop(columns=["name"], inplace=True)
 
         df = df[["emp", "Full Name"]]
+
+        # 👉 This table will be used for raffle
+        st.session_state.current_table = df.to_dict("records")
 
         st.dataframe(df, use_container_width=True)
 
@@ -595,6 +589,7 @@ if st.session_state.page == "admin":
             "text/csv",
             key="download_csv"
         )
+
 
 
         st.button(
