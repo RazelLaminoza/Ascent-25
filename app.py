@@ -483,9 +483,9 @@ elif st.session_state.page == "register":
     with col2:
         st.button("Admin Login", on_click=go_to, args=("admin",), type="secondary")
 
+#-----------------admin----------------
 
-
-st.set_page_config(page_title="Raffle System", layout="centered")
+st.set_page_config(page_title="Employee Raffle", layout="centered")
 
 # ---------------- SESSION STATE ----------------
 if "page" not in st.session_state:
@@ -503,13 +503,12 @@ if "winner" not in st.session_state:
 
 # ---------------- CREDENTIALS ----------------
 USERNAME = "admin"
-PASSWORD = "admin123"
+PASSWORD = "123"
 
 
 # ---------------- FUNCTIONS ----------------
 def go_to(page):
     st.session_state.page = page
-    st.rerun()
 
 
 def login_admin():
@@ -527,7 +526,6 @@ def logout():
     st.session_state.entries = []
     st.session_state.winner = None
     st.session_state.page = "landing"
-    st.rerun()
 
 
 def run_raffle():
@@ -539,11 +537,15 @@ def run_raffle():
 
 # ---------------- LANDING ----------------
 if st.session_state.page == "landing":
-    st.markdown("<h1 style='text-align:center;'>🎉 Welcome</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align:center;'>Employee Raffle System</p>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align:center;'>🎉 Employee Raffle</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align:center;'>Welcome</p>", unsafe_allow_html=True)
 
-    st.markdown("<br>", unsafe_allow_html=True)
-    st.button("🔐 Admin Login", on_click=go_to, args=("admin",), type="primary")
+    st.button(
+        "🔐 Admin Login",
+        on_click=go_to,
+        args=("admin",),
+        type="primary"
+    )
 
 
 # ---------------- ADMIN ----------------
@@ -576,17 +578,16 @@ elif st.session_state.page == "admin":
 
                 if "Employee ID" not in df.columns or "Full Name" not in df.columns:
                     st.error("Excel must contain 'Employee ID' and 'Full Name'")
-                    st.stop()
-
-                df = df.drop_duplicates("Employee ID")
-                st.session_state.entries = df[["Employee ID", "Full Name"]].to_dict("records")
+                else:
+                    df = df.drop_duplicates("Employee ID")
+                    st.session_state.entries = df[["Employee ID", "Full Name"]].to_dict("records")
 
             if login_admin():
                 st.success("Login successful")
             else:
                 st.error("Invalid login")
 
-    # ---- POST LOGIN ACTIONS ----
+    # ---- AFTER LOGIN ----
     if st.session_state.admin:
 
         st.markdown("---")
@@ -617,20 +618,23 @@ elif st.session_state.page == "admin":
 elif st.session_state.page == "raffle":
 
     if not st.session_state.admin:
-        st.warning("Unauthorized access")
-        go_to("admin")
+        st.session_state.page = "admin"
 
     st.markdown("<h1>🎰 Raffle Draw</h1>", unsafe_allow_html=True)
 
     if not st.session_state.entries:
-        st.info("No entries available")
+        st.info("No entries loaded")
         st.button("Back to Admin", on_click=go_to, args=("admin",))
         st.stop()
 
     df = pd.DataFrame(st.session_state.entries)
-    st.data_editor(df, key="raffle_editor")
+    st.data_editor(df, key="raffle_editor", disabled=True)
 
-    st.button("🎰 Run Raffle", on_click=run_raffle, type="primary")
+    st.button(
+        "🎰 Run Raffle",
+        on_click=run_raffle,
+        type="primary"
+    )
 
     if st.session_state.winner:
         st.markdown(
