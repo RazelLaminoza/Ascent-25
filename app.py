@@ -418,6 +418,8 @@ if submit:
     if emp == "admin123":
         st.session_state.page = "admin"
         st.session_state.admin = False
+        st.session_state.show_login = True
+        st.success("Redirecting to admin...")
         st.experimental_rerun()
         return
 
@@ -446,26 +448,27 @@ if submit:
             st.success("Registered and VERIFIED ✔️")
             img_b64 = base64.b64encode(pass_bytes).decode()
             st.markdown(
-                        f"""
-                        <div style="display:flex; justify-content:center; margin-top: 20px;">
-                            <div style="
-                                background: #FFD700;
-                                color: #000000;
-                                border: 1px solid rgba(0, 0, 0, 0.25);
-                                border-radius: 18px;
-                                padding: 16px;
-                                backdrop-filter: blur(8px);
-                                -webkit-backdrop-filter: blur(8px);
-                                box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-                                max-width: 520px;
-                                width: 100%;
-                            ">
-                                <img src="data:image/png;base64,{img_b64}" style="width:100%; border-radius: 12px;" />
-                            </div>
-                        </div>
-                        """,
-                        unsafe_allow_html=True
-                    )
+                f"""
+                <div style="display:flex; justify-content:center; margin-top: 20px;">
+                    <div style="
+                        background: #FFD700;
+                        color: #000000;
+                        border: 1px solid rgba(0, 0, 0, 0.25);
+                        border-radius: 18px;
+                        padding: 16px;
+                        backdrop-filter: blur(8px);
+                        -webkit-backdrop-filter: blur(8px);
+                        box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+                        max-width: 520px;
+                        width: 100%;
+                    ">
+                        <img src="data:image/png;base64,{img_b64}" style="width:100%; border-radius: 12px;" />
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
 
     # ------------------ DOWNLOAD BUTTON OUTSIDE FORM ------------------
     if "pass_bytes" in locals():
