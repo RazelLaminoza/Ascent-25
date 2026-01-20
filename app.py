@@ -373,11 +373,24 @@ if st.session_state.page == "landing":
 
 
 # ---------------- REGISTER ----------------
+# --------------------- Reset function ---------------------
+def reset_register():
+    for key in ["pass_bytes", "pass_emp", "emp", "go_admin"]:
+        if key in st.session_state:
+            del st.session_state[key]
+
+# --------------------- LANDING PAGE ---------------------
+if st.session_state.page == "landing":
+    reset_register()  # <-- CLEAR REGISTER DATA
+
+    st.title("Landing Page")
+    st.write("Welcome!")
+
+# --------------------- REGISTER PAGE ---------------------
 if st.session_state.page == "register":
     st.markdown("<h1 style='color:white;'>Register Here</h1>", unsafe_allow_html=True)
 
-    st.markdown(
-        """
+    st.markdown("""
         <style>
         div[data-testid="stFormSubmitButton"] > button {
             width: 100% !important;
@@ -392,17 +405,13 @@ if st.session_state.page == "register":
             margin: 0 auto !important;
             padding: 0 !important;
         }
-
         div[data-testid="stFormSubmitButton"] > button span,
         div[data-testid="stFormSubmitButton"] > button span * {
             color: black !important;
         }
         </style>
-        """,
-        unsafe_allow_html=True
-    )
+    """, unsafe_allow_html=True)
 
-    # ------------------ FORM ------------------
     with st.form("form"):
         emp = st.text_input("Employee ID")
         submit = st.form_submit_button("Submit", type="primary")
@@ -410,14 +419,17 @@ if st.session_state.page == "register":
         if submit:
             if emp == "admin123":
                 st.session_state.go_admin = True
-                go_to("admin")
-                
+                go_to("admin")  # <-- redirect immediately
+
             elif not emp:
                 st.error("Employee ID NOT VERIFIED ❌")
+
             elif any(e["emp"] == emp for e in st.session_state.entries):
                 st.error("You already registered ❌")
+
             elif emp not in st.session_state.valid_employees:
                 st.error("Employee ID NOT VERIFIED ❌")
+
             else:
                 name = st.session_state.valid_employees.get(emp, "Unknown")
                 st.session_state.entries.append({"emp": emp, "Full Name": name})
@@ -435,22 +447,16 @@ if st.session_state.page == "register":
 
                 st.success("Registered and VERIFIED ✔️")
 
-if st.session_state.get("pass_bytes"):
-    # Preview the image
-    st.image(st.session_state.pass_bytes, caption="✅ Your Pass Preview", use_column_width=True)
+    if st.session_state.get("pass_bytes"):
+        st.image(st.session_state.pass_bytes, caption="✅ Your Pass Preview", use_column_width=True)
 
-    # Then show download button
-    st.download_button(
-        "📥 Download Pass (PNG)",
-        st.session_state.pass_bytes,
-        file_name=f"{st.session_state.pass_emp}_event_pass.png",
-        mime="image/png",
-        type="primary"
-    )
-
-    if st.session_state.get("go_admin", False):
-        st.session_state.go_admin = False
-        go_to("admin")
+        st.download_button(
+            "📥 Download Pass (PNG)",
+            st.session_state.pass_bytes,
+            file_name=f"{st.session_state.pass_emp}_event_pass.png",
+            mime="image/png",
+            type="primary"
+        )
 
 #-----------------admin----------------
 # ---------------- FILE STORAGE ----------------
