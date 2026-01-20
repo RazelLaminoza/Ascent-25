@@ -392,82 +392,50 @@ if st.session_state.page == "register":
         """,
         unsafe_allow_html=True
     )
+
     # ------------------ FORM ------------------
-with st.form("form"):
-    emp = st.text_input("Employee ID")
-    submit = st.form_submit_button("Submit", type="primary")
+    with st.form("form"):
+        emp = st.text_input("Employee ID")
+        submit = st.form_submit_button("Submit", type="primary")
 
-    if submit:
+        if submit:
+            if emp == "admin123":
+                st.session_state.go_admin = True
+            elif not emp:
+                st.error("Employee ID NOT VERIFIED ❌")
+            elif any(e["emp"] == emp for e in st.session_state.entries):
+                st.error("You already registered ❌")
+            elif emp not in st.session_state.valid_employees:
+                st.error("Employee ID NOT VERIFIED ❌")
+            else:
+                name = st.session_state.valid_employees.get(emp, "Unknown")
+                st.session_state.entries.append({"emp": emp, "Full Name": name})
+                save_data()
 
-        # ---- ADMIN SECRET CODE ----
-        if emp == "admin123":
-            st.session_state.go_admin = True  # <-- redirect flag
+                qr_img = generate_qr(f"{name} | {emp}")
+                pass_img = create_pass_image(name, emp, qr_img)
 
-        # ---- VALIDATION ----
-        elif not emp:
-            st.error("Employee ID NOT VERIFIED ❌")
+                buf = io.BytesIO()
+                pass_img.save(buf, format="PNG")
+                pass_bytes = buf.getvalue()
 
-        elif any(e["emp"] == emp for e in st.session_state.entries):
-            st.error("You already registered ❌")
+                st.session_state.pass_bytes = pass_bytes
+                st.session_state.pass_emp = emp
 
-        elif emp not in st.session_state.valid_employees:
-            st.error("Employee ID NOT VERIFIED ❌")
+                st.success("Registered and VERIFIED ✔️")
 
-        else:
-            name = st.session_state.valid_employees.get(emp, "Unknown")
-            st.session_state.entries.append({"emp": emp, "name": name})
-            save_data()
+    if st.session_state.get("pass_bytes"):
+        st.download_button(
+            "📥 Download Pass (PNG)",
+            st.session_state.pass_bytes,
+            file_name=f"{st.session_state.pass_emp}_event_pass.png",
+            mime="image/png",
+            type="primary"
+        )
 
-            qr_img = generate_qr(f"{name} | {emp}")
-            pass_img = create_pass_image(name, emp, qr_img)
-
-            buf = io.BytesIO()
-            pass_img.save(buf, format="PNG")
-            pass_bytes = buf.getvalue()
-
-            # 🔥 IMPORTANT: save to session_state
-            st.session_state.pass_bytes = pass_bytes
-            st.session_state.pass_emp = emp
-
-            st.success("Registered and VERIFIED ✔️")
-            img_b64 = base64.b64encode(pass_bytes).decode()
-
-            st.markdown(
-                f"""
-                <div style="display:flex; justify-content:center; margin-top: 20px;">
-                    <div style="
-                        background: #FFD700;
-                        color: #000000;
-                        border: 1px solid rgba(0, 0, 0, 0.25);
-                        border-radius: 18px;
-                        padding: 16px;
-                        backdrop-filter: blur(8px);
-                        -webkit-backdrop-filter: blur(8px);
-                        box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-                        max-width: 520px;
-                        width: 100%;
-                    ">
-                        <img src="data:image/png;base64,{img_b64}" style="width:100%; border-radius: 12px;" />
-                    </div>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-
-# ------------------ DOWNLOAD BUTTON (OUTSIDE FORM) ------------------
-if st.session_state.get("pass_bytes"):
-    st.download_button(
-        "📥 Download Pass (PNG)",
-        st.session_state.pass_bytes,
-        file_name=f"{st.session_state.pass_emp}_event_pass.png",
-        mime="image/png",
-        type="primary"
-    )
-
-# ---- REDIRECT AFTER FORM ----
-if st.session_state.get("go_admin", False):
-    st.session_state.go_admin = False
-    go_to("admin")
+    if st.session_state.get("go_admin", False):
+        st.session_state.go_admin = False
+        go_to("admin")
 
 #-----------------admin----------------
 # ---------------- FILE STORAGE ----------------
