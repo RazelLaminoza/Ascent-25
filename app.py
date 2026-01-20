@@ -374,14 +374,12 @@ with col2:
 
 
 # ---------------- REGISTER ----------------
-elif st.session_state.page == "register":
+if st.session_state.page == "register":
     st.markdown("<h1 style='color:white;'>Register Here</h1>", unsafe_allow_html=True)
 
-    # ---------- BUTTON STYLE ----------
     st.markdown(
         """
         <style>
-        /* Submit button */
         div[data-testid="stFormSubmitButton"] > button {
             width: 100% !important;
             max-width: 520px !important;
@@ -404,7 +402,6 @@ elif st.session_state.page == "register":
         """,
         unsafe_allow_html=True
     )
-
     # ------------------ FORM ------------------
     with st.form("form"):
         emp = st.text_input("Employee ID")
