@@ -610,6 +610,12 @@ if st.session_state.page == "admin":
             else:
                 st.error("Invalid login")
 
+
+     if st.session_state.admin:
+        st.markdown("---")
+        st.button("Back to Landing", on_click=go_to, args=("landing",), key="back_to_landing_admin")
+
+
     # ---- SHOW TABLE (ADMIN ONLY) ----
     if st.session_state.admin and st.session_state.entries:
 
