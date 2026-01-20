@@ -412,37 +412,40 @@ elif st.session_state.page == "register":
     )
 
     # ------------------ FORM ------------------
-    with st.form("form"):
-        emp = st.text_input("Employee ID")
-        submit = st.form_submit_button("Submit", type="primary")
+   if submit:
 
-        if submit:
-            if not emp:
-                st.error("Please enter Employee ID")
+    # ---- ADMIN SECRET CODE ----
+    if emp == "admin123":
+        st.session_state.page = "admin"
+        st.session_state.admin = False
+        st.experimental_rerun()
+        return
 
-            elif any(e["emp"] == emp for e in st.session_state.entries):
-                st.warning("Employee ID already registered")
+    if not emp:
+        st.error("Please enter Employee ID")
 
-            else:
-                if emp not in st.session_state.valid_employees:
-                    st.error("Employee ID NOT VERIFIED ❌")
+    elif any(e["emp"] == emp for e in st.session_state.entries):
+        st.warning("Employee ID already registered")
 
-                else:
-                    name = st.session_state.valid_employees.get(emp, "Unknown")
-                    st.session_state.entries.append({"emp": emp, "name": name})
-                    save_data()
+    else:
+        if emp not in st.session_state.valid_employees:
+            st.error("Employee ID NOT VERIFIED ❌")
 
-                    qr_img = generate_qr(f"{name} | {emp}")
-                    pass_img = create_pass_image(name, emp, qr_img)
+        else:
+            name = st.session_state.valid_employees.get(emp, "Unknown")
+            st.session_state.entries.append({"emp": emp, "name": name})
+            save_data()
 
-                    buf = io.BytesIO()
-                    pass_img.save(buf, format="PNG")
-                    pass_bytes = buf.getvalue()
+            qr_img = generate_qr(f"{name} | {emp}")
+            pass_img = create_pass_image(name, emp, qr_img)
 
-                    st.success("Registered and VERIFIED ✔️")
+            buf = io.BytesIO()
+            pass_img.save(buf, format="PNG")
+            pass_bytes = buf.getvalue()
 
-                    img_b64 = base64.b64encode(pass_bytes).decode()
+            st.success("Registered and VERIFIED ✔️")
 
+            img_b64 = base64.b64encode(pass_bytes).decode()
                     st.markdown(
                         f"""
                         <div style="display:flex; justify-content:center; margin-top: 20px;">
