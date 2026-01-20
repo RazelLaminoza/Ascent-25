@@ -637,7 +637,7 @@ if st.session_state.page == "admin":
     if st.session_state.admin:
         st.markdown("---")
         st.button("Logout", on_click=logout, key="logout_admin")
-
+        st.button("Back to Landing", on_click=go_to, args=("landing",), key="back_to_landing_admin")
 
 # ---------------- RAFFLE PAGE ----------------
 elif st.session_state.page == "raffle":
