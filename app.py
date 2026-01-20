@@ -578,46 +578,179 @@ if st.session_state.page == "admin":
         st.button(
             "🗑️ Delete All Entries",
             on_click=delete_all_entries,
-            type="secondary",
-            key="delete_entries"
+#--------------file----------------
+FILE_PATH = "entries.csv"
+
+# ---------------- SESSION STATE ----------------
+if "page" not in st.session_state:
+    st.session_state.page = "admin"
+
+if "admin" not in st.session_state:
+    st.session_state.admin = False
+
+if "entries" not in st.session_state:
+    st.session_state.entries = []
+
+if "current_table" not in st.session_state:
+    st.session_state.current_table = []
+
+if "winner" not in st.session_state:
+    st.session_state.winner = None
+
+# ---------------- CREDENTIALS ----------------
+USERNAME = "admin"
+PASSWORD = "admin123"
+
+# ---------------- FUNCTIONS ----------------
+def load_entries():
+    if os.path.exists(FILE_PATH):
+        df = pd.read_csv(FILE_PATH)
+        st.session_state.entries = df.to_dict("records")
+
+def save_entries():
+    df = pd.DataFrame(st.session_state.entries)
+    df.to_csv(FILE_PATH, index=False)
+
+def delete_all_entries():
+    st.session_state.entries = []
+    st.session_state.current_table = []
+    st.session_state.winner = None
+    if os.path.exists(FILE_PATH):
+        os.remove(FILE_PATH)
+
+def go_to(page):
+    st.session_state.page = page
+    st.session_state.winner = None
+
+def login_admin():
+    if st.session_state.user == USERNAME and st.session_state.pwd == PASSWORD:
+        st.session_state.admin = True
+        return True
+    return False
+
+def logout():
+    st.session_state.admin = False
+    st.session_state.page = "admin"
+    st.session_state.winner = None
+
+def shuffle_effect():
+    table = st.session_state.current_table
+
+    if not table:
+        st.warning("⚠️ No participants in current table.")
+        return
+
+    placeholder = st.empty()
+
+    for _ in range(15):
+        temp = random.choice(table)
+        placeholder.markdown(
+            f"""
+            <div style="text-align:center;margin-top:40px;">
+                <h2>🎉 SHUFFLING 🎉</h2>
+                <h1 style="color:gold;font-size:70px;">
+                    {temp["Full Name"]}
+                </h1>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+        time.sleep(0.08)
+
+    st.session_state.winner = random.choice(table)
+    placeholder.empty()
+
+# ---------------- LOAD ENTRIES ----------------
+load_entries()
+
+# ---------------- ADMIN PAGE ----------------
+if st.session_state.page == "admin":
+
+    st.markdown("<h1>🔐 Admin Panel</h1>", unsafe_allow_html=True)
+
+    with st.form("admin_form"):
+        uploaded_file = st.file_uploader(
+            "Upload Employee List (CSV)",
+            type=["csv"]
+        )
+
+        st.text_input("Username", key="user")
+        st.text_input("Password", type="password", key="pwd")
+
+        submit = st.form_submit_button("Login", type="primary")
+
+        if submit:
+            if uploaded_file:
+                df = pd.read_csv(uploaded_file)
+                st.session_state.entries = df.to_dict("records")
+                save_entries()
+
+            if login_admin():
+                st.success("Login successful")
+            else:
+                st.error("Invalid login")
+
+    # ---------- ADMIN CONTROLS ----------
+    if st.session_state.admin and st.session_state.entries:
+
+        st.markdown("### Employee List")
+
+        df = pd.DataFrame(st.session_state.entries)
+
+        search = st.text_input("🔍 Search name")
+        if search:
+            df = df[df["Full Name"].str.contains(search, case=False, na=False)]
+
+        # ✅ STORE CURRENT TABLE FOR RAFFLE
+        st.session_state.current_table = df.to_dict("records")
+
+        st.dataframe(df, use_container_width=True)
+
+        st.download_button(
+            "⬇️ Download CSV",
+            df.to_csv(index=False).encode("utf-8-sig"),
+            "entries.csv",
+            "text/csv"
+        )
+
+        st.button(
+            "🗑️ Delete All Entries",
+            on_click=delete_all_entries
         )
 
         st.button(
             "🎰 Enter Raffle",
             on_click=go_to,
             args=("raffle",),
-            type="primary",
-            key="enter_raffle"
+            type="primary"
         )
 
     if st.session_state.admin:
         st.markdown("---")
-        st.button("Logout", on_click=logout, key="logout_admin")
-
+        st.button("Logout", on_click=logout)
 
 # ---------------- RAFFLE PAGE ----------------
 elif st.session_state.page == "raffle":
 
     if not st.session_state.admin:
         st.session_state.page = "admin"
+        st.stop()
 
     st.markdown("<h1>🎰 Raffle Draw</h1>", unsafe_allow_html=True)
 
-    st.button("🎰 Run Raffle", on_click=shuffle_effect, type="primary", key="run_raffle")
+    st.button(
+        "🎰 Run Raffle",
+        on_click=shuffle_effect,
+        type="primary"
+    )
 
     if st.session_state.winner:
-        winner_name = (
-            st.session_state.winner.get("Full Name")
-            if isinstance(st.session_state.winner, dict)
-            else st.session_state.winner
-        )
-
         st.markdown(
             f"""
             <div style="text-align:center;margin-top:40px;">
                 <h2>🎉 WINNER 🎉</h2>
                 <h1 style="color:gold;font-size:70px;">
-                    {winner_name}
+                    {st.session_state.winner["Full Name"]}
                 </h1>
             </div>
             """,
@@ -625,4 +758,5 @@ elif st.session_state.page == "raffle":
         )
 
     st.markdown("---")
-    st.button("Logout", on_click=logout, key="logout_raffle")
+    st.button("Logout", on_click=logout)
+                
