@@ -574,7 +574,7 @@ load_entries()
 if st.session_state.page == "admin":
 
     st.markdown("<h1>🔐 Admin Panel</h1>", unsafe_allow_html=True)
-     st.button("Back to Landing", on_click=go_to, args=("landing",), key="back_to_landing_admin")
+    st.button("Back to Landing", on_click=go_to, args=("landing",), key="back_to_landing_admin")
 
     with st.form("admin_form"):
         uploaded_file = st.file_uploader(
