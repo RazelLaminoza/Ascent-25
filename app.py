@@ -627,7 +627,12 @@ if st.session_state.page == "admin":
             "text/csv",
             key="download_csv"
         )
-
+        st.button(
+        "🗑️ Delete All Entries",
+        on_click=delete_all_entries,
+        type="secondary",
+        key="delete_entries"
+        )
         st.button(
             "🎰 Enter Raffle",
             on_click=go_to,
