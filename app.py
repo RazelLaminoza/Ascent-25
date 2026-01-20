@@ -308,7 +308,6 @@ def export_csv():
 
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
-
     st.markdown("""
     <style>
     .block-container { padding: 0 !important; max-width: 100% !important; }
@@ -353,7 +352,6 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
-    # <-- MOVE IT HERE -->
     col1, col2, col3 = st.columns([5.2, 1, 5])
     with col2:
         st.button(
@@ -362,7 +360,8 @@ if st.session_state.page == "landing":
             args=("register",),
             type="primary",
             key="landing_register_1"
-                        )
+        )
+
 
 # ---------------- REGISTER ----------------
 if st.session_state.page == "register":
