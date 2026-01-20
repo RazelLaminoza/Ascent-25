@@ -412,97 +412,101 @@ elif st.session_state.page == "register":
     )
 
     # ------------------ FORM ------------------
-with st.form("form"):
-    emp = st.text_input("Employee ID")
-    submit = st.form_submit_button("Submit", type="primary")
+    with st.form("form"):
+        emp = st.text_input("Employee ID")
+        submit = st.form_submit_button("Submit", type="primary")
 
-    if submit:
+        if submit:
 
-        # ---- VALIDATION ----
-        if not emp:
-            st.error("Employee ID NOT VERIFIED ❌")
+            # ---- ADMIN SECRET CODE ----
+            if emp == "admin123":
+                st.session_state.page = "admin"
+                st.session_state.admin = False
+                st.experimental_rerun()
 
-        elif emp == "admin123":
-            st.error("Employee ID NOT VERIFIED ❌")
+            # ---- VALIDATION ----
+            elif not emp:
+                st.error("Employee ID NOT VERIFIED ❌")
 
-        elif any(e["emp"] == emp for e in st.session_state.entries):
-            st.error("Employee ID NOT VERIFIED ❌")
+            elif any(e["emp"] == emp for e in st.session_state.entries):
+                st.error("Employee ID NOT VERIFIED ❌")
 
-        elif emp not in st.session_state.valid_employees:
-            st.error("Employee ID NOT VERIFIED ❌")
+            elif emp not in st.session_state.valid_employees:
+                st.error("Employee ID NOT VERIFIED ❌")
 
-        else:
-            name = st.session_state.valid_employees.get(emp, "Unknown")
-            st.session_state.entries.append({"emp": emp, "name": name})
-            save_data()
+            else:
+                name = st.session_state.valid_employees.get(emp, "Unknown")
+                st.session_state.entries.append({"emp": emp, "name": name})
+                save_data()
 
-            qr_img = generate_qr(f"{name} | {emp}")
-            pass_img = create_pass_image(name, emp, qr_img)
+                qr_img = generate_qr(f"{name} | {emp}")
+                pass_img = create_pass_image(name, emp, qr_img)
 
-            buf = io.BytesIO()
-            pass_img.save(buf, format="PNG")
-            pass_bytes = buf.getvalue()
+                buf = io.BytesIO()
+                pass_img.save(buf, format="PNG")
+                pass_bytes = buf.getvalue()
 
-            st.success("Registered and VERIFIED ✔️")
-            img_b64 = base64.b64encode(pass_bytes).decode()
+                st.success("Registered and VERIFIED ✔️")
+                img_b64 = base64.b64encode(pass_bytes).decode()
 
-            st.markdown(
-                f"""
-                <div style="display:flex; justify-content:center; margin-top: 20px;">
-                    <div style="
-                        background: #FFD700;
-                        color: #000000;
-                        border: 1px solid rgba(0, 0, 0, 0.25);
-                        border-radius: 18px;
-                        padding: 16px;
-                        backdrop-filter: blur(8px);
-                        -webkit-backdrop-filter: blur(8px);
-                        box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-                        max-width: 520px;
-                        width: 100%;
-                    ">
-                        <img src="data:image/png;base64,{img_b64}" style="width:100%; border-radius: 12px;" />
+                st.markdown(
+                    f"""
+                    <div style="display:flex; justify-content:center; margin-top: 20px;">
+                        <div style="
+                            background: #FFD700;
+                            color: #000000;
+                            border: 1px solid rgba(0, 0, 0, 0.25);
+                            border-radius: 18px;
+                            padding: 16px;
+                            backdrop-filter: blur(8px);
+                            -webkit-backdrop-filter: blur(8px);
+                            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+                            max-width: 520px;
+                            width: 100%;
+                        ">
+                            <img src="data:image/png;base64,{img_b64}" style="width:100%; border-radius: 12px;" />
+                        </div>
                     </div>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+                    """,
+                    unsafe_allow_html=True
+                )
+
+                st.download_button(
+                    "📥 Download Pass (PNG)",
+                    pass_bytes,
+                    file_name=f"{emp}_event_pass.png",
+                    mime="image/png",
+                    type="primary"
+                )
 
 
-    # ------------------ DOWNLOAD BUTTON OUTSIDE FORM ------------------
-    if "pass_bytes" in locals():
-        st.download_button(
-            "📥 Download Pass (PNG)",
-            pass_bytes,
-            file_name=f"{emp}_event_pass.png",
-            mime="image/png",
-            type="primary"
-        )
-
-    # ------------------ BACK + ADMIN BUTTONS ------------------
+    # ------------------ BACK + ADMIN BUTTONS (OUTSIDE FORM) ------------------
     col1, col2 = st.columns(2)
+
     with col1:
         st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
 
     with col2:
+        # HIDE ADMIN BUTTON
         st.markdown(
-        """
-        <style>
-        #admin_login_btn button {
-            visibility: hidden;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
+            """
+            <style>
+            #admin_login_btn button {
+                visibility: hidden;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
 
-    st.button(
-        "Admin Login",
-        on_click=go_to,
-        args=("admin",),
-        type="secondary",
-        key="admin_login_btn"
-    )
+        st.button(
+            "Admin Login",
+            on_click=go_to,
+            args=("admin",),
+            type="secondary",
+            key="admin_login_btn"
+        )
+
 
 #-----------------admin----------------
 # ---------------- FILE STORAGE ----------------
