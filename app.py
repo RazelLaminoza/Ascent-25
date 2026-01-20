@@ -500,9 +500,6 @@ if "entries" not in st.session_state:
 if "winner" not in st.session_state:
     st.session_state.winner = None
 
-if "shuffling" not in st.session_state:
-    st.session_state.shuffling = False
-
 # ---------------- CREDENTIALS ----------------
 USERNAME = "admin"
 PASSWORD = "admin123"
@@ -543,14 +540,30 @@ def run_raffle():
 
 
 def shuffle_effect():
-    st.session_state.shuffling = True
+    if not st.session_state.entries:
+        return
+
+    placeholder = st.empty()
+
+    # Shuffle effect
     for _ in range(15):
         temp = random.choice(st.session_state.entries)
-        st.session_state.winner = temp
-        time.sleep(0.1)
-        st.experimental_rerun()
-    st.session_state.shuffling = False
-    run_raffle()
+        placeholder.markdown(
+            f"""
+            <div style="text-align:center;margin-top:40px;">
+                <h2>🎉 SHUFFLING 🎉</h2>
+                <h1 style="color:gold;font-size:70px;">
+                    {temp["Full Name"]}
+                </h1>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+        time.sleep(0.08)
+
+    # Final winner
+    st.session_state.winner = random.choice(st.session_state.entries)
+    placeholder.empty()
 
 
 # ---------------- LOAD ENTRIES ON START ----------------
