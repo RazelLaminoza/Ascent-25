@@ -308,7 +308,6 @@ def delete_all_entries():
 
     st.success("✅ All entries deleted and table cleared.")
 
-
     
 def export_csv():
     df = pd.DataFrame(st.session_state.entries)
