@@ -484,12 +484,9 @@ elif st.session_state.page == "register":
         st.button("Admin Login", on_click=go_to, args=("admin",), type="secondary")
 
 #-----------------admin----------------
-
-st.set_page_config(page_title="Employee Raffle", layout="centered")
-
 # ---------------- SESSION STATE ----------------
 if "page" not in st.session_state:
-    st.session_state.page = "landing"
+    st.session_state.page = "admin"   # 👈 START DIRECTLY HERE
 
 if "admin" not in st.session_state:
     st.session_state.admin = False
@@ -512,10 +509,7 @@ def go_to(page):
 
 
 def login_admin():
-    if (
-        st.session_state.user == USERNAME
-        and st.session_state.pwd == PASSWORD
-    ):
+    if st.session_state.user == USERNAME and st.session_state.pwd == PASSWORD:
         st.session_state.admin = True
         return True
     return False
@@ -525,28 +519,18 @@ def logout():
     st.session_state.admin = False
     st.session_state.entries = []
     st.session_state.winner = None
-    st.session_state.page = "landing"
+    st.session_state.page = "admin"
 
 
 def run_raffle():
     if st.session_state.entries:
-        st.session_state.winner = random.choice(
-            st.session_state.entries
-        )
+        st.session_state.winner = random.choice(st.session_state.entries)
 
 
-# ---------------- LANDING ----------------
-if st.session_state.page == "landing":
-    st.markdown("<h1 style='text-align:center;'>🎉 Employee Raffle</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align:center;'>Welcome</p>", unsafe_allow_html=True)
+# ---------------- ADMIN PAGE ----------------
+if st.session_state.page == "admin":
 
-    st.button("🔐 Admin Login", on_click=go_to, args=("admin",), type="primary")
-
-
-# ---------------- ADMIN ----------------
-elif st.session_state.page == "admin":
-
-    st.markdown("<h1>Admin Panel</h1>", unsafe_allow_html=True)
+    st.markdown("<h1>🔐 Admin Panel</h1>", unsafe_allow_html=True)
 
     with st.form("admin_form"):
         uploaded_file = st.file_uploader(
@@ -604,13 +588,11 @@ elif st.session_state.page == "admin":
             type="primary"
         )
 
-    if st.session_state.admin:
         st.markdown("---")
         st.button("Logout", on_click=logout)
-        st.button("Back to Landing", on_click=go_to, args=("landing",))
 
 
-# ---------------- RAFFLE ----------------
+# ---------------- RAFFLE PAGE ----------------
 elif st.session_state.page == "raffle":
 
     if not st.session_state.admin:
@@ -635,4 +617,3 @@ elif st.session_state.page == "raffle":
 
     st.markdown("---")
     st.button("Logout", on_click=logout)
-    st.button("Back to Landing", on_click=go_to, args=("landing",))
