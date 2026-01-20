@@ -439,6 +439,7 @@ if st.session_state.page == "register":
 
 #-----------------admin----------------
 # ---------------- FILE STORAGE ----------------
+# ---------------- FILE STORAGE ----------------
 FILE_PATH = "entries.csv"
 
 # ---------------- SESSION STATE ----------------
@@ -450,6 +451,9 @@ if "admin" not in st.session_state:
 
 if "entries" not in st.session_state:
     st.session_state.entries = []
+
+if "current_table" not in st.session_state:
+    st.session_state.current_table = []
 
 if "winner" not in st.session_state:
     st.session_state.winner = None
@@ -488,26 +492,24 @@ def logout():
     st.session_state.page = "admin"
 
 
-def run_raffle():
-    if st.session_state.entries:
-        st.session_state.winner = random.choice(st.session_state.entries)
-
-
 def shuffle_effect():
-    if not st.session_state.entries:
+    table = st.session_state.current_table
+
+    if not table:
+        st.warning("⚠️ No participants in current table.")
         return
 
     placeholder = st.empty()
 
     # Shuffle effect
     for _ in range(15):
-        temp = random.choice(st.session_state.entries)
+        temp = random.choice(table)
         placeholder.markdown(
             f"""
             <div style="text-align:center;margin-top:40px;">
                 <h2>🎉 SHUFFLING 🎉</h2>
                 <h1 style="color:gold;font-size:70px;">
-                    {temp["Full Name,name"]}
+                    {temp["Full Name"]}
                 </h1>
             </div>
             """,
@@ -516,7 +518,7 @@ def shuffle_effect():
         time.sleep(0.08)
 
     # Final winner
-    st.session_state.winner = random.choice(st.session_state.entries)
+    st.session_state.winner = random.choice(table)
     placeholder.empty()
 
 
@@ -564,6 +566,10 @@ if st.session_state.page == "admin":
 
         st.markdown("### Employee List")
         df = pd.DataFrame(st.session_state.entries)
+
+        # 👉 IMPORTANT: This is the table that will be used in raffle
+        st.session_state.current_table = df.to_dict("records")
+
         st.dataframe(df, use_container_width=True)
 
         csv = df.to_csv(index=False).encode("utf-8-sig")
