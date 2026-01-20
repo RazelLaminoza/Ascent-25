@@ -308,61 +308,55 @@ def export_csv():
 
 # ---------------- LANDING PAGE ----------------
 if st.session_state.page == "landing":
+    st.markdown("""<style> ... </style>""", unsafe_allow_html=True)
+    st.button("Pre-register", on_click=go_to, args=("register",), type="primary")
 
-    st.markdown("""
-    <style>
-    .block-container { padding: 0 !important; max-width: 100% !important; }
-    html, body { overflow: hidden !important; height: 100% !important; }
+# ---------------- REGISTER PAGE ----------------
+if st.session_state.page == "register":
+    st.markdown("<h1 style='color:white;'>Register Here</h1>", unsafe_allow_html=True)
 
-    .landing {
-        position: relative;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        margin-top: -90px;
-    }
+    with st.form("form"):
+        emp = st.text_input("Employee ID")
+        submit = st.form_submit_button("Submit", type="primary")
 
-    div[data-testid="stButton"] > button {
-        width: 360px !important;
-        height: 55px !important;
-        font-size: 16px !important;
-        font-weight: 700 !important;
-        background-color: #FFD700 !important;
-        color: black !important;
-        border: none !important;
-        border-radius: 8px !important;
-    }
+        if submit:
+            if emp == "admin123":
+                st.session_state.go_admin = True
+            elif not emp:
+                st.error("Employee ID NOT VERIFIED ❌")
+            elif any(e["emp"] == emp for e in st.session_state.entries):
+                st.error("You already registered ❌")
+            elif emp not in st.session_state.valid_employees:
+                st.error("Employee ID NOT VERIFIED ❌")
+            else:
+                name = st.session_state.valid_employees.get(emp, "Unknown")
+                st.session_state.entries.append({"emp": emp, "Full Name": name})
+                save_data()
 
-    </style>
-    """, unsafe_allow_html=True)
+                qr_img = generate_qr(f"{name} | {emp}")
+                pass_img = create_pass_image(name, emp, qr_img)
 
-    st.markdown(
-        f"""
-        <div class="landing">
-            <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' width='160'/>
-            <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' style='width:70%; max-width:900px; margin-top:20px;'/>
-            <p style="font-size:28px; line-height:1.3;">
-                PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
-                <span style="font-size:26px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
-            </p>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+                buf = io.BytesIO()
+                pass_img.save(buf, format="PNG")
+                pass_bytes = buf.getvalue()
 
-    # <-- MOVE IT HERE -->
-    col1, col2, col3 = st.columns([5.2, 1, 5])
-    with col2:
-        st.button(
-            "Pre-register",
-            on_click=go_to,
-            args=("register",),
-            type="primary",
-            key="landing_register_1"
-                        )
+                st.session_state.pass_bytes = pass_bytes
+                st.session_state.pass_emp = emp
+
+                st.success("Registered and VERIFIED ✔️")
+
+    if st.session_state.get("pass_bytes"):
+        st.download_button(
+            "📥 Download Pass (PNG)",
+            st.session_state.pass_bytes,
+            file_name=f"{st.session_state.pass_emp}_event_pass.png",
+            mime="image/png",
+            type="primary"
+        )
+
+    if st.session_state.get("go_admin", False):
+        st.session_state.go_admin = False
+        go_to("admin")
 
 # ---------------- REGISTER ----------------
 if st.session_state.page == "register":
