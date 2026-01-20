@@ -529,7 +529,7 @@ if st.session_state.page == "admin":
 
     st.markdown("<h1>🔐 Admin Panel</h1>", unsafe_allow_html=True)
 
-    with st.form("admin_form"):
+    with st.form("admin_form_2"):
         uploaded_file = st.file_uploader(
             "Upload Employee List (Excel)",
             type=["xlsx"]
