@@ -500,7 +500,7 @@ if "winner" not in st.session_state:
 
 # ---------------- CREDENTIALS ----------------
 USERNAME = "admin"
-PASSWORD = "123"
+PASSWORD = "admin123"
 
 
 # ---------------- FUNCTIONS ----------------
