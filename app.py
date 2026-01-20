@@ -507,7 +507,7 @@ def shuffle_effect():
             <div style="text-align:center;margin-top:40px;">
                 <h2>🎉 SHUFFLING 🎉</h2>
                 <h1 style="color:gold;font-size:70px;">
-                    {temp["Full Name"]}
+                    {temp["Full Name,name"]}
                 </h1>
             </div>
             """,
