@@ -597,11 +597,10 @@ if st.session_state.page == "admin":
 
         st.markdown("### Employee List")
 
-        df = pd.DataFrame(st.session_state.entries)
+        df = pd.DataFrame(st.session_state.current_table)
 
         if not df.empty:
             df = df[["emp", "Full Name"]]
-            st.session_state.current_table = df.to_dict("records")
         else:
             st.session_state.current_table = []
 
@@ -624,6 +623,7 @@ if st.session_state.page == "admin":
             type="secondary",
             key="delete_entries"
         )
+
 
         st.button(
             "🎰 Enter Raffle",
