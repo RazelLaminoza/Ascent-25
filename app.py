@@ -540,12 +540,7 @@ if st.session_state.page == "landing":
     st.markdown("<h1 style='text-align:center;'>🎉 Employee Raffle</h1>", unsafe_allow_html=True)
     st.markdown("<p style='text-align:center;'>Welcome</p>", unsafe_allow_html=True)
 
-    st.button(
-        "🔐 Admin Login",
-        on_click=go_to,
-        args=("admin",),
-        type="primary"
-    )
+    st.button("🔐 Admin Login", on_click=go_to, args=("admin",), type="primary")
 
 
 # ---------------- ADMIN ----------------
@@ -587,21 +582,20 @@ elif st.session_state.page == "admin":
             else:
                 st.error("Invalid login")
 
-    # ---- AFTER LOGIN ----
-    if st.session_state.admin:
+    # ---- ADMIN VIEW (TABLE ONLY HERE) ----
+    if st.session_state.admin and st.session_state.entries:
 
-        st.markdown("---")
+        st.markdown("### Employee List")
+        df = pd.DataFrame(st.session_state.entries)
+        st.dataframe(df, use_container_width=True)
 
-        if st.session_state.entries:
-            df = pd.DataFrame(st.session_state.entries)
-            csv = df.to_csv(index=False).encode("utf-8-sig")
-
-            st.download_button(
-                "⬇️ Download CSV",
-                csv,
-                "entries.csv",
-                "text/csv"
-            )
+        csv = df.to_csv(index=False).encode("utf-8-sig")
+        st.download_button(
+            "⬇️ Download CSV",
+            csv,
+            "entries.csv",
+            "text/csv"
+        )
 
         st.button(
             "🎰 Enter Raffle",
@@ -610,6 +604,8 @@ elif st.session_state.page == "admin":
             type="primary"
         )
 
+    if st.session_state.admin:
+        st.markdown("---")
         st.button("Logout", on_click=logout)
         st.button("Back to Landing", on_click=go_to, args=("landing",))
 
@@ -622,19 +618,7 @@ elif st.session_state.page == "raffle":
 
     st.markdown("<h1>🎰 Raffle Draw</h1>", unsafe_allow_html=True)
 
-    if not st.session_state.entries:
-        st.info("No entries loaded")
-        st.button("Back to Admin", on_click=go_to, args=("admin",))
-        st.stop()
-
-    df = pd.DataFrame(st.session_state.entries)
-    st.data_editor(df, key="raffle_editor", disabled=True)
-
-    st.button(
-        "🎰 Run Raffle",
-        on_click=run_raffle,
-        type="primary"
-    )
+    st.button("🎰 Run Raffle", on_click=run_raffle, type="primary")
 
     if st.session_state.winner:
         st.markdown(
