@@ -481,7 +481,24 @@ elif st.session_state.page == "register":
         st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
 
     with col2:
-        st.button("Admin Login", on_click=go_to, args=("admin",), type="secondary")
+    st.markdown(
+        """
+        <style>
+        #admin_login_btn button {
+            visibility: hidden;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    st.button(
+        "Admin Login",
+        on_click=go_to,
+        args=("admin",),
+        type="secondary",
+        key="admin_login_btn"
+    )
 
 #-----------------admin----------------
 # ---------------- FILE STORAGE ----------------
