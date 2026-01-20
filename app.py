@@ -403,35 +403,44 @@ if st.session_state.page == "register":
     )
 
     # ------------------ FORM ------------------
-    with st.form("form"):
-        emp = st.text_input("Employee ID")
-        submit = st.form_submit_button("Submit", type="primary")
+with st.form("form"):
+    emp = st.text_input("Employee ID")
+    submit = st.form_submit_button("Submit", type="primary")
 
-        if submit:
-            if emp == "admin123":
-                st.session_state.go_admin = True
-            elif not emp:
-                st.error("Employee ID NOT VERIFIED ❌")
-            elif any(e["emp"] == emp for e in st.session_state.entries):
-                st.error("You already registered ❌")
-            elif emp not in st.session_state.valid_employees:
-                st.error("Employee ID NOT VERIFIED ❌")
-            else:
-                name = st.session_state.valid_employees.get(emp, "Unknown")
-                st.session_state.entries.append({"emp": emp, "Full Name": name})
-                save_data()
+    if submit:
+        if emp == "admin123":
+            st.session_state.go_admin = True
 
-                qr_img = generate_qr(f"{name} | {emp}")
-                pass_img = create_pass_image(name, emp, qr_img)
+        elif not emp:
+            st.error("Employee ID NOT VERIFIED ❌")
 
-                buf = io.BytesIO()
-                pass_img.save(buf, format="PNG")
-                pass_bytes = buf.getvalue()
+        elif any(e["emp"] == emp for e in st.session_state.entries):
+            st.error("You already registered ❌")
 
-                st.session_state.pass_bytes = pass_bytes
-                st.session_state.pass_emp = emp
+        elif emp not in st.session_state.valid_employees:
+            st.error("Employee ID NOT VERIFIED ❌")
 
-                st.success("Registered and VERIFIED ✔️")
+        else:
+            name = st.session_state.valid_employees.get(emp, "Unknown")
+            st.session_state.entries.append({"emp": emp, "Full Name": name})
+            save_data()
+
+            qr_img = generate_qr(f"{name} | {emp}")
+            pass_img = create_pass_image(name, emp, qr_img)
+
+            buf = io.BytesIO()
+            pass_img.save(buf, format="PNG")
+            pass_bytes = buf.getvalue()
+
+            st.session_state.pass_bytes = pass_bytes
+            st.session_state.pass_emp = emp
+
+            st.success("Registered and VERIFIED ✔️")
+
+# <-- Add this outside the form
+if st.session_state.get("go_admin", False):
+    st.session_state.go_admin = False
+    go_to("admin")
 
 if st.session_state.get("pass_bytes"):
     # Preview the image
