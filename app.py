@@ -422,7 +422,6 @@ elif st.session_state.page == "register":
             if emp == "admin123":
                 st.session_state.page = "admin"
                 st.session_state.admin = False
-                st.experimental_rerun()
 
             # ---- VALIDATION ----
             elif not emp:
