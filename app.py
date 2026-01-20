@@ -383,9 +383,6 @@ def reset_register():
 if st.session_state.page == "landing":
     reset_register()  # <-- CLEAR REGISTER DATA
 
-    st.title("Landing Page")
-    st.write("Welcome!")
-
 # --------------------- REGISTER PAGE ---------------------
 if st.session_state.page == "register":
     st.markdown("<h1 style='color:white;'>Register Here</h1>", unsafe_allow_html=True)
