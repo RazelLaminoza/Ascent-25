@@ -448,7 +448,6 @@ if st.session_state.page == "register":
 
 #-----------------admin----------------
 # ---------------- FILE STORAGE ----------------
-# ---------------- FILE STORAGE ----------------
 FILE_PATH = "entries.csv"
 
 # ---------------- SESSION STATE ----------------
@@ -471,22 +470,18 @@ if "winner" not in st.session_state:
 USERNAME = "admin"
 PASSWORD = "admin123"
 
-
 # ---------------- FUNCTIONS ----------------
 def load_entries():
     if os.path.exists(FILE_PATH):
         df = pd.read_csv(FILE_PATH)
         st.session_state.entries = df.to_dict("records")
 
-
 def save_entries():
     df = pd.DataFrame(st.session_state.entries)
     df.to_csv(FILE_PATH, index=False)
 
-
 def go_to(page):
     st.session_state.page = page
-
 
 def login_admin():
     if st.session_state.user == USERNAME and st.session_state.pwd == PASSWORD:
@@ -494,12 +489,32 @@ def login_admin():
         return True
     return False
 
-
 def logout():
     st.session_state.admin = False
     st.session_state.winner = None
     st.session_state.page = "admin"
 
+def delete_all_entries():
+    st.session_state.entries = []
+    st.session_state.current_table = []
+    if os.path.exists(FILE_PATH):
+        os.remove(FILE_PATH)
+
+def upload_excel(file):
+    df = pd.read_excel(file)
+
+    df.columns = [c.strip().lower() for c in df.columns]
+
+    if "emp" not in df.columns or "name" not in df.columns:
+        st.error("Excel must contain 'emp' and 'name' columns")
+        return
+
+    df = df[["emp", "name"]]
+    df["Full Name"] = df["name"]
+    df.drop(columns=["name"], inplace=True)
+
+    st.session_state.entries = df.to_dict("records")
+    save_entries()
 
 def shuffle_effect():
     table = st.session_state.current_table
@@ -510,7 +525,6 @@ def shuffle_effect():
 
     placeholder = st.empty()
 
-    # Shuffle effect
     for _ in range(15):
         temp = random.choice(table)
         placeholder.markdown(
@@ -526,14 +540,11 @@ def shuffle_effect():
         )
         time.sleep(0.08)
 
-    # Final winner
     st.session_state.winner = random.choice(table)
     placeholder.empty()
 
-
-# ---------------- LOAD ENTRIES ON START ----------------
+# ---------------- LOAD DATA ----------------
 load_entries()
-
 
 # ---------------- ADMIN PAGE ----------------
 if st.session_state.page == "admin":
@@ -553,15 +564,14 @@ if st.session_state.page == "admin":
 
         if submit:
             if uploaded_file:
-                # your file upload logic here
-                pass
+                upload_excel(uploaded_file)
 
             if login_admin():
                 st.success("Login successful")
             else:
                 st.error("Invalid login")
 
-    # ---------- SHOW BACK BUTTON ONLY WHEN NOT LOGGED IN ----------
+    # ---------- BACK BUTTON WHEN NOT LOGGED IN ----------
     if not st.session_state.admin:
         st.button(
             "Back to Landing",
@@ -570,36 +580,31 @@ if st.session_state.page == "admin":
             key="back_to_landing_admin"
         )
 
-    # ---------- SHOW ADMIN CONTROLS ONLY WHEN LOGGED IN ----------
-    if st.session_state.admin and st.session_state.entries:
+    # ---------- ADMIN CONTROLS ----------
+    if st.session_state.admin:
 
         st.markdown("### Employee List")
 
         df = pd.DataFrame(st.session_state.entries)
 
-        # ---- FORCE ONLY THESE COLUMNS ----
-        if "name" in df.columns:
-            df["Full Name"] = df["name"]
-            df.drop(columns=["name"], inplace=True)
-
-        df = df[["emp", "Full Name"]]
-
-        # 👉 This table will be used for raffle
-        st.session_state.current_table = df.to_dict("records")
+        if not df.empty:
+            df = df[["emp", "Full Name"]]
+            st.session_state.current_table = df.to_dict("records")
+        else:
+            st.session_state.current_table = []
 
         st.dataframe(df, use_container_width=True)
 
-        csv = df.to_csv(index=False).encode("utf-8-sig")
+        if not df.empty:
+            csv = df.to_csv(index=False).encode("utf-8-sig")
 
-        st.download_button(
-            "⬇️ Download CSV",
-            csv,
-            "entries.csv",
-            "text/csv",
-            key="download_csv"
-        )
-
-
+            st.download_button(
+                "⬇️ Download CSV",
+                csv,
+                "entries.csv",
+                "text/csv",
+                key="download_csv"
+            )
 
         st.button(
             "🗑️ Delete All Entries",
@@ -616,10 +621,8 @@ if st.session_state.page == "admin":
             key="enter_raffle"
         )
 
-    if st.session_state.admin:
         st.markdown("---")
         st.button("Logout", on_click=logout, key="logout_admin")
-
 
 # ---------------- RAFFLE PAGE ----------------
 elif st.session_state.page == "raffle":
@@ -629,14 +632,15 @@ elif st.session_state.page == "raffle":
 
     st.markdown("<h1>🎰 Raffle Draw</h1>", unsafe_allow_html=True)
 
-    st.button("🎰 Run Raffle", on_click=shuffle_effect, type="primary", key="run_raffle")
+    st.button(
+        "🎰 Run Raffle",
+        on_click=shuffle_effect,
+        type="primary",
+        key="run_raffle"
+    )
 
     if st.session_state.winner:
-        winner_name = (
-            st.session_state.winner.get("Full Name")
-            if isinstance(st.session_state.winner, dict)
-            else st.session_state.winner
-        )
+        winner_name = st.session_state.winner.get("Full Name")
 
         st.markdown(
             f"""
