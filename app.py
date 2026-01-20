@@ -496,6 +496,65 @@ def save_entries():
 def go_to(page):
     st.session_state.page = page
 
+if "page" not in st.session_state:
+    st.session_state.page = "landing"
+
+if st.session_state.page == "landing":
+    st.markdown("""
+    <style>
+    .block-container { padding: 0 !important; max-width: 100% !important; }
+    html, body { overflow: hidden !important; height: 100% !important; }
+
+    .landing {
+        position: relative;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        margin-top: -90px;
+    }
+
+    div[data-testid="stButton"] > button {
+        width: 360px !important;
+        height: 55px !important;
+        font-size: 16px !important;
+        font-weight: 700 !important;
+        background-color: #FFD700 !important;
+        color: black !important;
+        border: none !important;
+        border-radius: 8px !important;
+    }
+
+    </style>
+    """, unsafe_allow_html=True)
+
+    st.markdown(
+        f"""
+        <div class="landing">
+            <img src='data:image/png;base64,{base64.b64encode(open("2.png","rb").read()).decode()}' width='160'/>
+            <img src='data:image/png;base64,{base64.b64encode(open("1.png","rb").read()).decode()}' style='width:70%; max-width:900px; margin-top:20px;'/>
+            <p style="font-size:28px; line-height:1.3;">
+                PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
+                <span style="font-size:26px;">January 25, 2026 | OKADA BALLROOM 1–3</span>
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    col1, col2, col3 = st.columns([3.8, 1, 5])
+    with col2:
+        st.button(
+            "Pre-register",
+            on_click=go_to,
+            args=("register",),
+            type="primary",
+            key="landing_register_1"
+        )
+
+
 def login_admin():
     if st.session_state.user == USERNAME and st.session_state.pwd == PASSWORD:
         st.session_state.admin = True
