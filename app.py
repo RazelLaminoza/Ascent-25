@@ -362,11 +362,14 @@ if st.session_state.page == "landing":
     )
 
 col1, col2, col3 = st.columns([5.2, 1, 5])
-
-col1, col2 = st.columns([5.2, 1])
 with col2:
-    st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
-
+    st.button(
+        "Pre-register",
+        on_click=go_to,
+        args=("register",),
+        type="primary",
+        key="landing_register_1"
+    )
 
 # ---------------- REGISTER ----------------
 if st.session_state.page == "register":
@@ -471,9 +474,10 @@ if st.session_state.page == "register":
         go_to("admin")
 
     # ------------------ BACK + ADMIN BUTTONS (OUTSIDE FORM) ------------------
-    col1, col2 = st.columns(2)
+col1, col2 = st.columns(2)
     with col1:
         st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
+   
    
 
 
