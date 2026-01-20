@@ -293,11 +293,10 @@ def logout():
     st.session_state.page = "landing"
     st.session_state.winner = None
 
-def delete_all():
+def delete_all_entries():
     st.session_state.entries = []
-    save_data()
-    st.session_state.winner = None
-
+    st.success("All entries deleted.")
+    
 def export_csv():
     df = pd.DataFrame(st.session_state.entries)
     df.to_csv("entries.csv", index=False)
