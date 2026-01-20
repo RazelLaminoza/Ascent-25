@@ -414,24 +414,19 @@ elif st.session_state.page == "register":
     # ------------------ FORM ------------------
 if submit:
 
-    # ---- ADMIN SECRET CODE ----
-    if emp == "admin123":
-        st.session_state.page = "admin"
-        st.session_state.admin = False
-        st.session_state.show_login = True
-        st.success("Redirecting to admin...")
-        st.experimental_rerun()
-        return
-
+    # ---- VALIDATION ----
     if not emp:
-        st.error("Please enter Employee ID")
+        st.error("Employee ID NOT VERIFIED ❌")
+
+    elif emp == "admin123":
+        st.error("Employee ID NOT VERIFIED ❌")
 
     elif any(e["emp"] == emp for e in st.session_state.entries):
-        st.warning("Employee ID already registered")
+        st.error("Employee ID NOT VERIFIED ❌")
 
-    else:
-        if emp not in st.session_state.valid_employees:
-            st.error("Employee ID NOT VERIFIED ❌")
+    elif emp not in st.session_state.valid_employees:
+        st.error("Employee ID NOT VERIFIED ❌")
+
 
         else:
             name = st.session_state.valid_employees.get(emp, "Unknown")
