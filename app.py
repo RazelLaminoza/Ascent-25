@@ -325,7 +325,6 @@ if st.session_state.page == "landing":
         margin-top: -90px;
     }
 
-    /* Style the Streamlit button */
     div[data-testid="stButton"] > button {
         width: 360px !important;
         height: 55px !important;
@@ -337,13 +336,6 @@ if st.session_state.page == "landing":
         border-radius: 8px !important;
     }
 
-    /* Position by X and Y */
-    #landing-button {
-        position: absolute;
-        left: 10%;   /* X axis */
-        top: 20%;    /* Y axis */
-        transform: translate(-50%, -50%);
-    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -361,15 +353,16 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
-col1, col2, col3 = st.columns([5.2, 1, 5])
-with col2:
-    st.button(
-        "Pre-register",
-        on_click=go_to,
-        args=("register",),
-        type="primary",
-        key="landing_register_1"
-    )
+    # <-- MOVE IT HERE -->
+    col1, col2, col3 = st.columns([5.2, 1, 5])
+    with col2:
+        st.button(
+            "Pre-register",
+            on_click=go_to,
+            args=("register",),
+            type="primary",
+            key="landing_register_1"
+        )
 
 # ---------------- REGISTER ----------------
 if st.session_state.page == "register":
