@@ -361,7 +361,9 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
-    # Streamlit button with id for positioning
+    col1, col2, col3 = st.columns([5.5, 1, 5])
+
+with col2:
     st.button(
         "Pre-register",
         on_click=go_to,
