@@ -396,16 +396,6 @@ elif st.session_state.page == "register":
         div[data-testid="stFormSubmitButton"] > button span * {
             color: black !important;
         }
-
-        /* Back + Admin buttons */
-        div[data-testid="stButton"] > button {
-            width: 100% !important;
-            max-width: 520px !important;
-            height: 55px !important;
-            font-size: 16px !important;
-            font-weight: 700 !important;
-            border-radius: 8px !important;
-        }
         </style>
         """,
         unsafe_allow_html=True
@@ -420,8 +410,7 @@ elif st.session_state.page == "register":
 
             # ---- ADMIN SECRET CODE ----
             if emp == "admin123":
-                st.session_state.page = "admin"
-                st.session_state.admin = False
+                st.session_state.go_admin = True  # <-- redirect flag
 
             # ---- VALIDATION ----
             elif not emp:
@@ -470,6 +459,7 @@ elif st.session_state.page == "register":
                     unsafe_allow_html=True
                 )
 
+                # ------------------ DOWNLOAD BUTTON ------------------
                 st.download_button(
                     "📥 Download Pass (PNG)",
                     pass_bytes,
@@ -478,6 +468,11 @@ elif st.session_state.page == "register":
                     type="primary"
                 )
 
+
+    # ---- REDIRECT AFTER FORM ----
+    if st.session_state.get("go_admin", False):
+        st.session_state.go_admin = False
+        go_to("admin")
 
     # ------------------ BACK + ADMIN BUTTONS (OUTSIDE FORM) ------------------
     col1, col2 = st.columns(2)
