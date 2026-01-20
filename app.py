@@ -572,7 +572,15 @@ if st.session_state.page == "admin":
 
         st.dataframe(df, use_container_width=True)
 
-        csv = df.to_csv(index=False).encode("utf-8-sig")
+       df = pd.DataFrame(st.session_state.entries)
+
+# ---- FORCE ONLY THESE COLUMNS ----
+if "name" in df.columns:
+    df["Full Name"] = df["name"]
+    df.drop(columns=["name"], inplace=True)
+
+df = df[["emp", "Full Name"]]
+
         st.download_button(
             "⬇️ Download CSV",
             csv,
