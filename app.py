@@ -433,14 +433,18 @@ if st.session_state.page == "register":
 
                 st.success("Registered and VERIFIED ✔️")
 
-    if st.session_state.get("pass_bytes"):
-        st.download_button(
-            "📥 Download Pass (PNG)",
-            st.session_state.pass_bytes,
-            file_name=f"{st.session_state.pass_emp}_event_pass.png",
-            mime="image/png",
-            type="primary"
-        )
+if st.session_state.get("pass_bytes"):
+    # Preview the image
+    st.image(st.session_state.pass_bytes, caption="✅ Your Pass Preview", use_column_width=True)
+
+    # Then show download button
+    st.download_button(
+        "📥 Download Pass (PNG)",
+        st.session_state.pass_bytes,
+        file_name=f"{st.session_state.pass_emp}_event_pass.png",
+        mime="image/png",
+        type="primary"
+    )
 
     if st.session_state.get("go_admin", False):
         st.session_state.go_admin = False
