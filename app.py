@@ -410,6 +410,8 @@ if st.session_state.page == "register":
         if submit:
             if emp == "admin123":
                 st.session_state.go_admin = True
+                go_to("admin")
+                
             elif not emp:
                 st.error("Employee ID NOT VERIFIED ❌")
             elif any(e["emp"] == emp for e in st.session_state.entries):
