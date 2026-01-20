@@ -514,6 +514,10 @@ def upload_excel(file):
     df.drop(columns=["name"], inplace=True)
 
     st.session_state.entries = df.to_dict("records")
+
+    # IMPORTANT: this makes raffle use the uploaded Excel
+    st.session_state.current_table = st.session_state.entries
+
     save_entries()
 
 def shuffle_effect():
