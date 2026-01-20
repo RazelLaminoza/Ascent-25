@@ -476,27 +476,9 @@ elif st.session_state.page == "register":
 
     # ------------------ BACK + ADMIN BUTTONS (OUTSIDE FORM) ------------------
     col1, col2 = st.columns(2)
-
-    with col2:
-        # HIDE ADMIN BUTTON
-        st.markdown(
-            """
-            <style>
-            #admin_login_btn button {
-                visibility: hidden;
-            }
-            </style>
-            """,
-            unsafe_allow_html=True
-        )
-
-        st.button(
-            "Admin Login",
-            on_click=go_to,
-            args=("admin",),
-            type="secondary",
-            key="admin_login_btn"
-        )
+    with col1:
+        st.button("Back to Landing", on_click=go_to, args=("landing",), type="secondary")
+   
 
 
 #-----------------admin----------------
