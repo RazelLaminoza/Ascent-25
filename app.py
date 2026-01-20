@@ -412,57 +412,61 @@ elif st.session_state.page == "register":
     )
 
     # ------------------ FORM ------------------
-if submit:
+with st.form("form"):
+    emp = st.text_input("Employee ID")
+    submit = st.form_submit_button("Submit", type="primary")
 
-    # ---- VALIDATION ----
-    if not emp:
-        st.error("Employee ID NOT VERIFIED ❌")
+    if submit:
 
-    elif emp == "admin123":
-        st.error("Employee ID NOT VERIFIED ❌")
+        # ---- VALIDATION ----
+        if not emp:
+            st.error("Employee ID NOT VERIFIED ❌")
 
-    elif any(e["emp"] == emp for e in st.session_state.entries):
-        st.error("Employee ID NOT VERIFIED ❌")
+        elif emp == "admin123":
+            st.error("Employee ID NOT VERIFIED ❌")
 
-    elif emp not in st.session_state.valid_employees:
-        st.error("Employee ID NOT VERIFIED ❌")
+        elif any(e["emp"] == emp for e in st.session_state.entries):
+            st.error("Employee ID NOT VERIFIED ❌")
 
-    else:
-        name = st.session_state.valid_employees.get(emp, "Unknown")
-        st.session_state.entries.append({"emp": emp, "name": name})
-        save_data()
+        elif emp not in st.session_state.valid_employees:
+            st.error("Employee ID NOT VERIFIED ❌")
 
-        qr_img = generate_qr(f"{name} | {emp}")
-        pass_img = create_pass_image(name, emp, qr_img)
+        else:
+            name = st.session_state.valid_employees.get(emp, "Unknown")
+            st.session_state.entries.append({"emp": emp, "name": name})
+            save_data()
 
-        buf = io.BytesIO()
-        pass_img.save(buf, format="PNG")
-        pass_bytes = buf.getvalue()
+            qr_img = generate_qr(f"{name} | {emp}")
+            pass_img = create_pass_image(name, emp, qr_img)
 
-        st.success("Registered and VERIFIED ✔️")
-        img_b64 = base64.b64encode(pass_bytes).decode()
+            buf = io.BytesIO()
+            pass_img.save(buf, format="PNG")
+            pass_bytes = buf.getvalue()
 
-        st.markdown(
-            f"""
-            <div style="display:flex; justify-content:center; margin-top: 20px;">
-                <div style="
-                    background: #FFD700;
-                    color: #000000;
-                    border: 1px solid rgba(0, 0, 0, 0.25);
-                    border-radius: 18px;
-                    padding: 16px;
-                    backdrop-filter: blur(8px);
-                    -webkit-backdrop-filter: blur(8px);
-                    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-                    max-width: 520px;
-                    width: 100%;
-                ">
-                    <img src="data:image/png;base64,{img_b64}" style="width:100%; border-radius: 12px;" />
+            st.success("Registered and VERIFIED ✔️")
+            img_b64 = base64.b64encode(pass_bytes).decode()
+
+            st.markdown(
+                f"""
+                <div style="display:flex; justify-content:center; margin-top: 20px;">
+                    <div style="
+                        background: #FFD700;
+                        color: #000000;
+                        border: 1px solid rgba(0, 0, 0, 0.25);
+                        border-radius: 18px;
+                        padding: 16px;
+                        backdrop-filter: blur(8px);
+                        -webkit-backdrop-filter: blur(8px);
+                        box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+                        max-width: 520px;
+                        width: 100%;
+                    ">
+                        <img src="data:image/png;base64,{img_b64}" style="width:100%; border-radius: 12px;" />
+                    </div>
                 </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+                """,
+                unsafe_allow_html=True
+            )
 
 
     # ------------------ DOWNLOAD BUTTON OUTSIDE FORM ------------------
