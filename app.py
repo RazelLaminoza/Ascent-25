@@ -412,7 +412,7 @@ elif st.session_state.page == "register":
     )
 
     # ------------------ FORM ------------------
-if submit:
+    if submit:
 
     # ---- ADMIN SECRET CODE ----
     if emp == "admin123":
