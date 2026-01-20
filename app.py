@@ -577,7 +577,7 @@ if st.session_state.page == "admin":
 
         st.button(
             "🗑️ Delete All Entries",
-            on_click=delete_all_entries,
+            on_click=delete_all_entries,)
 #--------------file----------------
 FILE_PATH = "entries.csv"
 
