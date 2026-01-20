@@ -294,11 +294,20 @@ def logout():
     st.session_state.winner = None
 
 def delete_all_entries():
+    # Clear session state
     st.session_state.entries = []
-    # also delete the CSV file
+    st.session_state.current_table = []
+    st.session_state.winner = None
+
+    # Delete saved files
+    if os.path.exists(DATA_FILE):
+        os.remove(DATA_FILE)
+
     if os.path.exists(FILE_PATH):
         os.remove(FILE_PATH)
-    st.success("All entries deleted.")
+
+    st.success("✅ All entries deleted and table cleared.")
+
 
     
 def export_csv():
