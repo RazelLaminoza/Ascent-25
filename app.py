@@ -361,7 +361,7 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
-    col1, col2, col3 = st.columns([3.8, 1, 5])
+    col1, col2, col3 = st.columns([4.1, 1, 5])
     with col2:
         st.button(
             "Pre-register",
