@@ -14,7 +14,7 @@ def shuffle_effect(df):
 
     # shuffle effect
     for _ in range(20):
-        name = random.choice(df["Full Name"].tolist())
+        name = random.choice(df["name"].tolist())
         placeholder.markdown(
             f"<h2 style='text-align:center; color:#FFD700;'>{name}</h2>",
             unsafe_allow_html=True
@@ -22,12 +22,13 @@ def shuffle_effect(df):
         time.sleep(0.05)
 
     # final winner
-    winner = random.choice(df["Full Name"].tolist())
+    winner = random.choice(df["name"].tolist())
     st.session_state.winner = winner
     placeholder.markdown(
         f"<h2 style='text-align:center; color:#FFD700;'>{winner}</h2>",
         unsafe_allow_html=True
     )
+
 def add_custom_font():
     font_path = "PPNeueMachina-PlainUltrabold.ttf"
 
@@ -42,17 +43,14 @@ def add_custom_font():
                     src: url("data:font/ttf;base64,{font_b64}") format("truetype");
                 }}
 
-                /* Apply font everywhere in Streamlit */
                 * {{
                     font-family: "PPNeueMachina" !important;
                 }}
 
-                /* Extra strong override for Streamlit internal elements */
                 [class*="css"] {{
                     font-family: "PPNeueMachina" !important;
                 }}
 
-                /* Buttons and Inputs */
                 button, input, textarea, select {{
                     font-family: "PPNeueMachina" !important;
                 }}
@@ -150,7 +148,6 @@ def generate_qr(data):
     return img
 
 def create_pass_image(name, emp, qr_img):
-    # Load background image
     bg = Image.open("bgna.png").convert("RGBA")
     bg = bg.resize((900, 500))
 
@@ -159,7 +156,6 @@ def create_pass_image(name, emp, qr_img):
 
     draw = ImageDraw.Draw(img)
 
-    # Load fonts
     try:
         font_big = ImageFont.truetype("CourierPrime-Bold.ttf", 42)
         font_small = ImageFont.truetype("CourierPrime-Bold.ttf", 26)
@@ -168,7 +164,6 @@ def create_pass_image(name, emp, qr_img):
 
     text_color = (255, 255, 255, 255)
 
-    # Add 1.png and 2.png at the top-right
     logo1 = Image.open("1.png").convert("RGBA")
     logo2 = Image.open("2.png").convert("RGBA")
 
@@ -178,7 +173,6 @@ def create_pass_image(name, emp, qr_img):
     img.paste(logo1, (620, 30), logo1)
     img.paste(logo2, (760, 30), logo2)
 
-    # Text
     draw.text((40, 40), "ASCENT APAC 2026", fill=text_color, font=font_big)
     draw.text((40, 120), "FULL NAME:", fill=text_color, font=font_big)
     draw.text((40, 160), name, fill=text_color, font=font_small)
@@ -207,6 +201,7 @@ def main():
 
     if "page" not in st.session_state:
         st.session_state.page = "landing"
+        st.session_state.winner = None
 
     if st.session_state.page == "landing":
         landing_page()
@@ -226,7 +221,6 @@ def landing_page():
 
     st.markdown("""
     <style>
-    /* Lock scrolling */
     html, body {
         overflow: hidden !important;
         height: 100% !important;
@@ -239,7 +233,7 @@ def landing_page():
         align-items: center;
         height: 100vh;
         text-align: center;
-        opacity: 0.95; /* Slight transparency */
+        opacity: 0.95;
     }
 
     .landing img {
@@ -284,11 +278,8 @@ def landing_page():
         unsafe_allow_html=True
     )
 
-    # Streamlit button (centered by CSS)
     if st.button("Pre-register"):
         set_page("register")
-
-
 
 # ---------------------------
 # Register Page
@@ -301,8 +292,6 @@ def register_page():
         submit = st.form_submit_button("Submit")
 
     if submit:
-
-        # ---- ADMIN SECRET CODE ----
         if emp_id == "admin123":
             set_page("admin")
             return
@@ -313,26 +302,22 @@ def register_page():
 
         df_employees = pd.read_excel(EMPLOYEE_EXCEL)
 
-        # Validation using emp column
         if emp_id not in df_employees["emp"].astype(str).tolist():
             st.error("Employee ID NOT VERIFIED ❌")
             return
 
         df_reg = load_registered()
 
-        # Already used?
         if emp_id in df_reg["emp_id"].astype(str).tolist():
             st.error("Employee ID NOT VERIFIED ❌")
             return
 
         name = df_employees[df_employees["emp"].astype(str) == emp_id]["name"].values[0]
 
-        # Add to registered list
         new_row = pd.DataFrame([{"name": name, "emp_id": emp_id}])
         df_reg = pd.concat([df_reg, new_row], ignore_index=True)
         save_registered(df_reg)
 
-        # ----- CREATE PASS IMAGE -----
         qr_img = generate_qr(f"{name} | {emp_id}")
         pass_img = create_pass_image(name, emp_id, qr_img)
 
@@ -434,18 +419,16 @@ def show_admin_table():
     if st.button("Back", key="admin_table_back_btn"):
         set_page("landing")
 
-
 # ---------------------------
-# Raffle Page (Only 1 Name)
+# Raffle Page (WORKING!)
 # ---------------------------
-elif st.session_state.page == "raffle":
-
-    if not st.session_state.admin:
-        st.session_state.page = "admin"
-
-    st.markdown("<h1>🎰 Raffle Draw</h1>", unsafe_allow_html=True)
+def raffle_page():
+    st.markdown("<h1 style='text-align:center;'>🎰 Raffle Draw</h1>", unsafe_allow_html=True)
 
     df = load_registered()
+    if df.empty:
+        st.warning("No entries yet.")
+        return
 
     st.button(
         "🎰 Run Raffle",
@@ -455,19 +438,13 @@ elif st.session_state.page == "raffle":
         key="run_raffle"
     )
 
-    if st.session_state.winner:
-        winner_name = (
-            st.session_state.winner.get("Full Name")
-            if isinstance(st.session_state.winner, dict)
-            else st.session_state.winner
-        )
-
+    if st.session_state.get("winner"):
         st.markdown(
             f"""
             <div style="text-align:center;margin-top:40px;">
                 <h2>🎉 WINNER 🎉</h2>
                 <h1 style="color:gold;font-size:70px;">
-                    {winner_name}
+                    {st.session_state.winner}
                 </h1>
             </div>
             """,
@@ -475,4 +452,8 @@ elif st.session_state.page == "raffle":
         )
 
     st.markdown("---")
-    st.button("Logout", on_click=logout, key="logout_raffle")
+    if st.button("Back to Admin"):
+        set_page("admin")
+
+if __name__ == "__main__":
+    main()
