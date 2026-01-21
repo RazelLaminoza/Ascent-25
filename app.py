@@ -501,7 +501,9 @@ def raffle_page():
 
     # ---------- TOP CENTER IMAGE ----------
     img = Image.open("1.png")  # Make sure this image exists
-    st.image(img, use_column_width=False, width=80)
+    img = img.resize((80, int(80 * img.height / img.width)))
+    
+    st.image(img)
 
     # ---------- BIG TITLE ----------
     st.markdown(
