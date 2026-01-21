@@ -167,13 +167,62 @@ def main():
 # Landing Page
 # ---------------------------
 def landing_page():
-    if os.path.exists("2.png"):
-        st.image("2.png", width=300)
-    if os.path.exists("1.png"):
-        st.image("1.png", width=350)
+    img2_b64 = base64.b64encode(open("2.png", "rb").read()).decode()
+    img1_b64 = base64.b64encode(open("1.png", "rb").read()).decode()
 
-    if st.button("Go to Register"):
+    st.markdown("""
+    <style>
+    .landing {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 90vh;
+        text-align: center;
+    }
+    .landing img {
+        margin: 10px;
+    }
+    .landing p {
+        font-size: 18px;
+        line-height: 1.3;
+        color: white;
+    }
+    .landing span {
+        font-size: 16px;
+    }
+    .stButton button {
+        width: 360px !important;
+        height: 55px !important;
+        font-size: 16px !important;
+        font-weight: 700 !important;
+        background-color: #FFD700 !important;
+        color: black !important;
+        border: none !important;
+        border-radius: 8px !important;
+        margin-top: 20px !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    st.markdown(
+        f"""
+        <div class="landing">
+            <img src="data:image/png;base64,{img2_b64}" width="200" />
+            <img src="data:image/png;base64,{img1_b64}" width="450" />
+            <p>
+                PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
+                <span>January 25, 2026 | OKADA BALLROOM 1–3</span>
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # Streamlit button (centered by CSS)
+    if st.button("Pre-register"):
         set_page("register")
+
 
 # ---------------------------
 # Register Page
