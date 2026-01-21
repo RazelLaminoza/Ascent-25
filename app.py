@@ -560,8 +560,19 @@ def raffle_page():
         unsafe_allow_html=True
     )
 
-    # ---------- DRAW WINNER BUTTON ----------
+    # ---------- DRAW WINNER BUTTON WITH SHUFFLE ----------
     if st.button("🎉 Draw Winner", key="draw_winner_btn"):
+
+        # Shuffle Effect
+        for i in range(15):
+            random_name = random.choice(df["name"].tolist())
+            placeholder.markdown(
+                f"<h2 style='color:#FFD700; font-size: 60px; text-align:center;'>{random_name}</h2>",
+                unsafe_allow_html=True
+            )
+            time.sleep(0.05)  # speed of shuffle
+
+        # Final Winner
         winner = random.choice(df["name"].tolist())
         st.session_state.raffle_name = winner
         placeholder.markdown(
