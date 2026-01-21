@@ -92,6 +92,8 @@ def main():
         register_page()
     elif st.session_state.page == "admin":
         admin_page()
+    elif st.session_state.page == "raffle":
+        raffle_page()
 
 # ---------------------------
 # Landing Page
@@ -230,25 +232,32 @@ def show_admin_table():
     if st.button("Delete All Entries", key="delete_all_btn"):
         delete_all_entries()
 
-    if st.button("Enter Raffle", key="raffle_btn"):
-        raffle(df)
+    if st.button("Go to Raffle", key="go_raffle_btn"):
+        set_page("raffle")
 
     if st.button("Back", key="admin_table_back_btn"):
         set_page("landing")
 
 # ---------------------------
-# Raffle Shuffle
+# Raffle Page (ONE NAME ONLY)
 # ---------------------------
-def raffle(df):
+def raffle_page():
+    st.markdown("<h1 style='text-align:center;'>Raffle Winner</h1>", unsafe_allow_html=True)
+
+    df = load_registered()
+
     if df.empty:
         st.warning("No entries yet.")
-        return
+    else:
+        if st.button("Draw Winner", key="draw_btn"):
+            winner = df.sample(1)["name"].values[0]
+            st.markdown(f"<h2 style='text-align:center;'>{winner}</h2>", unsafe_allow_html=True)
 
-    names = df["name"].tolist()
-    random.shuffle(names)
+    if st.button("Back", key="raffle_back_btn"):
+        set_page("admin")
 
-    for n in names:
-        st.markdown(f"<h3 style='text-align:center;'>{n}</h3>", unsafe_allow_html=True)
-
+# ---------------------------
+# Run App
+# ---------------------------
 if __name__ == "__main__":
     main()
