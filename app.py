@@ -599,7 +599,6 @@ if st.session_state.page == "admin":
             type="secondary",
             key="delete_entries"
         )
-
 # 🔥 HARD RESET BUTTON (NO EXPERIMENTAL)
 def HARD_RESET():
     # Clear session state
@@ -612,7 +611,6 @@ def HARD_RESET():
             os.remove(file)
 
     st.success("✅ System reset complete. Please refresh the page.")
-
 
         st.button(
             "🔥 HARD RESET SYSTEM",
