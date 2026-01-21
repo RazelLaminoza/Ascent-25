@@ -2,9 +2,9 @@ import streamlit as st
 import pandas as pd
 import random
 import os
-from PIL import Image, ImageDraw, ImageFont
 import io
 import base64
+from PIL import Image, ImageDraw, ImageFont
 import qrcode
 
 # ---------------------------
@@ -14,7 +14,7 @@ DATA_FILE = "registered.csv"
 EMPLOYEE_EXCEL = "employee_list.xlsx"
 
 # ---------------------------
-# Custom Font
+# Custom Font + Background
 # ---------------------------
 def load_custom_font():
     font_path = "PPNeueMachina-PlainUltrabold.ttf"
@@ -26,7 +26,7 @@ def load_custom_font():
                 font-family: "PPNeue";
                 src: url("{font_path}");
             }}
-            html, body, [class*="css"]  {{
+            html, body, [class*="css"] {{
                 font-family: "PPNeue";
             }}
             </style>
@@ -34,23 +34,29 @@ def load_custom_font():
             unsafe_allow_html=True,
         )
 
-# ---------------------------
-# Background Image
-# ---------------------------
 def set_background():
-    if os.path.exists("bgna.png"):
-        st.markdown(
-            f"""
-            <style>
-            .stApp {{
-                background: url("bgna.png");
-                background-size: cover;
-                background-attachment: fixed;
-            }}
-            </style>
-            """,
-            unsafe_allow_html=True
-        )
+    image_path = "bgna.png"
+    if not os.path.exists(image_path):
+        return
+
+    with open(image_path, "rb") as f:
+        data = f.read()
+    b64 = base64.b64encode(data).decode()
+
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background-image: url("data:image/png;base64,{b64}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
 
 # ---------------------------
 # Data
@@ -71,6 +77,30 @@ def set_page(page_name):
     st.session_state.page = page_name
     if page_name != "admin":
         st.session_state.admin_logged_in = False
+
+# ---------------------------
+# QR & Pass Image
+# ---------------------------
+def generate_qr(data):
+    qr = qrcode.QRCode(box_size=8, border=2)
+    qr.add_data(data)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white")
+    return img
+
+def create_pass_image(name, emp_id, qr_img):
+    img = Image.new("RGB", (700, 400), color=(255, 255, 255))
+    draw = ImageDraw.Draw(img)
+    font = ImageFont.truetype("PPNeueMachina-PlainUltrabold.ttf", 40)
+
+    draw.text((50, 120), f"Name: {name}", font=font, fill=(0,0,0))
+    draw.text((50, 200), f"ID: {emp_id}", font=font, fill=(0,0,0))
+
+    # Add QR
+    qr_img = qr_img.resize((180, 180))
+    img.paste(qr_img, (480, 150))
+
+    return img
 
 # ---------------------------
 # Main App
@@ -97,17 +127,16 @@ def main():
 def landing_page():
     st.markdown("<h1 style='text-align:center;'>Welcome</h1>", unsafe_allow_html=True)
 
+    # Top Center Image
     if os.path.exists("2.png"):
         st.image("2.png", width=300)
 
+    # Center Image
     if os.path.exists("1.png"):
         st.image("1.png", width=350)
 
     if st.button("Go to Register"):
         set_page("register")
-
-    if st.button("Raffle"):
-        set_page("raffle")
 
 # ---------------------------
 # Register Page
@@ -195,28 +224,6 @@ def register_page():
     if st.button("Back", key="register_back_btn"):
         set_page("landing")
 
-# ---------------------------
-# QR + Pass Design
-# ---------------------------
-def generate_qr(data):
-    qr = qrcode.QRCode(box_size=8, border=2)
-    qr.add_data(data)
-    qr.make(fit=True)
-    img = qr.make_image(fill_color="black", back_color="white")
-    return img
-
-def create_pass_image(name, emp_id, qr_img):
-    img = Image.new("RGB", (700, 400), color=(255, 255, 255))
-    draw = ImageDraw.Draw(img)
-    font = ImageFont.truetype("PPNeueMachina-PlainUltrabold.ttf", 40)
-
-    draw.text((50, 120), f"Name: {name}", font=font, fill=(0,0,0))
-    draw.text((50, 200), f"ID: {emp_id}", font=font, fill=(0,0,0))
-
-    qr_img = qr_img.resize((180, 180))
-    img.paste(qr_img, (480, 150))
-
-    return img
 
 # ---------------------------
 # Admin Page
@@ -228,10 +235,10 @@ def admin_page():
         show_admin_table()
         return
 
-    user = st.text_input("User")
-    pwd = st.text_input("Password", type="password")
+    user = st.text_input("User", key="admin_user")
+    pwd = st.text_input("Password", type="password", key="admin_pwd")
 
-    if st.button("Login"):
+    if st.button("Login", key="admin_login_btn"):
         if user == "admin" and pwd == "admin123":
             st.success("Login Successful!")
             st.session_state.admin_logged_in = True
@@ -239,8 +246,9 @@ def admin_page():
         else:
             st.error("Invalid credentials")
 
-    if st.button("Back"):
+    if st.button("Back", key="admin_back_btn"):
         set_page("landing")
+
 
 def delete_all_entries():
     if os.path.exists(DATA_FILE):
@@ -268,29 +276,31 @@ def show_admin_table():
     if st.button("Delete All Entries", key="delete_all_btn"):
         delete_all_entries()
 
+    if st.button("Enter Raffle", key="raffle_btn"):
+        set_page("raffle")
+
     if st.button("Back", key="admin_table_back_btn"):
         set_page("landing")
 
+
 # ---------------------------
-# Raffle Page (1 Winner)
+# Raffle Page (Only 1 Name)
 # ---------------------------
 def raffle_page():
     st.markdown("<h1 style='text-align:center;'>Raffle</h1>", unsafe_allow_html=True)
 
     df = load_registered()
-
     if df.empty:
         st.warning("No entries yet.")
-    else:
-        if st.button("Pick Winner"):
-            winner = df.sample(1).iloc[0]
-            st.success(f"🎉 Winner: {winner['name']} ({winner['emp_id']})")
+        return
 
-    if st.button("Back"):
-        set_page("landing")
+    if st.button("Draw Winner", key="draw_winner_btn"):
+        winner = random.choice(df["name"].tolist())
+        st.markdown(f"<h2 style='text-align:center; color:#FFD700;'>{winner}</h2>", unsafe_allow_html=True)
 
-# ---------------------------
-# Run App
-# ---------------------------
+    if st.button("Back", key="raffle_back_btn"):
+        set_page("admin")
+
+
 if __name__ == "__main__":
     main()
