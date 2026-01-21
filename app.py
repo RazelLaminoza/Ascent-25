@@ -118,7 +118,7 @@ def register_page():
 
         name = df_employees[df_employees["emp"].astype(str) == emp_id]["name"].values[0]
 
-        # ✅ New concat method (No append)
+        # New concat method (No append)
         new_row = pd.DataFrame([{"name": name, "emp_id": emp_id}])
         df_reg = pd.concat([df_reg, new_row], ignore_index=True)
 
@@ -172,7 +172,7 @@ def admin_page():
         if user == "admin" and pwd == "admin123":
             st.success("Login Successful!")
             st.session_state.admin_logged_in = True
-            st.experimental_rerun()
+            show_admin_table()
         else:
             st.error("Invalid credentials")
 
@@ -184,16 +184,12 @@ def delete_all_entries():
     if os.path.exists(DATA_FILE):
         os.remove(DATA_FILE)
     st.success("All entries deleted!")
-    st.experimental_rerun()
-
 
 def delete_entry(emp_id):
     df = load_registered()
     df = df[df["emp_id"].astype(str) != str(emp_id)]
     save_registered(df)
     st.success(f"Deleted entry: {emp_id}")
-    st.experimental_rerun()
-
 
 def show_admin_table():
     st.markdown("<h2>Registered Users</h2>", unsafe_allow_html=True)
