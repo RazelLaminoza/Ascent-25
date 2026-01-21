@@ -415,7 +415,6 @@ def show_admin_table():
     if st.button("Back", key="admin_table_back_btn"):
         set_page("landing")
 
-import time
 
 # ---------------------------
 # Raffle Page (Only 1 Name)
@@ -428,23 +427,29 @@ def raffle_page():
         st.warning("No entries yet.")
         return
 
-    placeholder = st.empty()
+    # Placeholder for showing the name
+    if "raffle_name" not in st.session_state:
+        st.session_state.raffle_name = "Press Draw Winner"
 
+    placeholder = st.empty()
+    placeholder.markdown(
+        f"<h2 style='text-align:center; color:#FFD700;'>{st.session_state.raffle_name}</h2>",
+        unsafe_allow_html=True
+    )
+
+    # Draw Winner Button
     if st.button("Draw Winner", key="draw_winner_btn"):
-        # fast shuffle effect (no delay)
+        # shuffle 15 times
         for _ in range(15):
-            shuffled_name = random.choice(df["name"].tolist())
+            st.session_state.raffle_name = random.choice(df["name"].tolist())
             placeholder.markdown(
-                f"<h2 style='text-align:center; color:#FFD700;'>{shuffled_name}</h2>",
+                f"<h2 style='text-align:center; color:#FFD700;'>{st.session_state.raffle_name}</h2>",
                 unsafe_allow_html=True
             )
 
         # Final winner
-        winner = random.choice(df["name"].tolist())
+        st.session_state.raffle_name = random.choice(df["name"].tolist())
         placeholder.markdown(
-            f"<h2 style='text-align:center; color:#FFD700;'>{winner}</h2>",
+            f"<h2 style='text-align:center; color:#FFD700;'>{st.session_state.raffle_name}</h2>",
             unsafe_allow_html=True
         )
-
-    if st.button("Back", key="raffle_back_btn"):
-        set_page("admin")
