@@ -49,6 +49,8 @@ def save_registered(df):
 # ---------------------------
 def set_page(page_name):
     st.session_state.page = page_name
+    if page_name != "admin":
+        st.session_state.admin_logged_in = False
 
 # ---------------------------
 # Main App
@@ -158,13 +160,19 @@ def show_card(name, emp_id):
 def admin_page():
     st.markdown("<h1 style='text-align:center;'>Admin Login</h1>", unsafe_allow_html=True)
 
+    # if admin already logged in
+    if st.session_state.get("admin_logged_in", False):
+        show_admin_table()
+        return
+
     user = st.text_input("User")
     pwd = st.text_input("Password", type="password")
 
     if st.button("Login"):
         if user == "admin" and pwd == "admin123":
             st.success("Login Successful!")
-            show_admin_table()
+            st.session_state.admin_logged_in = True
+            st.experimental_rerun()
         else:
             st.error("Invalid credentials")
 
@@ -204,3 +212,20 @@ def show_admin_table():
 
     if st.button("Enter Raffle"):
         raffle(df)
+
+# ---------------------------
+# Raffle Shuffle
+# ---------------------------
+def raffle(df):
+    if df.empty:
+        st.warning("No entries yet.")
+        return
+
+    names = df["name"].tolist()
+    random.shuffle(names)
+
+    for n in names:
+        st.markdown(f"<h3 style='text-align:center;'>{n}</h3>", unsafe_allow_html=True)
+
+if __name__ == "__main__":
+    main()
