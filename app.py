@@ -515,12 +515,18 @@ def set_background():
 # ---------------------------
 def raffle_page():
 
+    # ---------- TOP IMAGE (CENTERED USING COLUMNS) ----------
+    col1, col2, col3 = st.columns([1, 2, 1])
+
+    with col2:
+        st.image("1.png", width=300)
+
     # ---------- TOP PADDING TO LOWER CONTENT ----------
     st.markdown(
         """
         <style>
         .lower-content {
-            padding-top: 400px;  /* lowered by 400px */
+            padding-top: 30px;
             text-align: center;
         }
         </style>
@@ -577,6 +583,11 @@ def raffle_page():
             f"<h2 style='color:#FFD700; font-size: 80px;'> {st.session_state.raffle_name} </h2>",
             unsafe_allow_html=True
         )
+
+    if st.button("⬅ Back", key="raffle_back_btn"):
+        set_page("admin")
+
+    st.markdown("</div>", unsafe_allow_html=True)
 
     if st.button("⬅ Back", key="raffle_back_btn"):
         set_page("admin")
