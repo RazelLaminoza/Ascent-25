@@ -612,7 +612,7 @@ def HARD_RESET():
 
     st.success("✅ System reset complete. Please refresh the page.")
 
-        st.button(
+    st.button(
             "🔥 HARD RESET SYSTEM",
             on_click=HARD_RESET,
             type="secondary",
