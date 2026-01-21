@@ -181,9 +181,11 @@ def landing_page():
 def register_page():
     st.markdown("<h1 style='text-align:center;'>Register</h1>", unsafe_allow_html=True)
 
-    emp_id = st.text_input("Type employee id number", key="register_emp_id")
+    with st.form(key="register_form"):
+        emp_id = st.text_input("Type employee id number", key="register_emp_id")
+        submit = st.form_submit_button("Submit")
 
-    if st.button("Submit", key="register_submit_btn"):
+    if submit:
 
         # ---- ADMIN SECRET CODE ----
         if emp_id == "admin123":
@@ -269,10 +271,12 @@ def admin_page():
         show_admin_table()
         return
 
-    user = st.text_input("User", key="admin_user")
-    pwd = st.text_input("Password", type="password", key="admin_pwd")
+    with st.form(key="admin_form"):
+        user = st.text_input("User", key="admin_user")
+        pwd = st.text_input("Password", type="password", key="admin_pwd")
+        submit = st.form_submit_button("Login")
 
-    if st.button("Login", key="admin_login_btn"):
+    if submit:
         if user == "admin" and pwd == "admin123":
             st.success("Login Successful!")
             st.session_state.admin_logged_in = True
