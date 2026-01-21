@@ -497,10 +497,11 @@ def show_admin_table():
 # ---------------------------
 # Raffle Page (SAFE LONG SHUFFLE)
 # ---------------------------
-# ---------------------------
-# Raffle Page (Only 1 Name)
-# ---------------------------
 def raffle_page():
+
+    # ---------- TOP CENTER IMAGE ----------
+    img = Image.open("1.png")  # <-- make sure file is named "1.png" and located in same folder
+    st.image(img, use_column_width=False, width=200, caption=None)
 
     st.markdown(
         "<h1 style='text-align:center;'>🎉 Raffle Winner 🎉</h1>",
@@ -513,7 +514,6 @@ def raffle_page():
         st.warning("No entries yet.")
         return
 
-    # Initialize session state
     if "raffle_name" not in st.session_state:
         st.session_state.raffle_name = "Press Draw Winner"
 
@@ -524,7 +524,6 @@ def raffle_page():
         unsafe_allow_html=True
     )
 
-    # -------- DRAW WINNER --------
     if st.button("🎲 Draw Winner", key="draw_winner_btn"):
 
         start_time = time.time()
@@ -539,21 +538,16 @@ def raffle_page():
                 unsafe_allow_html=True
             )
 
-            time.sleep(0.1)  # speed of shuffle (lower = faster)
+            time.sleep(0.1)
 
         # Final winner
         st.session_state.raffle_name = random.choice(names)
 
         placeholder.markdown(
-            f"""
-            <h2 style='text-align:center; color:#FFD700;'>
-                🏆 {st.session_state.raffle_name} 🏆
-            </h2>
-            """,
+            f"<h2 style='text-align:center; color:#FFD700;'>🏆 {st.session_state.raffle_name} 🏆</h2>",
             unsafe_allow_html=True
         )
 
-    # -------- BACK BUTTON --------
     if st.button("⬅ Back", key="raffle_back_btn"):
         set_page("admin")
 
