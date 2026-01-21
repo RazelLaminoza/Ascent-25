@@ -761,7 +761,7 @@ elif st.session_state.page == "register":
         </style>
     """, unsafe_allow_html=True)
 
-    with st.form("form"):
+    with st.form("register_form"):  # <-- changed here
         emp = st.text_input("Employee ID")
         submit = st.form_submit_button("Submit", type="primary")
 
