@@ -532,7 +532,7 @@ def raffle_page():
 
     # ---------- BIG TITLE ----------
     st.markdown(
-        "<h1 style='font-size: 64px;'>Raffle Winner</h1>",
+        "<h1 style='font-size: 80px;'>Raffle Winner</h1>",
         unsafe_allow_html=True
     )
 
@@ -550,7 +550,7 @@ def raffle_page():
 
     # ---------- BIG NAME DISPLAY ----------
     placeholder.markdown(
-        f"<h2 style='color:#FFD700; font-size: 56px;'>{st.session_state.raffle_name}</h2>",
+        f"<h2 style='color:#FFD700; font-size: 90px;'>{st.session_state.raffle_name}</h2>",
         unsafe_allow_html=True
     )
 
