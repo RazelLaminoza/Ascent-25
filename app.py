@@ -294,19 +294,11 @@ def logout():
     st.session_state.winner = None
 
 def delete_all_entries():
-    # Clear session state
     st.session_state.entries = []
-    st.session_state.current_table = []
-    st.session_state.winner = None
-
-    # Delete saved files
-    if os.path.exists(DATA_FILE):
-        os.remove(DATA_FILE)
-
+    # also delete the CSV file
     if os.path.exists(FILE_PATH):
         os.remove(FILE_PATH)
-
-    st.success("✅ All entries deleted and table cleared.")
+    st.success("All entries deleted.")
 
     
 def export_csv():
@@ -360,7 +352,7 @@ if st.session_state.page == "landing":
         unsafe_allow_html=True
     )
 
-    col1, col2, col3 = st.columns([4.8, 1, 5])
+    col1, col2, col3 = st.columns([3.8, 1, 5])
     with col2:
         st.button(
             "Pre-register",
@@ -372,21 +364,11 @@ if st.session_state.page == "landing":
 
 
 # ---------------- REGISTER ----------------
-# --------------------- Reset function ---------------------
-def reset_register():
-    for key in ["pass_bytes", "pass_emp", "emp", "go_admin"]:
-        if key in st.session_state:
-            del st.session_state[key]
-
-# --------------------- LANDING PAGE ---------------------
-if st.session_state.page == "landing":
-    reset_register()  # <-- CLEAR REGISTER DATA
-
-# --------------------- REGISTER PAGE ---------------------
 if st.session_state.page == "register":
     st.markdown("<h1 style='color:white;'>Register Here</h1>", unsafe_allow_html=True)
 
-    st.markdown("""
+    st.markdown(
+        """
         <style>
         div[data-testid="stFormSubmitButton"] > button {
             width: 100% !important;
@@ -401,13 +383,17 @@ if st.session_state.page == "register":
             margin: 0 auto !important;
             padding: 0 !important;
         }
+
         div[data-testid="stFormSubmitButton"] > button span,
         div[data-testid="stFormSubmitButton"] > button span * {
             color: black !important;
         }
         </style>
-    """, unsafe_allow_html=True)
+        """,
+        unsafe_allow_html=True
+    )
 
+    # ------------------ FORM ------------------
     with st.form("form"):
         emp = st.text_input("Employee ID")
         submit = st.form_submit_button("Submit", type="primary")
@@ -415,17 +401,12 @@ if st.session_state.page == "register":
         if submit:
             if emp == "admin123":
                 st.session_state.go_admin = True
-                go_to("admin")  # <-- redirect immediately
-
             elif not emp:
-                st.error("Employee ID NOT VERIFIED 1❌")
-
+                st.error("Employee ID NOT VERIFIED ❌")
             elif any(e["emp"] == emp for e in st.session_state.entries):
-                st.error("You already registered 2❌")
-
+                st.error("You already registered ❌")
             elif emp not in st.session_state.valid_employees:
-                st.error("Employee ID NOT VERIFIED 3❌")
-
+                st.error("Employee ID NOT VERIFIED ❌")
             else:
                 name = st.session_state.valid_employees.get(emp, "Unknown")
                 st.session_state.entries.append({"emp": emp, "Full Name": name})
@@ -444,8 +425,6 @@ if st.session_state.page == "register":
                 st.success("Registered and VERIFIED ✔️")
 
     if st.session_state.get("pass_bytes"):
-        st.image(st.session_state.pass_bytes, caption="✅ Your Pass Preview", use_column_width=True)
-
         st.download_button(
             "📥 Download Pass (PNG)",
             st.session_state.pass_bytes,
@@ -454,10 +433,13 @@ if st.session_state.page == "register":
             type="primary"
         )
 
+    if st.session_state.get("go_admin", False):
+        st.session_state.go_admin = False
+        go_to("admin")
+
 #-----------------admin----------------
 # ---------------- FILE STORAGE ----------------
 FILE_PATH = "entries.csv"
-JSON_PATH = "raffle_data.json"
 
 # ---------------- SESSION STATE ----------------
 if "page" not in st.session_state:
@@ -469,21 +451,8 @@ if "admin" not in st.session_state:
 if "entries" not in st.session_state:
     st.session_state.entries = []
 
-if "current_table" not in st.session_state:
-    st.session_state.current_table = []
-
 if "winner" not in st.session_state:
     st.session_state.winner = None
-
-if "valid_employees" not in st.session_state:
-    st.session_state.valid_employees = {}
-
-if "pass_bytes" not in st.session_state:
-    st.session_state.pass_bytes = None
-
-if "pass_emp" not in st.session_state:
-    st.session_state.pass_emp = None
-
 
 # ---------------- CREDENTIALS ----------------
 USERNAME = "admin"
@@ -519,33 +488,150 @@ def logout():
     st.session_state.page = "admin"
 
 
+def run_raffle():
+    if st.session_state.entries:
+        st.session_state.winner = random.choice(st.session_state.entries)
+
+
+def shuffle_effect():
+    if not st.session_state.entries:
+        return
+
+    placeholder = st.empty()
+
+    # Shuffle effect
+    for _ in range(15):
+        temp = random.choice(st.session_state.entries)
+        placeholder.markdown(
+            f"""
+            <div style="text-align:center;margin-top:40px;">
+                <h2>🎉 SHUFFLING 🎉</h2>
+                <h1 style="color:gold;font-size:70px;">
+                    {temp["Full Name,name"]}
+                </h1>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+        time.sleep(0.08)
+
+    # Final winner
+    st.session_state.winner = random.choice(st.session_state.entries)
+    placeholder.empty()
+
+
+# ---------------- LOAD ENTRIES ON START ----------------
+load_entries()
+
+
+# ---------------- ADMIN PAGE ----------------
+if st.session_state.page == "admin":
+
+    st.markdown("<h1>🔐 Admin Panel</h1>", unsafe_allow_html=True)
+
+    with st.form("admin_form"):
+        uploaded_file = st.file_uploader(
+            "Upload Employee List (Excel)",
+            type=["xlsx"]
+        )
+
+        st.text_input("Username", key="user")
+        st.text_input("Password", type="password", key="pwd")
+
+        submit = st.form_submit_button("Login", type="primary")
+
+        if submit:
+            if uploaded_file:
+                # your file upload logic here
+                pass
+
+            if login_admin():
+                st.success("Login successful")
+            else:
+                st.error("Invalid login")
+
+    # ---------- SHOW BACK BUTTON ONLY WHEN NOT LOGGED IN ----------
+    if not st.session_state.admin:
+        st.button(
+            "Back to Landing",
+            on_click=go_to,
+            args=("landing",),
+            key="back_to_landing_admin"
+        )
+
+    # ---------- SHOW ADMIN CONTROLS ONLY WHEN LOGGED IN ----------
+    if st.session_state.admin and st.session_state.entries:
+
+        st.markdown("### Employee List")
+        df = pd.DataFrame(st.session_state.entries)
+        st.dataframe(df, use_container_width=True)
+
+        csv = df.to_csv(index=False).encode("utf-8-sig")
+        st.download_button(
+            "⬇️ Download CSV",
+            csv,
+            "entries.csv",
+            "text/csv",
+            key="download_csv"
+        )
+
+        st.button(
+            "🗑️ Delete All Entries",
+            on_click=delete_all_entries,)
+#--------------file----------------
+FILE_PATH = "entries.csv"
+
+# ---------------- SESSION STATE ----------------
+if "page" not in st.session_state:
+    st.session_state.page = "admin"
+
+if "admin" not in st.session_state:
+    st.session_state.admin = False
+
+if "entries" not in st.session_state:
+    st.session_state.entries = []
+
+if "current_table" not in st.session_state:
+    st.session_state.current_table = []
+
+if "winner" not in st.session_state:
+    st.session_state.winner = None
+
+# ---------------- CREDENTIALS ----------------
+USERNAME = "admin"
+PASSWORD = "admin123"
+
+# ---------------- FUNCTIONS ----------------
+def load_entries():
+    if os.path.exists(FILE_PATH):
+        df = pd.read_csv(FILE_PATH)
+        st.session_state.entries = df.to_dict("records")
+
+def save_entries():
+    df = pd.DataFrame(st.session_state.entries)
+    df.to_csv(FILE_PATH, index=False)
+
 def delete_all_entries():
     st.session_state.entries = []
     st.session_state.current_table = []
+    st.session_state.winner = None
     if os.path.exists(FILE_PATH):
         os.remove(FILE_PATH)
 
+def go_to(page):
+    st.session_state.page = page
+    st.session_state.winner = None
 
-def upload_excel(file):
-    df = pd.read_excel(file)
+def login_admin():
+    if st.session_state.user == USERNAME and st.session_state.pwd == PASSWORD:
+        st.session_state.admin = True
+        return True
+    return False
 
-    df.columns = [c.strip().lower() for c in df.columns]
-
-    if "emp" not in df.columns or "name" not in df.columns:
-        st.error("Excel must contain 'emp' and 'name' columns")
-        return
-
-    df = df[["emp", "name"]]
-    df["Full Name"] = df["name"]
-    df.drop(columns=["name"], inplace=True)
-
-    st.session_state.entries = df.to_dict("records")
-
-    # IMPORTANT: this makes raffle use the uploaded Excel
-    st.session_state.current_table = st.session_state.entries
-
-    save_entries()
-
+def logout():
+    st.session_state.admin = False
+    st.session_state.page = "admin"
+    st.session_state.winner = None
 
 def shuffle_effect():
     table = st.session_state.current_table
@@ -574,42 +660,8 @@ def shuffle_effect():
     st.session_state.winner = random.choice(table)
     placeholder.empty()
 
-
-def generate_qr(text):
-    # Dummy function (replace with your own)
-    return None
-
-
-def create_pass_image(name, emp, qr_img):
-    # Dummy function (replace with your own)
-    return None
-
-
-# ---------------- LOAD DATA ----------------
+# ---------------- LOAD ENTRIES ----------------
 load_entries()
-
-
-# ---------------- HARD RESET (NO EXPERIMENTAL) ----------------
-def HARD_RESET():
-    # Clear session state
-    for key in list(st.session_state.keys()):
-        del st.session_state[key]
-
-    # Delete saved files
-    for file in ["raffle_data.json", "entries.csv", "employees.json"]:
-        if os.path.exists(file):
-            os.remove(file)
-
-    # Reinitialize session state
-    st.session_state.entries = []
-    st.session_state.valid_employees = {}
-    st.session_state.current_table = []
-    st.session_state.page = "landing"
-    st.session_state.admin = False
-    st.session_state.winner = None
-
-    st.success("✅ System reset complete. Please refresh the page.")
-
 
 # ---------------- ADMIN PAGE ----------------
 if st.session_state.page == "admin":
@@ -618,8 +670,8 @@ if st.session_state.page == "admin":
 
     with st.form("admin_form"):
         uploaded_file = st.file_uploader(
-            "Upload Employee List (Excel)",
-            type=["xlsx"]
+            "Upload Employee List (CSV)",
+            type=["csv"]
         )
 
         st.text_input("Username", key="user")
@@ -629,226 +681,76 @@ if st.session_state.page == "admin":
 
         if submit:
             if uploaded_file:
-                upload_excel(uploaded_file)
+                df = pd.read_csv(uploaded_file)
+                st.session_state.entries = df.to_dict("records")
+                save_entries()
 
             if login_admin():
                 st.success("Login successful")
             else:
                 st.error("Invalid login")
 
-    # ---------- BACK BUTTON WHEN NOT LOGGED IN ----------
-    if not st.session_state.admin:
-        st.button(
-            "Back to Landing",
-            on_click=go_to,
-            args=("landing",),
-            key="back_to_landing_admin"
-        )
-
     # ---------- ADMIN CONTROLS ----------
-    if st.session_state.admin:
+    if st.session_state.admin and st.session_state.entries:
 
         st.markdown("### Employee List")
 
-        df = pd.DataFrame(st.session_state.current_table)
+        df = pd.DataFrame(st.session_state.entries)
 
-        if not df.empty:
-            df = df[["emp", "Full Name"]]
-        else:
-            st.session_state.current_table = []
+        search = st.text_input("🔍 Search name")
+        if search:
+            df = df[df["Full Name"].str.contains(search, case=False, na=False)]
+
+        # ✅ STORE CURRENT TABLE FOR RAFFLE
+        st.session_state.current_table = df.to_dict("records")
 
         st.dataframe(df, use_container_width=True)
 
-        if not df.empty:
-            csv = df.to_csv(index=False).encode("utf-8-sig")
-
-            st.download_button(
-                "⬇️ Download CSV",
-                csv,
-                "entries.csv",
-                "text/csv",
-                key="download_csv"
-            )
+        st.download_button(
+            "⬇️ Download CSV",
+            df.to_csv(index=False).encode("utf-8-sig"),
+            "entries.csv",
+            "text/csv"
+        )
 
         st.button(
             "🗑️ Delete All Entries",
-            on_click=delete_all_entries,
-            type="secondary",
-            key="delete_entries"
-        )
-
-        # ======================
-        # 🔥 HARD RESET BUTTON
-        # ======================
-        st.button(
-            "🔥 HARD RESET SYSTEM",
-            on_click=HARD_RESET,
-            type="secondary",
-            key="hard_reset"
+            on_click=delete_all_entries
         )
 
         st.button(
             "🎰 Enter Raffle",
             on_click=go_to,
             args=("raffle",),
-            type="primary",
-            key="enter_raffle"
-        )
-
-        st.markdown("---")
-
-        st.button("Logout", on_click=logout, key="logout_admin")
-
-
-# ---------------- RAFFLE PAGE ----------------
-elif st.session_state.page == "raffle":
-
-    if not st.session_state.admin:
-        st.session_state.page = "admin"
-
-    st.markdown("<h1>🎰 Raffle Draw</h1>", unsafe_allow_html=True)
-
-    st.button(
-        "🎰 Run Raffle",
-        on_click=shuffle_effect,
-        type="primary",
-        key="run_raffle"
-    )
-
-    if st.session_state.winner:
-        winner_name = st.session_state.winner.get("Full Name")
-
-        st.markdown(
-            f"""
-            <div style="text-align:center;margin-top:40px;">
-                <h2>🎉 WINNER 🎉</h2>
-                <h1 style="color:gold;font-size:70px;">
-                    {winner_name}
-                </h1>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-    st.markdown("---")
-    st.button("Logout", on_click=logout, key="logout_raffle")
-
-
-# ---------------- REGISTER PAGE ----------------
-elif st.session_state.page == "register":
-
-    st.markdown("<h1 style='color:white;'>Register Here</h1>", unsafe_allow_html=True)
-
-    st.markdown("""
-        <style>
-        div[data-testid="stFormSubmitButton"] > button {
-            width: 100% !important;
-            max-width: 520px !important;
-            height: 55px !important;
-            font-size: 16px !important;
-            font-weight: 700 !important;
-            background-color: #FFD700 !important;
-            color: black !important;
-            border: none !important;
-            border-radius: 8px !important;
-            margin: 0 auto !important;
-            padding: 0 !important;
-        }
-        div[data-testid="stFormSubmitButton"] > button span,
-        div[data-testid="stFormSubmitButton"] > button span * {
-            color: black !important;
-        }
-        </style>
-    """, unsafe_allow_html=True)
-
-    with st.form("register_form"):  # <-- changed here
-        emp = st.text_input("Employee ID")
-        submit = st.form_submit_button("Submit", type="primary")
-
-        if submit:
-            if emp == "admin123":
-                st.session_state.go_admin = True
-                go_to("admin")
-
-            elif not emp:
-                st.error("Employee ID NOT VERIFIED 1❌")
-
-            elif any(e["emp"] == emp for e in st.session_state.entries):
-                st.error("You already registered 2❌")
-
-            elif emp not in st.session_state.valid_employees:
-                st.error("Employee ID NOT VERIFIED 3❌")
-
-            else:
-                name = st.session_state.valid_employees.get(emp, "Unknown")
-                st.session_state.entries.append({"emp": emp, "Full Name": name})
-                save_entries()
-
-                qr_img = generate_qr(f"{name} | {emp}")
-                pass_img = create_pass_image(name, emp, qr_img)
-
-                buf = io.BytesIO()
-                pass_img.save(buf, format="PNG")
-                pass_bytes = buf.getvalue()
-
-                st.session_state.pass_bytes = pass_bytes
-                st.session_state.pass_emp = emp
-
-                st.success("Registered and VERIFIED ✔️")
-
-    if st.session_state.get("pass_bytes"):
-        st.image(st.session_state.pass_bytes, caption="✅ Your Pass Preview", use_column_width=True)
-
-        st.download_button(
-            "📥 Download Pass (PNG)",
-            st.session_state.pass_bytes,
-            file_name=f"{st.session_state.pass_emp}_event_pass.png",
-            mime="image/png",
             type="primary"
         )
-        st.button(
-            "🗑️ Delete All Entries",
-            on_click=delete_all_entries,
-            type="secondary",
-            key="delete_entries"
-        )
 
-
-        st.button(
-            "🎰 Enter Raffle",
-            on_click=go_to,
-            args=("raffle",),
-            type="primary",
-            key="enter_raffle"
-        )
-
+    if st.session_state.admin:
         st.markdown("---")
-        st.button("Logout", on_click=logout, key="logout_admin")
+        st.button("Logout", on_click=logout)
 
 # ---------------- RAFFLE PAGE ----------------
 elif st.session_state.page == "raffle":
 
     if not st.session_state.admin:
         st.session_state.page = "admin"
+        st.stop()
 
     st.markdown("<h1>🎰 Raffle Draw</h1>", unsafe_allow_html=True)
 
     st.button(
         "🎰 Run Raffle",
         on_click=shuffle_effect,
-        type="primary",
-        key="run_raffle"
+        type="primary"
     )
 
     if st.session_state.winner:
-        winner_name = st.session_state.winner.get("Full Name")
-
         st.markdown(
             f"""
             <div style="text-align:center;margin-top:40px;">
                 <h2>🎉 WINNER 🎉</h2>
                 <h1 style="color:gold;font-size:70px;">
-                    {winner_name}
+                    {st.session_state.winner["Full Name"]}
                 </h1>
             </div>
             """,
@@ -856,4 +758,5 @@ elif st.session_state.page == "raffle":
         )
 
     st.markdown("---")
-    st.button("Logout", on_click=logout, key="logout_raffle")
+    st.button("Logout", on_click=logout)
+                
