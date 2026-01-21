@@ -294,20 +294,11 @@ def logout():
     st.session_state.winner = None
 
 def delete_all_entries():
-    # Clear session state
     st.session_state.entries = []
-    st.session_state.current_table = []
-    st.session_state.winner = None
-
-    # Delete saved files
-    if os.path.exists(DATA_FILE):
-        os.remove(DATA_FILE)
-
+    # also delete the CSV file
     if os.path.exists(FILE_PATH):
         os.remove(FILE_PATH)
-
-    st.success("✅ All entries deleted and table cleared.")
-
+    st.success("All entries deleted.")
 
     
 def export_csv():
@@ -403,63 +394,51 @@ if st.session_state.page == "register":
     )
 
     # ------------------ FORM ------------------
-with st.form("form"):
-    emp = st.text_input("Employee ID")
-    submit = st.form_submit_button("Submit", type="primary")
+    with st.form("form"):
+        emp = st.text_input("Employee ID")
+        submit = st.form_submit_button("Submit", type="primary")
 
-    if submit:
-        if emp == "admin123":
-            st.session_state.go_admin = True
+        if submit:
+            if emp == "admin123":
+                st.session_state.go_admin = True
+            elif not emp:
+                st.error("Employee ID NOT VERIFIED ❌")
+            elif any(e["emp"] == emp for e in st.session_state.entries):
+                st.error("You already registered ❌")
+            elif emp not in st.session_state.valid_employees:
+                st.error("Employee ID NOT VERIFIED ❌")
+            else:
+                name = st.session_state.valid_employees.get(emp, "Unknown")
+                st.session_state.entries.append({"emp": emp, "Full Name": name})
+                save_data()
 
-        elif not emp:
-            st.error("Employee ID NOT VERIFIED ❌")
+                qr_img = generate_qr(f"{name} | {emp}")
+                pass_img = create_pass_image(name, emp, qr_img)
 
-        elif any(e["emp"] == emp for e in st.session_state.entries):
-            st.error("You already registered ❌")
+                buf = io.BytesIO()
+                pass_img.save(buf, format="PNG")
+                pass_bytes = buf.getvalue()
 
-        elif emp not in st.session_state.valid_employees:
-            st.error("Employee ID NOT VERIFIED ❌")
+                st.session_state.pass_bytes = pass_bytes
+                st.session_state.pass_emp = emp
 
-        else:
-            name = st.session_state.valid_employees.get(emp, "Unknown")
-            st.session_state.entries.append({"emp": emp, "Full Name": name})
-            save_data()
+                st.success("Registered and VERIFIED ✔️")
 
-            qr_img = generate_qr(f"{name} | {emp}")
-            pass_img = create_pass_image(name, emp, qr_img)
-
-            buf = io.BytesIO()
-            pass_img.save(buf, format="PNG")
-            pass_bytes = buf.getvalue()
-
-            st.session_state.pass_bytes = pass_bytes
-            st.session_state.pass_emp = emp
-
-            st.success("Registered and VERIFIED ✔️")
-
-# <-- Add this outside the form
-if st.session_state.get("go_admin", False):
-    st.session_state.go_admin = False
-    go_to("admin")
-
-if st.session_state.get("pass_bytes"):
-    # Preview the image
-    st.image(st.session_state.pass_bytes, caption="✅ Your Pass Preview", use_column_width=True)
-
-    # Then show download button
-    st.download_button(
-        "📥 Download Pass (PNG)",
-        st.session_state.pass_bytes,
-        file_name=f"{st.session_state.pass_emp}_event_pass.png",
-        mime="image/png",
-        type="primary"
-    )
+    if st.session_state.get("pass_bytes"):
+        st.download_button(
+            "📥 Download Pass (PNG)",
+            st.session_state.pass_bytes,
+            file_name=f"{st.session_state.pass_emp}_event_pass.png",
+            mime="image/png",
+            type="primary"
+        )
 
     if st.session_state.get("go_admin", False):
         st.session_state.go_admin = False
         go_to("admin")
 
 #-----------------admin----------------
+# ---------------- FILE STORAGE ----------------
 # ---------------- FILE STORAGE ----------------
 FILE_PATH = "entries.csv"
 
@@ -483,18 +462,22 @@ if "winner" not in st.session_state:
 USERNAME = "admin"
 PASSWORD = "admin123"
 
+
 # ---------------- FUNCTIONS ----------------
 def load_entries():
     if os.path.exists(FILE_PATH):
         df = pd.read_csv(FILE_PATH)
         st.session_state.entries = df.to_dict("records")
 
+
 def save_entries():
     df = pd.DataFrame(st.session_state.entries)
     df.to_csv(FILE_PATH, index=False)
 
+
 def go_to(page):
     st.session_state.page = page
+
 
 def login_admin():
     if st.session_state.user == USERNAME and st.session_state.pwd == PASSWORD:
@@ -502,36 +485,12 @@ def login_admin():
         return True
     return False
 
+
 def logout():
     st.session_state.admin = False
     st.session_state.winner = None
     st.session_state.page = "admin"
 
-def delete_all_entries():
-    st.session_state.entries = []
-    st.session_state.current_table = []
-    if os.path.exists(FILE_PATH):
-        os.remove(FILE_PATH)
-
-def upload_excel(file):
-    df = pd.read_excel(file)
-
-    df.columns = [c.strip().lower() for c in df.columns]
-
-    if "emp" not in df.columns or "name" not in df.columns:
-        st.error("Excel must contain 'emp' and 'name' columns")
-        return
-
-    df = df[["emp", "name"]]
-    df["Full Name"] = df["name"]
-    df.drop(columns=["name"], inplace=True)
-
-    st.session_state.entries = df.to_dict("records")
-
-    # IMPORTANT: this makes raffle use the uploaded Excel
-    st.session_state.current_table = st.session_state.entries
-
-    save_entries()
 
 def shuffle_effect():
     table = st.session_state.current_table
@@ -542,6 +501,7 @@ def shuffle_effect():
 
     placeholder = st.empty()
 
+    # Shuffle effect
     for _ in range(15):
         temp = random.choice(table)
         placeholder.markdown(
@@ -557,11 +517,14 @@ def shuffle_effect():
         )
         time.sleep(0.08)
 
+    # Final winner
     st.session_state.winner = random.choice(table)
     placeholder.empty()
 
-# ---------------- LOAD DATA ----------------
+
+# ---------------- LOAD ENTRIES ON START ----------------
 load_entries()
+
 
 # ---------------- ADMIN PAGE ----------------
 if st.session_state.page == "admin":
@@ -581,14 +544,15 @@ if st.session_state.page == "admin":
 
         if submit:
             if uploaded_file:
-                upload_excel(uploaded_file)
+                # your file upload logic here
+                pass
 
             if login_admin():
                 st.success("Login successful")
             else:
                 st.error("Invalid login")
 
-    # ---------- BACK BUTTON WHEN NOT LOGGED IN ----------
+    # ---------- SHOW BACK BUTTON ONLY WHEN NOT LOGGED IN ----------
     if not st.session_state.admin:
         st.button(
             "Back to Landing",
@@ -597,31 +561,36 @@ if st.session_state.page == "admin":
             key="back_to_landing_admin"
         )
 
-    # ---------- ADMIN CONTROLS ----------
-    if st.session_state.admin:
+    # ---------- SHOW ADMIN CONTROLS ONLY WHEN LOGGED IN ----------
+    if st.session_state.admin and st.session_state.entries:
 
         st.markdown("### Employee List")
 
         df = pd.DataFrame(st.session_state.entries)
 
-        if not df.empty:
-            df = df[["emp", "Full Name"]]
-            st.session_state.current_table = df.to_dict("records")
-        else:
-            st.session_state.current_table = []
+        # ---- FORCE ONLY THESE COLUMNS ----
+        if "name" in df.columns:
+            df["Full Name"] = df["name"]
+            df.drop(columns=["name"], inplace=True)
+
+        df = df[["emp", "Full Name"]]
+
+        # 👉 This table will be used for raffle
+        st.session_state.current_table = df.to_dict("records")
 
         st.dataframe(df, use_container_width=True)
 
-        if not df.empty:
-            csv = df.to_csv(index=False).encode("utf-8-sig")
+        csv = df.to_csv(index=False).encode("utf-8-sig")
 
-            st.download_button(
-                "⬇️ Download CSV",
-                csv,
-                "entries.csv",
-                "text/csv",
-                key="download_csv"
-            )
+        st.download_button(
+            "⬇️ Download CSV",
+            csv,
+            "entries.csv",
+            "text/csv",
+            key="download_csv"
+        )
+
+
 
         st.button(
             "🗑️ Delete All Entries",
@@ -638,8 +607,10 @@ if st.session_state.page == "admin":
             key="enter_raffle"
         )
 
+    if st.session_state.admin:
         st.markdown("---")
         st.button("Logout", on_click=logout, key="logout_admin")
+
 
 # ---------------- RAFFLE PAGE ----------------
 elif st.session_state.page == "raffle":
@@ -649,15 +620,14 @@ elif st.session_state.page == "raffle":
 
     st.markdown("<h1>🎰 Raffle Draw</h1>", unsafe_allow_html=True)
 
-    st.button(
-        "🎰 Run Raffle",
-        on_click=shuffle_effect,
-        type="primary",
-        key="run_raffle"
-    )
+    st.button("🎰 Run Raffle", on_click=shuffle_effect, type="primary", key="run_raffle")
 
     if st.session_state.winner:
-        winner_name = st.session_state.winner.get("Full Name")
+        winner_name = (
+            st.session_state.winner.get("Full Name")
+            if isinstance(st.session_state.winner, dict)
+            else st.session_state.winner
+        )
 
         st.markdown(
             f"""
