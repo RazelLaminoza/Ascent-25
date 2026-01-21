@@ -498,13 +498,12 @@ def show_admin_table():
 # ---------------------------
 def raffle_page():
 
-     # Check if image exists
+    # ---------- TOP CENTER IMAGE ----------
     if not os.path.exists("1.png"):
         st.error("Image file 1.png not found!")
         return
 
-    img_data = base64.b64decode(img_b64)
-    img = Image.open(BytesIO(img_data))
+    img = Image.open("1.png")
     img = img.resize((80, int(80 * img.height / img.width)))
 
     st.image(img, use_column_width=False)
@@ -558,6 +557,17 @@ def raffle_page():
 
     if st.button("⬅ Back", key="raffle_back_btn"):
         set_page("admin")
+
+
+# ---------------------------
+# Main Function
+# ---------------------------
+def main():
+    if "page" not in st.session_state:
+        st.session_state.page = "raffle"
+
+    if st.session_state.page == "raffle":
+        raffle_page()
 
 
 if __name__ == "__main__":
