@@ -519,7 +519,7 @@ def raffle_page():
     # ---------- TOP IMAGE (CENTERED) ----------
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        st.image("1.png", width=300)
+        st.image("12.png", width=300)
 
     # ---------- TOP PADDING TO LOWER CONTENT ----------
     st.markdown(
