@@ -430,16 +430,16 @@ def raffle_page():
 
     if st.button("Draw Winner", key="draw_winner_btn"):
 
-        placeholder = st.empty()  # placeholder for shuffle effect
+        placeholder = st.empty()
 
-        start_time = time.time()
-        while time.time() - start_time < 5:  # run shuffle for 5 seconds
+        # Shuffle for 5 seconds
+        for _ in range(50):  # 50 * 0.1 = 5 seconds
             shuffled_name = random.choice(df["name"].tolist())
             placeholder.markdown(
                 f"<h2 style='text-align:center; color:#FFD700;'>{shuffled_name}</h2>",
                 unsafe_allow_html=True
             )
-            time.sleep(0.1)  # speed of shuffle
+            st.sleep(0.1)  # <-- IMPORTANT: streamlit-friendly sleep
 
         # Final winner
         winner = random.choice(df["name"].tolist())
