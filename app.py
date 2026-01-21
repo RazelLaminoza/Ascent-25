@@ -495,7 +495,7 @@ def show_admin_table():
 
 
 # ---------------------------
-# Raffle Page (10s Shuffle)
+# Raffle Page (LONG Shuffle, NO TIME)
 # ---------------------------
 def raffle_page():
 
@@ -504,7 +504,7 @@ def raffle_page():
     with col2:
         st.image("1.png", use_container_width=True)
 
-    st.markdown("<br><br>", unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
 
     df = load_registered()
     if df.empty:
@@ -520,8 +520,10 @@ def raffle_page():
     if "raffle_running" not in st.session_state:
         st.session_state.raffle_running = False
 
-    if "raffle_start" not in st.session_state:
-        st.session_state.raffle_start = 0
+    if "shuffle_count" not in st.session_state:
+        st.session_state.shuffle_count = 0
+
+    MAX_SHUFFLES = 120  # 👈 make this bigger for longer shuffle
 
     center = st.empty()
 
@@ -540,21 +542,23 @@ def raffle_page():
         unsafe_allow_html=True
     )
 
-    # ---------- BUTTON ----------
+    # ---------- START BUTTON ----------
     if st.button("🎲 Draw Winner") and not st.session_state.raffle_running:
         st.session_state.raffle_running = True
-        st.session_state.raffle_start = time.time()
+        st.session_state.shuffle_count = 0
         st.experimental_rerun()
 
-    # ---------- SHUFFLE ----------
+    # ---------- SHUFFLE LOGIC ----------
     if st.session_state.raffle_running:
-        elapsed = time.time() - st.session_state.raffle_start
 
-        if elapsed < 10:
+        if st.session_state.shuffle_count < MAX_SHUFFLES:
             st.session_state.raffle_name = random.choice(names)
-            time.sleep(0.12)
+            st.session_state.shuffle_count += 1
+            time.sleep(0.08)  # visual speed (safe)
             st.experimental_rerun()
+
         else:
+            # FINAL WINNER
             st.session_state.raffle_name = random.choice(names)
             st.session_state.raffle_running = False
 
@@ -579,3 +583,4 @@ def raffle_page():
 
     if st.button("⬅ Back"):
         set_page("admin")
+
