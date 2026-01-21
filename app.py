@@ -560,6 +560,15 @@ def raffle_page():
         unsafe_allow_html=True
     )
 
+    # ---------- DRAW WINNER BUTTON ----------
+    if st.button("🎉 Draw Winner", key="draw_winner_btn"):
+        winner = random.choice(df["name"].tolist())
+        st.session_state.raffle_name = winner
+        placeholder.markdown(
+            f"<h2 style='color:#FFD700; font-size: 60px; text-align:center;'>{winner}</h2>",
+            unsafe_allow_html=True
+        )
+
     # ---------- BACK BUTTON ----------
     if st.button("⬅ Back", key="raffle_back_btn"):
         set_page("admin")
