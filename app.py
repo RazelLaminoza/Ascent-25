@@ -4,6 +4,7 @@ import random
 import os
 import io
 import base64
+import time
 from PIL import Image, ImageDraw, ImageFont
 import qrcode
 
