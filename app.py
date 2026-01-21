@@ -600,14 +600,19 @@ if st.session_state.page == "admin":
             key="delete_entries"
         )
 
-        # 🔥 HARD RESET BUTTON (ADDED)
-        def HARD_RESET():
-            for key in list(st.session_state.keys()):
-                del st.session_state[key]
-            for file in ["raffle_data.json", "entries.csv", "employees.json"]:
-                if os.path.exists(file):
-                    os.remove(file)
-            st.experimental_rerun()
+# 🔥 HARD RESET BUTTON (NO EXPERIMENTAL)
+def HARD_RESET():
+    # Clear session state
+    for key in list(st.session_state.keys()):
+        del st.session_state[key]
+
+    # Delete saved files
+    for file in ["raffle_data.json", "entries.csv", "employees.json"]:
+        if os.path.exists(file):
+            os.remove(file)
+
+    st.success("✅ System reset complete. Please refresh the page.")
+
 
         st.button(
             "🔥 HARD RESET SYSTEM",
