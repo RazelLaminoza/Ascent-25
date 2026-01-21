@@ -494,25 +494,41 @@ def show_admin_table():
         set_page("landing")
 
 
-# ---------------------------
-# Raffle Page (SAFE LONG SHUFFLE)
-# ---------------------------
 def raffle_page():
 
     # ---------- TOP CENTER IMAGE ----------
-    img = Image.open("1.png")  # Make sure this image exists
-    img = img.resize((80, int(80 * img.height / img.width)))
-    
-    st.image(img, use_column_width=False)
+    img = Image.open("1.png")
+    img = img.resize((120, int(120 * img.height / img.width)))
 
-    # ---------- BIG TITLE ----------
+    # Center everything using CSS
+    st.markdown("""
+        <style>
+        .centered {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .btn-row {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
+    st.markdown("<div class='centered'>", unsafe_allow_html=True)
+
+    st.image(img)
+
     st.markdown(
-        "<h1 style='text-align:center; font-size: 64px;'> Raffle Winner </h1>",
+        "<h1 style='font-size: 64px; color:white;'>Raffle Winner</h1>",
         unsafe_allow_html=True
     )
 
     df = load_registered()
-
     if df.empty:
         st.warning("No entries yet.")
         return
@@ -522,39 +538,34 @@ def raffle_page():
 
     placeholder = st.empty()
 
-    # ---------- BIG NAME DISPLAY ----------
     placeholder.markdown(
-        f"<h2 style='text-align:center; color:#FFD700; font-size: 56px;'>{st.session_state.raffle_name}</h2>",
+        f"<h2 style='color:#FFD700; font-size: 56px;'>{st.session_state.raffle_name}</h2>",
         unsafe_allow_html=True
     )
 
-    if st.button(" Draw Winner", key="draw_winner_btn"):
-
+    # buttons centered
+    st.markdown("<div class='btn-row'>", unsafe_allow_html=True)
+    if st.button("Draw Winner", key="draw_winner_btn"):
         start_time = time.time()
         names = df["name"].tolist()
 
-        # Shuffle for 5 seconds
         while time.time() - start_time < 5:
             st.session_state.raffle_name = random.choice(names)
-
             placeholder.markdown(
-                f"<h2 style='text-align:center; color:#FFD700; font-size: 56px;'>{st.session_state.raffle_name}</h2>",
+                f"<h2 style='color:#FFD700; font-size: 56px;'>{st.session_state.raffle_name}</h2>",
                 unsafe_allow_html=True
             )
-
             time.sleep(0.1)
 
-        # Final winner
         st.session_state.raffle_name = random.choice(names)
-
         placeholder.markdown(
-            f"<h2 style='text-align:center; color:#FFD700; font-size: 56px;'> {st.session_state.raffle_name} </h2>",
+            f"<h2 style='color:#FFD700; font-size: 56px;'>🏆 {st.session_state.raffle_name} 🏆</h2>",
             unsafe_allow_html=True
         )
 
     if st.button("⬅ Back", key="raffle_back_btn"):
         set_page("admin")
+    st.markdown("</div>", unsafe_allow_html=True)
 
+    st.markdown("</div>", unsafe_allow_html=True)
 
-if __name__ == "__main__":
-    main()
