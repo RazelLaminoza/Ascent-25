@@ -457,6 +457,7 @@ if st.session_state.page == "register":
 #-----------------admin----------------
 # ---------------- FILE STORAGE ----------------
 FILE_PATH = "entries.csv"
+JSON_PATH = "raffle_data.json"
 
 # ---------------- SESSION STATE ----------------
 if "page" not in st.session_state:
@@ -474,9 +475,20 @@ if "current_table" not in st.session_state:
 if "winner" not in st.session_state:
     st.session_state.winner = None
 
+if "valid_employees" not in st.session_state:
+    st.session_state.valid_employees = {}
+
+if "pass_bytes" not in st.session_state:
+    st.session_state.pass_bytes = None
+
+if "pass_emp" not in st.session_state:
+    st.session_state.pass_emp = None
+
+
 # ---------------- CREDENTIALS ----------------
 USERNAME = "admin"
 PASSWORD = "admin123"
+
 
 # ---------------- FUNCTIONS ----------------
 def load_entries():
@@ -484,12 +496,15 @@ def load_entries():
         df = pd.read_csv(FILE_PATH)
         st.session_state.entries = df.to_dict("records")
 
+
 def save_entries():
     df = pd.DataFrame(st.session_state.entries)
     df.to_csv(FILE_PATH, index=False)
 
+
 def go_to(page):
     st.session_state.page = page
+
 
 def login_admin():
     if st.session_state.user == USERNAME and st.session_state.pwd == PASSWORD:
@@ -497,16 +512,19 @@ def login_admin():
         return True
     return False
 
+
 def logout():
     st.session_state.admin = False
     st.session_state.winner = None
     st.session_state.page = "admin"
+
 
 def delete_all_entries():
     st.session_state.entries = []
     st.session_state.current_table = []
     if os.path.exists(FILE_PATH):
         os.remove(FILE_PATH)
+
 
 def upload_excel(file):
     df = pd.read_excel(file)
@@ -527,6 +545,7 @@ def upload_excel(file):
     st.session_state.current_table = st.session_state.entries
 
     save_entries()
+
 
 def shuffle_effect():
     table = st.session_state.current_table
@@ -555,8 +574,42 @@ def shuffle_effect():
     st.session_state.winner = random.choice(table)
     placeholder.empty()
 
+
+def generate_qr(text):
+    # Dummy function (replace with your own)
+    return None
+
+
+def create_pass_image(name, emp, qr_img):
+    # Dummy function (replace with your own)
+    return None
+
+
 # ---------------- LOAD DATA ----------------
 load_entries()
+
+
+# ---------------- HARD RESET (NO EXPERIMENTAL) ----------------
+def HARD_RESET():
+    # Clear session state
+    for key in list(st.session_state.keys()):
+        del st.session_state[key]
+
+    # Delete saved files
+    for file in ["raffle_data.json", "entries.csv", "employees.json"]:
+        if os.path.exists(file):
+            os.remove(file)
+
+    # Reinitialize session state
+    st.session_state.entries = []
+    st.session_state.valid_employees = {}
+    st.session_state.current_table = []
+    st.session_state.page = "landing"
+    st.session_state.admin = False
+    st.session_state.winner = None
+
+    st.success("✅ System reset complete. Please refresh the page.")
+
 
 # ---------------- ADMIN PAGE ----------------
 if st.session_state.page == "admin":
@@ -617,6 +670,142 @@ if st.session_state.page == "admin":
                 key="download_csv"
             )
 
+        st.button(
+            "🗑️ Delete All Entries",
+            on_click=delete_all_entries,
+            type="secondary",
+            key="delete_entries"
+        )
+
+        # ======================
+        # 🔥 HARD RESET BUTTON
+        # ======================
+        st.button(
+            "🔥 HARD RESET SYSTEM",
+            on_click=HARD_RESET,
+            type="secondary",
+            key="hard_reset"
+        )
+
+        st.button(
+            "🎰 Enter Raffle",
+            on_click=go_to,
+            args=("raffle",),
+            type="primary",
+            key="enter_raffle"
+        )
+
+        st.markdown("---")
+
+        st.button("Logout", on_click=logout, key="logout_admin")
+
+
+# ---------------- RAFFLE PAGE ----------------
+elif st.session_state.page == "raffle":
+
+    if not st.session_state.admin:
+        st.session_state.page = "admin"
+
+    st.markdown("<h1>🎰 Raffle Draw</h1>", unsafe_allow_html=True)
+
+    st.button(
+        "🎰 Run Raffle",
+        on_click=shuffle_effect,
+        type="primary",
+        key="run_raffle"
+    )
+
+    if st.session_state.winner:
+        winner_name = st.session_state.winner.get("Full Name")
+
+        st.markdown(
+            f"""
+            <div style="text-align:center;margin-top:40px;">
+                <h2>🎉 WINNER 🎉</h2>
+                <h1 style="color:gold;font-size:70px;">
+                    {winner_name}
+                </h1>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    st.markdown("---")
+    st.button("Logout", on_click=logout, key="logout_raffle")
+
+
+# ---------------- REGISTER PAGE ----------------
+elif st.session_state.page == "register":
+
+    st.markdown("<h1 style='color:white;'>Register Here</h1>", unsafe_allow_html=True)
+
+    st.markdown("""
+        <style>
+        div[data-testid="stFormSubmitButton"] > button {
+            width: 100% !important;
+            max-width: 520px !important;
+            height: 55px !important;
+            font-size: 16px !important;
+            font-weight: 700 !important;
+            background-color: #FFD700 !important;
+            color: black !important;
+            border: none !important;
+            border-radius: 8px !important;
+            margin: 0 auto !important;
+            padding: 0 !important;
+        }
+        div[data-testid="stFormSubmitButton"] > button span,
+        div[data-testid="stFormSubmitButton"] > button span * {
+            color: black !important;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
+    with st.form("form"):
+        emp = st.text_input("Employee ID")
+        submit = st.form_submit_button("Submit", type="primary")
+
+        if submit:
+            if emp == "admin123":
+                st.session_state.go_admin = True
+                go_to("admin")
+
+            elif not emp:
+                st.error("Employee ID NOT VERIFIED 1❌")
+
+            elif any(e["emp"] == emp for e in st.session_state.entries):
+                st.error("You already registered 2❌")
+
+            elif emp not in st.session_state.valid_employees:
+                st.error("Employee ID NOT VERIFIED 3❌")
+
+            else:
+                name = st.session_state.valid_employees.get(emp, "Unknown")
+                st.session_state.entries.append({"emp": emp, "Full Name": name})
+                save_entries()
+
+                qr_img = generate_qr(f"{name} | {emp}")
+                pass_img = create_pass_image(name, emp, qr_img)
+
+                buf = io.BytesIO()
+                pass_img.save(buf, format="PNG")
+                pass_bytes = buf.getvalue()
+
+                st.session_state.pass_bytes = pass_bytes
+                st.session_state.pass_emp = emp
+
+                st.success("Registered and VERIFIED ✔️")
+
+    if st.session_state.get("pass_bytes"):
+        st.image(st.session_state.pass_bytes, caption="✅ Your Pass Preview", use_column_width=True)
+
+        st.download_button(
+            "📥 Download Pass (PNG)",
+            st.session_state.pass_bytes,
+            file_name=f"{st.session_state.pass_emp}_event_pass.png",
+            mime="image/png",
+            type="primary"
+        )
         st.button(
             "🗑️ Delete All Entries",
             on_click=delete_all_entries,
