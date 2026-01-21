@@ -499,24 +499,12 @@ def show_admin_table():
 # ---------------------------
 def raffle_page():
 
-    # -------- TOP CENTER IMAGE --------
-    st.markdown(
-        """
-        <div style="
-            position: fixed;
-            top: 15px;
-            width: 100%;
-            text-align: center;
-            z-index: 1000;
-        ">
-            <img src="data:image/png;base64,{}"
-                 style="height:120px;" />
-        </div>
-        """.format(
-            base64.b64encode(open("1.png", "rb").read()).decode()
-        ),
-        unsafe_allow_html=True
-    )
+    # ---------- TOP CENTER IMAGE ----------
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        st.image("1.png", use_container_width=True)
+
+    st.markdown("<br><br>", unsafe_allow_html=True)
 
     df = load_registered()
     if df.empty:
@@ -524,9 +512,8 @@ def raffle_page():
         return
 
     names = df["name"].tolist()
-    placeholder = st.empty()
 
-    # -------- SESSION STATE INIT --------
+    # ---------- SESSION STATE ----------
     if "raffle_name" not in st.session_state:
         st.session_state.raffle_name = "Press Draw Winner"
 
@@ -536,20 +523,16 @@ def raffle_page():
     if "raffle_start" not in st.session_state:
         st.session_state.raffle_start = 0
 
-    # -------- CENTER DISPLAY --------
-    placeholder.markdown(
+    center = st.empty()
+
+    # ---------- CENTER DISPLAY ----------
+    center.markdown(
         f"""
-        <div style="
-            display:flex;
-            height:100vh;
-            justify-content:center;
-            align-items:center;
-            flex-direction:column;
-        ">
+        <div style="text-align:center; margin-top:80px;">
             <div style="font-size:36px; color:#FFD700;">
                 Winner is :
             </div>
-            <div style="font-size:64px; font-weight:900; color:white;">
+            <div style="font-size:64px; font-weight:900;">
                 {st.session_state.raffle_name}
             </div>
         </div>
@@ -557,13 +540,13 @@ def raffle_page():
         unsafe_allow_html=True
     )
 
-    # -------- DRAW BUTTON --------
+    # ---------- BUTTON ----------
     if st.button("🎲 Draw Winner") and not st.session_state.raffle_running:
         st.session_state.raffle_running = True
         st.session_state.raffle_start = time.time()
         st.experimental_rerun()
 
-    # -------- SHUFFLE EFFECT --------
+    # ---------- SHUFFLE ----------
     if st.session_state.raffle_running:
         elapsed = time.time() - st.session_state.raffle_start
 
@@ -575,15 +558,9 @@ def raffle_page():
             st.session_state.raffle_name = random.choice(names)
             st.session_state.raffle_running = False
 
-            placeholder.markdown(
+            center.markdown(
                 f"""
-                <div style="
-                    display:flex;
-                    height:100vh;
-                    justify-content:center;
-                    align-items:center;
-                    flex-direction:column;
-                ">
+                <div style="text-align:center; margin-top:80px;">
                     <div style="font-size:40px; color:#00FF7F;">
                         🏆 Winner is :
                     </div>
@@ -591,7 +568,6 @@ def raffle_page():
                         font-size:72px;
                         font-weight:900;
                         color:#FFD700;
-                        text-shadow:0 0 15px gold;
                     ">
                         {st.session_state.raffle_name}
                     </div>
@@ -599,9 +575,7 @@ def raffle_page():
                 """,
                 unsafe_allow_html=True
             )
-
             st.balloons()
 
     if st.button("⬅ Back"):
         set_page("admin")
-
