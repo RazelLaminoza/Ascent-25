@@ -171,27 +171,36 @@ def admin_page():
     if st.button("Back"):
         set_page("landing")
 
+
+def delete_all_entries():
+    if os.path.exists(DATA_FILE):
+        os.remove(DATA_FILE)
+    st.success("All entries deleted!")
+    st.experimental_rerun()
+
+
+def delete_entry(emp_id):
+    df = load_registered()
+    df = df[df["emp_id"].astype(str) != str(emp_id)]
+    save_registered(df)
+    st.success(f"Deleted entry: {emp_id}")
+    st.experimental_rerun()
+
+
 def show_admin_table():
     st.markdown("<h2>Registered Users</h2>", unsafe_allow_html=True)
     df = load_registered()
     st.dataframe(df)
 
+    emp_to_delete = st.text_input("Enter employee ID to delete", key="delete_emp")
+    if st.button("Delete Entry"):
+        if emp_to_delete.strip() == "":
+            st.error("Please enter an employee ID")
+        else:
+            delete_entry(emp_to_delete)
+
+    if st.button("Delete All Entries"):
+        delete_all_entries()
+
     if st.button("Enter Raffle"):
         raffle(df)
-
-# ---------------------------
-# Raffle Shuffle
-# ---------------------------
-def raffle(df):
-    if df.empty:
-        st.warning("No entries yet.")
-        return
-
-    names = df["name"].tolist()
-    random.shuffle(names)
-
-    for n in names:
-        st.markdown(f"<h3 style='text-align:center;'>{n}</h3>", unsafe_allow_html=True)
-
-if __name__ == "__main__":
-    main()
