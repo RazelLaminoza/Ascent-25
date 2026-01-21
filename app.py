@@ -12,7 +12,7 @@ DATA_FILE = "registered.csv"
 EMPLOYEE_EXCEL = "employee_list.xlsx"
 
 # ---------------------------
-# Custom Font
+# Custom Font + Background
 # ---------------------------
 def load_custom_font():
     font_path = "PPNeueMachina-PlainUltrabold.ttf"
@@ -26,6 +26,14 @@ def load_custom_font():
             }}
             html, body, [class*="css"]  {{
                 font-family: "PPNeue";
+            }}
+
+            /* BACKGROUND IMAGE */
+            .stApp {{
+                background-image: url("bgna.png");
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
             }}
             </style>
             """,
@@ -82,7 +90,7 @@ def landing_page():
     if os.path.exists("1.png"):
         st.image("1.png", width=350)
 
-    if st.button("Go to Register"):
+    if st.button("Go to Register", key="landing_register_btn"):
         set_page("register")
 
 # ---------------------------
@@ -91,9 +99,9 @@ def landing_page():
 def register_page():
     st.markdown("<h1 style='text-align:center;'>Register</h1>", unsafe_allow_html=True)
 
-    emp_id = st.text_input("Type employee id number")
+    emp_id = st.text_input("Type employee id number", key="register_emp_id")
 
-    if st.button("Submit"):
+    if st.button("Submit", key="register_submit_btn"):
         # Admin shortcut
         if emp_id == "admin123":
             set_page("admin")
@@ -126,9 +134,8 @@ def register_page():
 
         show_card(name, emp_id)
 
-    if st.button("Back"):
+    if st.button("Back", key="register_back_btn"):
         set_page("landing")
-
 
 # ---------------------------
 # Card & Download PNG
@@ -151,7 +158,8 @@ def show_card(name, emp_id):
         label="Download PNG",
         data=buffer,
         file_name="badge.png",
-        mime="image/png"
+        mime="image/png",
+        key="download_btn"
     )
 
 # ---------------------------
@@ -165,10 +173,10 @@ def admin_page():
         show_admin_table()
         return
 
-    user = st.text_input("User")
-    pwd = st.text_input("Password", type="password")
+    user = st.text_input("User", key="admin_user")
+    pwd = st.text_input("Password", type="password", key="admin_pwd")
 
-    if st.button("Login"):
+    if st.button("Login", key="admin_login_btn"):
         if user == "admin" and pwd == "admin123":
             st.success("Login Successful!")
             st.session_state.admin_logged_in = True
@@ -176,9 +184,8 @@ def admin_page():
         else:
             st.error("Invalid credentials")
 
-    if st.button("Back"):
+    if st.button("Back", key="admin_back_btn"):
         set_page("landing")
-
 
 def delete_all_entries():
     if os.path.exists(DATA_FILE):
@@ -211,7 +218,6 @@ def show_admin_table():
 
     if st.button("Back", key="admin_table_back_btn"):
         set_page("landing")
-
 
 # ---------------------------
 # Raffle Shuffle
