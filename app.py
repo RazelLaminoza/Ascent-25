@@ -5,9 +5,15 @@ import os
 from PIL import Image, ImageDraw, ImageFont
 import io
 
+# ---------------------------
+# Constants
+# ---------------------------
 DATA_FILE = "registered.csv"
 EMPLOYEE_EXCEL = "employee_list.xlsx"
 
+# ---------------------------
+# Custom Font
+# ---------------------------
 def load_custom_font():
     font_path = "PPNeueMachina-PlainUltrabold.ttf"
     if os.path.exists(font_path):
@@ -26,6 +32,9 @@ def load_custom_font():
             unsafe_allow_html=True,
         )
 
+# ---------------------------
+# Data
+# ---------------------------
 def load_registered():
     if os.path.exists(DATA_FILE):
         return pd.read_csv(DATA_FILE)
@@ -35,9 +44,15 @@ def load_registered():
 def save_registered(df):
     df.to_csv(DATA_FILE, index=False)
 
+# ---------------------------
+# Navigation
+# ---------------------------
 def set_page(page_name):
     st.session_state.page = page_name
 
+# ---------------------------
+# Main App
+# ---------------------------
 def main():
     load_custom_font()
 
@@ -51,18 +66,26 @@ def main():
     elif st.session_state.page == "admin":
         admin_page()
 
+# ---------------------------
+# Landing Page
+# ---------------------------
 def landing_page():
     st.markdown("<h1 style='text-align:center;'>Welcome</h1>", unsafe_allow_html=True)
 
+    # Top Center Image
     if os.path.exists("2.png"):
         st.image("2.png", width=300)
 
+    # Center Image
     if os.path.exists("1.png"):
         st.image("1.png", width=350)
 
     if st.button("Go to Register"):
         set_page("register")
 
+# ---------------------------
+# Register Page
+# ---------------------------
 def register_page():
     st.markdown("<h1 style='text-align:center;'>Register</h1>", unsafe_allow_html=True)
 
@@ -87,7 +110,11 @@ def register_page():
             return
 
         name = df_employees[df_employees["emp"].astype(str) == emp_id]["name"].values[0]
-        df_reg = df_reg.append({"name": name, "emp_id": emp_id}, ignore_index=True)
+
+        # ✅ New concat method (No append)
+        new_row = pd.DataFrame([{"name": name, "emp_id": emp_id}])
+        df_reg = pd.concat([df_reg, new_row], ignore_index=True)
+
         save_registered(df_reg)
 
         show_card(name, emp_id)
@@ -95,6 +122,9 @@ def register_page():
     if st.button("Back"):
         set_page("landing")
 
+# ---------------------------
+# Card & Download PNG
+# ---------------------------
 def show_card(name, emp_id):
     img = Image.new("RGB", (600, 350), color=(255, 255, 255))
     draw = ImageDraw.Draw(img)
@@ -116,6 +146,9 @@ def show_card(name, emp_id):
         mime="image/png"
     )
 
+# ---------------------------
+# Admin Page
+# ---------------------------
 def admin_page():
     st.markdown("<h1 style='text-align:center;'>Admin Login</h1>", unsafe_allow_html=True)
 
@@ -140,6 +173,9 @@ def show_admin_table():
     if st.button("Enter Raffle"):
         raffle(df)
 
+# ---------------------------
+# Raffle Shuffle
+# ---------------------------
 def raffle(df):
     if df.empty:
         st.warning("No entries yet.")
