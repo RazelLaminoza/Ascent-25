@@ -379,11 +379,10 @@ def reset_register():
         "pass_emp",
         "emp",
         "go_admin",
-        "entries"   # ← THIS is missing
+        "entries"  # 🔥 THIS is the missing one
     ]:
         if key in st.session_state:
             del st.session_state[key]
-
 # --------------------- LANDING PAGE ---------------------
 if st.session_state.page == "landing":
     reset_register()  # <-- CLEAR REGISTER DATA
