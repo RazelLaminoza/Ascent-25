@@ -253,60 +253,82 @@ def landing_page():
 
     st.markdown("""
     <style>
-    .landing {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        text-align: center;
-        opacity: 0.95;
-    }
+        /* Lock scroll safely */
+        html, body {
+            overflow: hidden !important;
+            height: 100%;
+        }
 
-    .landing img {
-        margin: 10px;
-    }
+        /* Remove default Streamlit padding */
+        .block-container {
+            padding: 0 !important;
+        }
 
-    .landing p {
-        font-size: 18px;
-        line-height: 1.3;
-        color: white;
-    }
+        /* Full-screen center container */
+        .landing-wrap {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
 
-    .landing span {
-        font-size: 16px;
-    }
+        .landing-wrap img {
+            margin: 10px 0;
+        }
 
-    .stButton button {
-        width: 360px !important;
-        height: 55px !important;
-        font-size: 16px !important;
-        font-weight: 700 !important;
-        background-color: #FFD700 !important;
-        color: black !important;
-        border: none !important;
-        border-radius: 8px !important;
-        margin-top: 20px !important;
-    }
+        .landing-text {
+            color: white;
+            font-size: 18px;
+            line-height: 1.4;
+        }
+
+        .landing-text span {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        /* Button style */
+        .stButton button {
+            width: 360px !important;
+            height: 55px !important;
+            font-size: 16px !important;
+            font-weight: 700 !important;
+            background-color: #FFD700 !important;
+            color: black !important;
+            border: none !important;
+            border-radius: 8px !important;
+            margin-top: 24px !important;
+        }
+
+        /* Hide Streamlit UI */
+        #MainMenu, footer {
+            visibility: hidden;
+        }
     </style>
     """, unsafe_allow_html=True)
 
     st.markdown(
         f"""
-        <div class="landing">
-            <img src="data:image/png;base64,{img2_b64}" width="200" />
-            <img src="data:image/png;base64,{img1_b64}" width="450" />
-            <p>
+        <div class="landing-wrap">
+            <img src="data:image/png;base64,{img2_b64}" width="200">
+            <img src="data:image/png;base64,{img1_b64}" width="450">
+
+            <div class="landing-text">
                 PRE-REGISTER NOW AND TAKE PART IN THE RAFFLE<br>
                 <span>January 25, 2026 | OKADA BALLROOM 1–3</span>
-            </p>
+            </div>
         </div>
         """,
         unsafe_allow_html=True
     )
 
+    # Button MUST be outside HTML to stay interactive
     if st.button("Pre-register"):
         set_page("register")
+
 
 
 # ---------------------------
