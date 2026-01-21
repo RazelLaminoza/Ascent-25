@@ -582,18 +582,3 @@ def raffle_page():
         set_page("admin")
 
     st.markdown("</div>", unsafe_allow_html=True)
-
-
-# ---------------------------
-# Main Function
-# ---------------------------
-def main():
-    if "page" not in st.session_state:
-        st.session_state.page = "raffle"
-
-    if st.session_state.page == "raffle":
-        raffle_page()
-
-
-if __name__ == "__main__":
-    main()
