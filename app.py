@@ -428,18 +428,16 @@ def raffle_page():
         st.warning("No entries yet.")
         return
 
+    placeholder = st.empty()
+
     if st.button("Draw Winner", key="draw_winner_btn"):
-
-        placeholder = st.empty()
-
-        # Shuffle for 5 seconds
-        for _ in range(50):  # 50 * 0.1 = 5 seconds
+        # fast shuffle effect (no delay)
+        for _ in range(15):
             shuffled_name = random.choice(df["name"].tolist())
             placeholder.markdown(
                 f"<h2 style='text-align:center; color:#FFD700;'>{shuffled_name}</h2>",
                 unsafe_allow_html=True
             )
-            st.sleep(0.1)  # <-- IMPORTANT: streamlit-friendly sleep
 
         # Final winner
         winner = random.choice(df["name"].tolist())
