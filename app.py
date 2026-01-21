@@ -497,85 +497,76 @@ import streamlit as st
 import random
 import time
 
+import streamlit as st
+import random
+import time
+import os
+from PIL import Image
+
 # ---------------------------
 # Raffle Page (SAFE LONG SHUFFLE)
 # ---------------------------
 def raffle_page():
 
-    # ---------- CENTER EVERYTHING ----------
+    # ---------- TOP CENTER IMAGE ----------
+    if not os.path.exists("1.png"):
+        st.error("Image file 1.png not found!")
+        return
+
+    img = Image.open("1.png")
+    img = img.resize((80, int(80 * img.height / img.width)))
+
+    st.image(img, use_column_width=False)
+
+    # ---------- BIG TITLE ----------
     st.markdown(
-        """
-        <style>
-        .center {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            height: 100vh;
-        }
-        </style>
-        """,
+        "<h1 style='text-align:center; font-size: 64px;'> Raffle Winner </h1>",
         unsafe_allow_html=True
     )
 
-    with st.container():
-        st.markdown("<div class='center'>", unsafe_allow_html=True)
+    df = load_registered()
 
-        # ---------- BIG TITLE ----------
-        st.markdown(
-            "<h1 style='font-size: 64px;'>Raffle Winner</h1>",
-            unsafe_allow_html=True
-        )
+    if df.empty:
+        st.warning("No entries yet.")
+        return
 
-        df = load_registered()
+    if "raffle_name" not in st.session_state:
+        st.session_state.raffle_name = "Press Draw Winner"
 
-        if df.empty:
-            st.warning("No entries yet.")
-            st.markdown("</div>", unsafe_allow_html=True)
-            return
+    placeholder = st.empty()
 
-        if "raffle_name" not in st.session_state:
-            st.session_state.raffle_name = "Press Draw Winner"
+    # ---------- BIG NAME DISPLAY ----------
+    placeholder.markdown(
+        f"<h2 style='text-align:center; color:#FFD700; font-size: 56px;'>{st.session_state.raffle_name}</h2>",
+        unsafe_allow_html=True
+    )
 
-        placeholder = st.empty()
+    if st.button(" Draw Winner", key="draw_winner_btn"):
 
-        # ---------- BIG NAME DISPLAY ----------
-        placeholder.markdown(
-            f"<h2 style='color:#FFD700; font-size: 56px;'>{st.session_state.raffle_name}</h2>",
-            unsafe_allow_html=True
-        )
+        start_time = time.time()
+        names = df["name"].tolist()
 
-        # ---------- DRAW BUTTON ----------
-        if st.button("Draw Winner", key="draw_winner_btn"):
-
-            start_time = time.time()
-            names = df["name"].tolist()
-
-            # Shuffle for 5 seconds
-            while time.time() - start_time < 5:
-                st.session_state.raffle_name = random.choice(names)
-
-                placeholder.markdown(
-                    f"<h2 style='color:#FFD700; font-size: 56px;'>{st.session_state.raffle_name}</h2>",
-                    unsafe_allow_html=True
-                )
-
-                time.sleep(0.1)
-
-            # Final winner
+        # Shuffle for 5 seconds
+        while time.time() - start_time < 5:
             st.session_state.raffle_name = random.choice(names)
 
             placeholder.markdown(
-                f"<h2 style='color:#FFD700; font-size: 56px;'> {st.session_state.raffle_name} </h2>",
+                f"<h2 style='text-align:center; color:#FFD700; font-size: 56px;'>{st.session_state.raffle_name}</h2>",
                 unsafe_allow_html=True
             )
 
-        # ---------- BACK BUTTON ----------
-        if st.button("⬅ Back", key="raffle_back_btn"):
-            set_page("admin")
+            time.sleep(0.1)
 
-        st.markdown("</div>", unsafe_allow_html=True)
+        # Final winner
+        st.session_state.raffle_name = random.choice(names)
+
+        placeholder.markdown(
+            f"<h2 style='text-align:center; color:#FFD700; font-size: 56px;'> {st.session_state.raffle_name} </h2>",
+            unsafe_allow_html=True
+        )
+
+    if st.button("⬅ Back", key="raffle_back_btn"):
+        set_page("admin")
 
 
 # ---------------------------
@@ -591,3 +582,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
