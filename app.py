@@ -5,6 +5,7 @@ import os
 from PIL import Image, ImageDraw, ImageFont
 import io
 import base64
+import qrcode
 
 # ---------------------------
 # Constants
@@ -13,18 +14,11 @@ DATA_FILE = "registered.csv"
 EMPLOYEE_EXCEL = "employee_list.xlsx"
 
 # ---------------------------
-# Custom Font + Background
+# Custom Font
 # ---------------------------
 def load_custom_font():
     font_path = "PPNeueMachina-PlainUltrabold.ttf"
-    bg_path = "bgna.png"
-
-    if os.path.exists(font_path) and os.path.exists(bg_path):
-
-        # Convert background image to base64
-        with open(bg_path, "rb") as f:
-            bg_base64 = base64.b64encode(f.read()).decode()
-
+    if os.path.exists(font_path):
         st.markdown(
             f"""
             <style>
@@ -32,29 +26,30 @@ def load_custom_font():
                 font-family: "PPNeue";
                 src: url("{font_path}");
             }}
-            html, body, [class*="css"] {{
+            html, body, [class*="css"]  {{
                 font-family: "PPNeue";
-            }}
-
-            /* BACKGROUND IMAGE */
-            [data-testid="stAppViewContainer"] {{
-                background-image: url("data:image/png;base64,{bg_base64}");
-                background-size: cover;
-                background-position: center;
-                background-repeat: no-repeat;
-            }}
-
-            /* Make content background transparent */
-            .css-18e3th9 {{
-                background: transparent;
-            }}
-
-            .css-1d391kg {{
-                background: transparent;
             }}
             </style>
             """,
             unsafe_allow_html=True,
+        )
+
+# ---------------------------
+# Background Image
+# ---------------------------
+def set_background():
+    if os.path.exists("bgna.png"):
+        st.markdown(
+            f"""
+            <style>
+            .stApp {{
+                background: url("bgna.png");
+                background-size: cover;
+                background-attachment: fixed;
+            }}
+            </style>
+            """,
+            unsafe_allow_html=True
         )
 
 # ---------------------------
@@ -82,6 +77,7 @@ def set_page(page_name):
 # ---------------------------
 def main():
     load_custom_font()
+    set_background()
 
     if "page" not in st.session_state:
         st.session_state.page = "landing"
@@ -101,16 +97,17 @@ def main():
 def landing_page():
     st.markdown("<h1 style='text-align:center;'>Welcome</h1>", unsafe_allow_html=True)
 
-    # Top Center Image
     if os.path.exists("2.png"):
         st.image("2.png", width=300)
 
-    # Center Image
     if os.path.exists("1.png"):
         st.image("1.png", width=350)
 
-    if st.button("Go to Register", key="landing_register_btn"):
+    if st.button("Go to Register"):
         set_page("register")
+
+    if st.button("Raffle"):
+        set_page("raffle")
 
 # ---------------------------
 # Register Page
@@ -121,7 +118,8 @@ def register_page():
     emp_id = st.text_input("Type employee id number", key="register_emp_id")
 
     if st.button("Submit", key="register_submit_btn"):
-        # Admin shortcut
+
+        # ---- ADMIN SECRET CODE ----
         if emp_id == "admin123":
             set_page("admin")
             return
@@ -134,52 +132,91 @@ def register_page():
 
         # Validation using emp column
         if emp_id not in df_employees["emp"].astype(str).tolist():
-            st.error("Invalid ID")
+            st.error("Employee ID NOT VERIFIED ❌")
             return
 
         df_reg = load_registered()
 
+        # Already used?
         if emp_id in df_reg["emp_id"].astype(str).tolist():
-            st.error("Already used")
+            st.error("Employee ID NOT VERIFIED ❌")
             return
 
         name = df_employees[df_employees["emp"].astype(str) == emp_id]["name"].values[0]
 
-        # New concat method (No append)
+        # Add to registered list
         new_row = pd.DataFrame([{"name": name, "emp_id": emp_id}])
         df_reg = pd.concat([df_reg, new_row], ignore_index=True)
-
         save_registered(df_reg)
 
-        show_card(name, emp_id)
+        # ----- CREATE PASS IMAGE -----
+        qr_img = generate_qr(f"{name} | {emp_id}")
+        pass_img = create_pass_image(name, emp_id, qr_img)
+
+        buf = io.BytesIO()
+        pass_img.save(buf, format="PNG")
+        pass_bytes = buf.getvalue()
+
+        st.success("Registered and VERIFIED ✔️")
+        img_b64 = base64.b64encode(pass_bytes).decode()
+
+        # ----- SHOW PASS IN STYLED BOX -----
+        st.markdown(
+            f"""
+            <div style="display:flex; justify-content:center; margin-top: 20px;">
+                <div style="
+                    background: #FFD700;
+                    color: #000000;
+                    border: 1px solid rgba(0, 0, 0, 0.25);
+                    border-radius: 18px;
+                    padding: 16px;
+                    backdrop-filter: blur(8px);
+                    -webkit-backdrop-filter: blur(8px);
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+                    max-width: 520px;
+                    width: 100%;
+                ">
+                    <img src="data:image/png;base64,{img_b64}" style="width:100%; border-radius: 12px;" />
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        # ------------------ DOWNLOAD BUTTON ------------------
+        st.download_button(
+            "📥 Download Pass (PNG)",
+            pass_bytes,
+            file_name=f"{emp_id}_event_pass.png",
+            mime="image/png",
+            key="download_pass_btn"
+        )
 
     if st.button("Back", key="register_back_btn"):
         set_page("landing")
 
 # ---------------------------
-# Card & Download PNG
+# QR + Pass Design
 # ---------------------------
-def show_card(name, emp_id):
-    img = Image.new("RGB", (600, 350), color=(255, 255, 255))
+def generate_qr(data):
+    qr = qrcode.QRCode(box_size=8, border=2)
+    qr.add_data(data)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white")
+    return img
+
+def create_pass_image(name, emp_id, qr_img):
+    img = Image.new("RGB", (700, 400), color=(255, 255, 255))
     draw = ImageDraw.Draw(img)
     font = ImageFont.truetype("PPNeueMachina-PlainUltrabold.ttf", 40)
 
-    draw.text((50, 100), f"Name: {name}", font=font, fill=(0,0,0))
-    draw.text((50, 180), f"ID: {emp_id}", font=font, fill=(0,0,0))
+    draw.text((50, 120), f"Name: {name}", font=font, fill=(0,0,0))
+    draw.text((50, 200), f"ID: {emp_id}", font=font, fill=(0,0,0))
 
-    buffer = io.BytesIO()
-    img.save(buffer, format="PNG")
-    buffer.seek(0)
+    qr_img = qr_img.resize((180, 180))
+    img.paste(qr_img, (480, 150))
 
-    st.image(img, width=500)
-
-    st.download_button(
-        label="Download PNG",
-        data=buffer,
-        file_name="badge.png",
-        mime="image/png",
-        key="download_btn"
-    )
+    return img
 
 # ---------------------------
 # Admin Page
@@ -187,15 +224,14 @@ def show_card(name, emp_id):
 def admin_page():
     st.markdown("<h1 style='text-align:center;'>Admin Login</h1>", unsafe_allow_html=True)
 
-    # if admin already logged in
     if st.session_state.get("admin_logged_in", False):
         show_admin_table()
         return
 
-    user = st.text_input("User", key="admin_user")
-    pwd = st.text_input("Password", type="password", key="admin_pwd")
+    user = st.text_input("User")
+    pwd = st.text_input("Password", type="password")
 
-    if st.button("Login", key="admin_login_btn"):
+    if st.button("Login"):
         if user == "admin" and pwd == "admin123":
             st.success("Login Successful!")
             st.session_state.admin_logged_in = True
@@ -203,7 +239,7 @@ def admin_page():
         else:
             st.error("Invalid credentials")
 
-    if st.button("Back", key="admin_back_btn"):
+    if st.button("Back"):
         set_page("landing")
 
 def delete_all_entries():
@@ -232,29 +268,26 @@ def show_admin_table():
     if st.button("Delete All Entries", key="delete_all_btn"):
         delete_all_entries()
 
-    if st.button("Go to Raffle", key="go_raffle_btn"):
-        set_page("raffle")
-
     if st.button("Back", key="admin_table_back_btn"):
         set_page("landing")
 
 # ---------------------------
-# Raffle Page (ONE NAME ONLY)
+# Raffle Page (1 Winner)
 # ---------------------------
 def raffle_page():
-    st.markdown("<h1 style='text-align:center;'>Raffle Winner</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align:center;'>Raffle</h1>", unsafe_allow_html=True)
 
     df = load_registered()
 
     if df.empty:
         st.warning("No entries yet.")
     else:
-        if st.button("Draw Winner", key="draw_btn"):
-            winner = df.sample(1)["name"].values[0]
-            st.markdown(f"<h2 style='text-align:center;'>{winner}</h2>", unsafe_allow_html=True)
+        if st.button("Pick Winner"):
+            winner = df.sample(1).iloc[0]
+            st.success(f"🎉 Winner: {winner['name']} ({winner['emp_id']})")
 
-    if st.button("Back", key="raffle_back_btn"):
-        set_page("admin")
+    if st.button("Back"):
+        set_page("landing")
 
 # ---------------------------
 # Run App
