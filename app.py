@@ -79,8 +79,12 @@ def set_page(page_name):
         st.session_state.admin_logged_in = False
 
 # ---------------------------
-# QR & Pass Image
+# QR & Pass Image (YOUR STYLE)
 # ---------------------------
+def resize_keep_aspect(img, max_size):
+    img.thumbnail(max_size, Image.ANTIALIAS)
+    return img
+
 def generate_qr(data):
     qr = qrcode.QRCode(box_size=8, border=2)
     qr.add_data(data)
@@ -88,19 +92,54 @@ def generate_qr(data):
     img = qr.make_image(fill_color="black", back_color="white")
     return img
 
-def create_pass_image(name, emp_id, qr_img):
-    img = Image.new("RGB", (700, 400), color=(255, 255, 255))
+def create_pass_image(name, emp, qr_img):
+    # Load background image
+    bg = Image.open("bgna.png").convert("RGBA")
+    bg = bg.resize((900, 500))
+
+    img = Image.new("RGBA", (900, 500))
+    img.paste(bg, (0, 0))
+
     draw = ImageDraw.Draw(img)
-    font = ImageFont.truetype("PPNeueMachina-PlainUltrabold.ttf", 40)
 
-    draw.text((50, 120), f"Name: {name}", font=font, fill=(0,0,0))
-    draw.text((50, 200), f"ID: {emp_id}", font=font, fill=(0,0,0))
+    # Load fonts (regular)
+    try:
+        font_big = ImageFont.truetype("CourierPrime-Bold.ttf", 42)
+        font_small = ImageFont.truetype("CourierPrime-Bold.ttf", 26)
+    except:
+        font_big = font_small = ImageFont.load_default()
 
-    # Add QR
-    qr_img = qr_img.resize((180, 180))
-    img.paste(qr_img, (480, 150))
+    text_color = (255, 255, 255, 255)
 
-    return img
+    # Add 1.png and 2.png at the top-right (no stretching)
+    logo1 = Image.open("1.png").convert("RGBA")
+    logo2 = Image.open("2.png").convert("RGBA")
+
+    logo1 = resize_keep_aspect(logo1, (120, 120))
+    logo2 = resize_keep_aspect(logo2, (120, 120))
+
+    img.paste(logo1, (620, 30), logo1)
+    img.paste(logo2, (760, 30), logo2)
+
+    # Text
+    draw.text((40, 40), "ASCENT APAC 2026", fill=text_color, font=font_big)
+    draw.text((40, 120), "FULL NAME:", fill=text_color, font=font_big)
+    draw.text((40, 160), name, fill=text_color, font=font_small)
+
+    draw.text((40, 260), "EMPLOYEE NO:", fill=text_color, font=font_small)
+    draw.text((40, 300), emp, fill=text_color, font=font_big)
+
+    draw.text(
+        (40, 380),
+        "Present this pre-registration pass\nat the check-in counter",
+        fill=text_color,
+        font=font_small
+    )
+
+    qr_img = qr_img.resize((220, 220))
+    img.paste(qr_img, (620, 140), qr_img.convert("RGBA"))
+
+    return img.convert("RGB")
 
 # ---------------------------
 # Main App
@@ -125,11 +164,8 @@ def main():
 # Landing Page
 # ---------------------------
 def landing_page():
-    # Top Center Image
     if os.path.exists("2.png"):
         st.image("2.png", width=300)
-
-    # Center Image
     if os.path.exists("1.png"):
         st.image("1.png", width=350)
 
@@ -159,21 +195,18 @@ def register_page():
 
         df_employees = pd.read_excel(EMPLOYEE_EXCEL)
 
-        # Validation using emp column
         if emp_id not in df_employees["emp"].astype(str).tolist():
             st.error("Employee ID NOT VERIFIED ❌")
             return
 
         df_reg = load_registered()
 
-        # Already used?
         if emp_id in df_reg["emp_id"].astype(str).tolist():
             st.error("Employee ID NOT VERIFIED ❌")
             return
 
         name = df_employees[df_employees["emp"].astype(str) == emp_id]["name"].values[0]
 
-        # Add to registered list
         new_row = pd.DataFrame([{"name": name, "emp_id": emp_id}])
         df_reg = pd.concat([df_reg, new_row], ignore_index=True)
         save_registered(df_reg)
@@ -189,7 +222,6 @@ def register_page():
         st.success("Registered and VERIFIED ✔️")
         img_b64 = base64.b64encode(pass_bytes).decode()
 
-        # ----- SHOW PASS IN STYLED BOX -----
         st.markdown(
             f"""
             <div style="display:flex; justify-content:center; margin-top: 20px;">
@@ -223,7 +255,6 @@ def register_page():
     if st.button("Back", key="register_back_btn"):
         set_page("landing")
 
-
 # ---------------------------
 # Admin Page
 # ---------------------------
@@ -249,7 +280,6 @@ def admin_page():
 
     if st.button("Back", key="admin_back_btn"):
         set_page("landing")
-
 
 def delete_all_entries():
     if os.path.exists(DATA_FILE):
@@ -283,7 +313,6 @@ def show_admin_table():
     if st.button("Back", key="admin_table_back_btn"):
         set_page("landing")
 
-
 # ---------------------------
 # Raffle Page (Only 1 Name)
 # ---------------------------
@@ -301,7 +330,6 @@ def raffle_page():
 
     if st.button("Back", key="raffle_back_btn"):
         set_page("admin")
-
 
 if __name__ == "__main__":
     main()
