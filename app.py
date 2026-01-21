@@ -40,7 +40,7 @@ header {
 /* Lock scrolling */
 html, body {
     overflow: hidden !important;
-    height: 110%;
+    height: 200%;
 }
 
 /* Remove Streamlit padding */
