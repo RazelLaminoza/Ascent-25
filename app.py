@@ -579,7 +579,7 @@ def raffle_page():
             # Final winner
             st.session_state.raffle_name = random.choice(names)
             placeholder.markdown(
-                f"<h2 style='color:#FFD700; font-size: 80px; text-align:center;'> {st.session_state.raffle_name} </h2>",
+                f"<h2 style='color:#FFD700; font-size: 60px; text-align:center;'> {st.session_state.raffle_name} </h2>",
                 unsafe_allow_html=True
             )
 
