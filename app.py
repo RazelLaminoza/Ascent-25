@@ -495,10 +495,28 @@ def show_admin_table():
 
 
 # ---------------------------
-# Raffle Page (Only 1 Name)
+# Raffle Page (10s Shuffle)
 # ---------------------------
 def raffle_page():
-    st.markdown("<h1 style='text-align:center;'>🎉 Raffle Winner 🎉</h1>", unsafe_allow_html=True)
+
+    # -------- TOP CENTER IMAGE --------
+    st.markdown(
+        """
+        <div style="
+            position: fixed;
+            top: 15px;
+            width: 100%;
+            text-align: center;
+            z-index: 1000;
+        ">
+            <img src="data:image/png;base64,{}"
+                 style="height:120px;" />
+        </div>
+        """.format(
+            base64.b64encode(open("1.png", "rb").read()).decode()
+        ),
+        unsafe_allow_html=True
+    )
 
     df = load_registered()
     if df.empty:
@@ -506,38 +524,84 @@ def raffle_page():
         return
 
     names = df["name"].tolist()
+    placeholder = st.empty()
 
+    # -------- SESSION STATE INIT --------
     if "raffle_name" not in st.session_state:
         st.session_state.raffle_name = "Press Draw Winner"
 
-    placeholder = st.empty()
+    if "raffle_running" not in st.session_state:
+        st.session_state.raffle_running = False
 
+    if "raffle_start" not in st.session_state:
+        st.session_state.raffle_start = 0
+
+    # -------- CENTER DISPLAY --------
     placeholder.markdown(
-        f"<h2 style='text-align:center; color:#FFD700;'>{st.session_state.raffle_name}</h2>",
+        f"""
+        <div style="
+            display:flex;
+            height:100vh;
+            justify-content:center;
+            align-items:center;
+            flex-direction:column;
+        ">
+            <div style="font-size:36px; color:#FFD700;">
+                Winner is :
+            </div>
+            <div style="font-size:64px; font-weight:900; color:white;">
+                {st.session_state.raffle_name}
+            </div>
+        </div>
+        """,
         unsafe_allow_html=True
     )
 
-    if st.button("🎲 Draw Winner", key="draw_winner_btn"):
+    # -------- DRAW BUTTON --------
+    if st.button("🎲 Draw Winner") and not st.session_state.raffle_running:
+        st.session_state.raffle_running = True
+        st.session_state.raffle_start = time.time()
+        st.experimental_rerun()
 
-        start_time = time.time()
-        duration = 10  # seconds
+    # -------- SHUFFLE EFFECT --------
+    if st.session_state.raffle_running:
+        elapsed = time.time() - st.session_state.raffle_start
 
-        while time.time() - start_time < duration:
+        if elapsed < 10:
             st.session_state.raffle_name = random.choice(names)
+            time.sleep(0.12)
+            st.experimental_rerun()
+        else:
+            st.session_state.raffle_name = random.choice(names)
+            st.session_state.raffle_running = False
 
             placeholder.markdown(
-                f"<h2 style='text-align:center; color:#FFD700;'>{st.session_state.raffle_name}</h2>",
+                f"""
+                <div style="
+                    display:flex;
+                    height:100vh;
+                    justify-content:center;
+                    align-items:center;
+                    flex-direction:column;
+                ">
+                    <div style="font-size:40px; color:#00FF7F;">
+                        🏆 Winner is :
+                    </div>
+                    <div style="
+                        font-size:72px;
+                        font-weight:900;
+                        color:#FFD700;
+                        text-shadow:0 0 15px gold;
+                    ">
+                        {st.session_state.raffle_name}
+                    </div>
+                </div>
+                """,
                 unsafe_allow_html=True
             )
 
-            time.sleep(0.15)  # speed of shuffle (lower = faster)
+            st.balloons()
 
-        # FINAL WINNER
-        st.session_state.raffle_name = random.choice(names)
-        placeholder.markdown(
-            f"<h2 style='text-align:center; color:#00FF7F;'>🏆 {st.session_state.raffle_name} 🏆</h2>",
-            unsafe_allow_html=True
-        )
-
-    if st.button("⬅ Back", key="raffle_back_btn"):
+    if st.button("⬅ Back"):
         set_page("admin")
+
