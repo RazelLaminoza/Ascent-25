@@ -434,7 +434,9 @@ if st.session_state.page == "register":
             else:
                 name = st.session_state.valid_employees.get(emp, "Unknown")
                 st.session_state.entries.append({"emp": emp, "Full Name": name})
-                save_data()
+                st.session_state.current_table = st.session_state.entries  # 🔥 ADD THIS
+                save_entries()
+
 
                 qr_img = generate_qr(f"{name} | {emp}")
                 pass_img = create_pass_image(name, emp, qr_img)
@@ -487,7 +489,9 @@ PASSWORD = "admin123"
 def load_entries():
     if os.path.exists(FILE_PATH):
         df = pd.read_csv(FILE_PATH)
-        st.session_state.entries = df.to_dict("records")
+        records = df.to_dict("records")
+        st.session_state.entries = records
+        st.session_state.current_table = records  # 🔥 ADD THIS
 
 def save_entries():
     df = pd.DataFrame(st.session_state.entries)
