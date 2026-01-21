@@ -599,7 +599,7 @@ if st.session_state.page == "admin":
             type="secondary",
             key="delete_entries"
         )
-# 🔥 HARD RESET BUTTON (NO EXPERIMENTAL)
+        # 🔥 HARD RESET BUTTON (NO EXPERIMENTAL)
 def HARD_RESET():
     # Clear session state
     for key in list(st.session_state.keys()):
@@ -613,33 +613,36 @@ def HARD_RESET():
     st.success("✅ System reset complete. Please refresh the page.")
 
 
-# ====== ADMIN PAGE BUTTONS ======
-st.button(
-    "🔥 HARD RESET SYSTEM",
-    on_click=HARD_RESET,
-    type="secondary",
-    key="hard_reset"
-)
+# ---------------- ADMIN PAGE ----------------
+if st.session_state.page == "admin":
 
-st.button(
-    "🎰 Enter Raffle",
-    on_click=go_to,
-    args=("raffle",),
-    type="primary",
-    key="enter_raffle"
-)
+    # ====== ADMIN PAGE BUTTONS ======
+    st.button(
+        "🔥 HARD RESET SYSTEM",
+        on_click=HARD_RESET,
+        type="secondary",
+        key="hard_reset"
+    )
 
-st.markdown("---")
+    st.button(
+        "🎰 Enter Raffle",
+        on_click=go_to,
+        args=("raffle",),
+        type="primary",
+        key="enter_raffle"
+    )
 
-st.button(
-    "Logout",
-    on_click=logout,
-    key="logout_admin"
-)
+    st.markdown("---")
+
+    st.button(
+        "Logout",
+        on_click=logout,
+        key="logout_admin"
+    )
 
 
 # ---------------- RAFFLE PAGE ----------------
-    elif st.session_state.page == "raffle":
+elif st.session_state.page == "raffle":
 
     if not st.session_state.admin:
         st.session_state.page = "admin"
