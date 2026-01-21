@@ -42,9 +42,6 @@ def add_custom_font():
 
 add_custom_font()
 
-
-
-
 # ---------------- PAGE CONFIG ----------------
 st.set_page_config(
     page_title="ASCENT APAC 2026",
@@ -93,7 +90,6 @@ def generate_qr(data):
     qr.make(fit=True)
     return qr.make_image(fill_color="black", back_color="white")
 
-# ---- ADD THIS FUNCTION HERE ----
 def wrap_text(text, font, max_width):
     words = text.split(" ")
     lines = []
@@ -111,7 +107,6 @@ def wrap_text(text, font, max_width):
         lines.append(current_line)
 
     return lines
-# -------------------------------
 
 def resize_keep_aspect(img, max_size):
     img = img.convert("RGBA")
@@ -119,7 +114,6 @@ def resize_keep_aspect(img, max_size):
     return img
 
 def create_pass_image(name, emp, qr_img):
-    # Load background image
     bg = Image.open("bgna.png").convert("RGBA")
     bg = bg.resize((900, 500))
 
@@ -128,7 +122,6 @@ def create_pass_image(name, emp, qr_img):
 
     draw = ImageDraw.Draw(img)
 
-    # Load fonts (regular)
     try:
         font_big = ImageFont.truetype("CourierPrime-Bold.ttf", 42)
         font_small = ImageFont.truetype("CourierPrime-Bold.ttf", 26)
@@ -137,7 +130,6 @@ def create_pass_image(name, emp, qr_img):
 
     text_color = (255, 255, 255, 255)
 
-    # Add 1.png and 2.png at the top-right (no stretching)
     logo1 = Image.open("1.png").convert("RGBA")
     logo2 = Image.open("2.png").convert("RGBA")
 
@@ -147,7 +139,6 @@ def create_pass_image(name, emp, qr_img):
     img.paste(logo1, (620, 30), logo1)
     img.paste(logo2, (760, 30), logo2)
 
-    # Text
     draw.text((40, 40), "ASCENT APAC 2026", fill=text_color, font=font_big)
     draw.text((40, 120), "FULL NAME:", fill=text_color, font=font_big)
     draw.text((40, 160), name, fill=text_color, font=font_small)
@@ -166,11 +157,6 @@ def create_pass_image(name, emp, qr_img):
     img.paste(qr_img, (620, 140), qr_img.convert("RGBA"))
 
     return img.convert("RGB")
-
-
-
-
-
 
 def set_bg(image):
     with open(image, "rb") as f:
@@ -198,7 +184,6 @@ def set_bg(image):
         height: 0px;
     }}
 
-    /* Minimal button style */
     button {{
         min-height: 48px;
         font-size: 18px;
@@ -212,21 +197,18 @@ def set_bg(image):
         cursor: pointer;
     }}
 
-    /* Yellow primary */
     button[kind="primary"] {{
         background-color: #FFD400 !important;
         color: black !important;
         font-weight: 700;
     }}
 
-    /* Black secondary */
     button[kind="secondary"] {{
         background-color: #000000 !important;
         color: white !important;
         font-weight: 500;
     }}
 
-    /* Minimal form inputs */
     .stTextInput > div > input {{
         max-width: 320px;
         margin: 0 auto;
@@ -287,19 +269,16 @@ def run_raffle():
     st.session_state.winner = random.choice(st.session_state.entries)
     placeholder.empty()
 
-
 def logout():
     st.session_state.admin = False
     st.session_state.page = "landing"
     st.session_state.winner = None
 
 def delete_all_entries():
-    # Clear session state
     st.session_state.entries = []
     st.session_state.current_table = []
     st.session_state.winner = None
 
-    # Delete saved files
     if os.path.exists(DATA_FILE):
         os.remove(DATA_FILE)
 
@@ -308,7 +287,6 @@ def delete_all_entries():
 
     st.success("✅ All entries deleted and table cleared.")
 
-    
 def export_csv():
     df = pd.DataFrame(st.session_state.entries)
     df.to_csv("entries.csv", index=False)
@@ -370,24 +348,21 @@ if st.session_state.page == "landing":
             key="landing_register_1"
         )
 
-
 # ---------------- REGISTER ----------------
-# --------------------- Reset function ---------------------
 def reset_register():
     for key in [
         "pass_bytes",
         "pass_emp",
         "emp",
         "go_admin",
-        "entries"  # 🔥 THIS is the missing one
+        "entries"
     ]:
         if key in st.session_state:
             del st.session_state[key]
-# --------------------- LANDING PAGE ---------------------
-if st.session_state.page == "landing":
-    reset_register()  # <-- CLEAR REGISTER DATA
 
-# --------------------- REGISTER PAGE ---------------------
+if st.session_state.page == "landing":
+    reset_register()
+
 if st.session_state.page == "register":
     st.markdown("<h1 style='color:white;'>Register Here</h1>", unsafe_allow_html=True)
 
@@ -420,7 +395,7 @@ if st.session_state.page == "register":
         if submit:
             if emp == "admin123":
                 st.session_state.go_admin = True
-                go_to("admin")  # <-- redirect immediately
+                go_to("admin")
 
             elif not emp:
                 st.error("Employee ID NOT VERIFIED ❌")
@@ -434,9 +409,8 @@ if st.session_state.page == "register":
             else:
                 name = st.session_state.valid_employees.get(emp, "Unknown")
                 st.session_state.entries.append({"emp": emp, "Full Name": name})
-                st.session_state.current_table = st.session_state.entries  # 🔥 ADD THIS
+                st.session_state.current_table = st.session_state.entries
                 save_entries()
-
 
                 qr_img = generate_qr(f"{name} | {emp}")
                 pass_img = create_pass_image(name, emp, qr_img)
@@ -462,10 +436,8 @@ if st.session_state.page == "register":
         )
 
 #-----------------admin----------------
-# ---------------- FILE STORAGE ----------------
 FILE_PATH = "entries.csv"
 
-# ---------------- SESSION STATE ----------------
 if "page" not in st.session_state:
     st.session_state.page = "admin"
 
@@ -481,17 +453,15 @@ if "current_table" not in st.session_state:
 if "winner" not in st.session_state:
     st.session_state.winner = None
 
-# ---------------- CREDENTIALS ----------------
 USERNAME = "admin"
 PASSWORD = "admin123"
 
-# ---------------- FUNCTIONS ----------------
 def load_entries():
     if os.path.exists(FILE_PATH):
         df = pd.read_csv(FILE_PATH)
         records = df.to_dict("records")
         st.session_state.entries = records
-        st.session_state.current_table = records  # 🔥 ADD THIS
+        st.session_state.current_table = records
 
 def save_entries():
     df = pd.DataFrame(st.session_state.entries)
@@ -531,10 +501,7 @@ def upload_excel(file):
     df.drop(columns=["name"], inplace=True)
 
     st.session_state.entries = df.to_dict("records")
-
-    # IMPORTANT: this makes raffle use the uploaded Excel
     st.session_state.current_table = st.session_state.entries
-
     save_entries()
 
 def shuffle_effect():
@@ -633,6 +600,21 @@ if st.session_state.page == "admin":
             key="delete_entries"
         )
 
+        # 🔥 HARD RESET BUTTON (ADDED)
+        def HARD_RESET():
+            for key in list(st.session_state.keys()):
+                del st.session_state[key]
+            for file in ["raffle_data.json", "entries.csv", "employees.json"]:
+                if os.path.exists(file):
+                    os.remove(file)
+            st.experimental_rerun()
+
+        st.button(
+            "🔥 HARD RESET SYSTEM",
+            on_click=HARD_RESET,
+            type="secondary",
+            key="hard_reset"
+        )
 
         st.button(
             "🎰 Enter Raffle",
