@@ -612,23 +612,31 @@ def HARD_RESET():
 
     st.success("✅ System reset complete. Please refresh the page.")
 
-    st.button(
-            "🔥 HARD RESET SYSTEM",
-            on_click=HARD_RESET,
-            type="secondary",
-            key="hard_reset"
-        )
 
-        st.button(
-            "🎰 Enter Raffle",
-            on_click=go_to,
-            args=("raffle",),
-            type="primary",
-            key="enter_raffle"
-        )
+# ====== ADMIN PAGE BUTTONS ======
+st.button(
+    "🔥 HARD RESET SYSTEM",
+    on_click=HARD_RESET,
+    type="secondary",
+    key="hard_reset"
+)
 
-        st.markdown("---")
-        st.button("Logout", on_click=logout, key="logout_admin")
+st.button(
+    "🎰 Enter Raffle",
+    on_click=go_to,
+    args=("raffle",),
+    type="primary",
+    key="enter_raffle"
+)
+
+st.markdown("---")
+
+st.button(
+    "Logout",
+    on_click=logout,
+    key="logout_admin"
+)
+
 
 # ---------------- RAFFLE PAGE ----------------
 elif st.session_state.page == "raffle":
