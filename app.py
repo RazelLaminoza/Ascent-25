@@ -4,6 +4,7 @@ import random
 import os
 from PIL import Image, ImageDraw, ImageFont
 import io
+import base64
 
 # ---------------------------
 # Constants
@@ -19,6 +20,11 @@ def load_custom_font():
     bg_path = "bgna.png"
 
     if os.path.exists(font_path) and os.path.exists(bg_path):
+
+        # Convert background image to base64
+        with open(bg_path, "rb") as f:
+            bg_base64 = base64.b64encode(f.read()).decode()
+
         st.markdown(
             f"""
             <style>
@@ -32,13 +38,13 @@ def load_custom_font():
 
             /* BACKGROUND IMAGE */
             [data-testid="stAppViewContainer"] {{
-                background: url("{bg_path}");
+                background-image: url("data:image/png;base64,{bg_base64}");
                 background-size: cover;
                 background-position: center;
                 background-repeat: no-repeat;
             }}
 
-            /* Make main container transparent */
+            /* Make content background transparent */
             .css-18e3th9 {{
                 background: transparent;
             }}
