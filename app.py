@@ -513,7 +513,7 @@ def raffle_page():
         """
         <style>
         .lower-content {
-            padding-top: 400px;  /* change this value to move lower/higher */
+            padding-top: 400px;  /* lowered by 400px */
             text-align: center;
         }
         </style>
@@ -548,7 +548,22 @@ def raffle_page():
     )
 
     if st.button("Draw Winner", key="draw_winner_btn"):
+
+        start_time = time.time()
         names = df["name"].tolist()
+
+        # Shuffle for 5 seconds
+        while time.time() - start_time < 5:
+            st.session_state.raffle_name = random.choice(names)
+
+            placeholder.markdown(
+                f"<h2 style='color:#FFD700; font-size: 56px;'>{st.session_state.raffle_name}</h2>",
+                unsafe_allow_html=True
+            )
+
+            time.sleep(0.1)
+
+        # Final winner
         st.session_state.raffle_name = random.choice(names)
 
         placeholder.markdown(
