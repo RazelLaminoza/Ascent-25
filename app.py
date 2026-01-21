@@ -207,25 +207,36 @@ def landing_page():
 
     st.markdown("""
     <style>
+    /* Lock scrolling */
+    html, body {
+        overflow: hidden !important;
+        height: 100% !important;
+    }
+
     .landing {
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        height: 90vh;
+        height: 100vh;
         text-align: center;
+        opacity: 0.95; /* Slight transparency */
     }
+
     .landing img {
         margin: 10px;
     }
+
     .landing p {
         font-size: 18px;
         line-height: 1.3;
         color: white;
     }
+
     .landing span {
         font-size: 16px;
     }
+
     .stButton button {
         width: 360px !important;
         height: 55px !important;
@@ -257,6 +268,7 @@ def landing_page():
     # Streamlit button (centered by CSS)
     if st.button("Pre-register"):
         set_page("register")
+
 
 
 # ---------------------------
