@@ -16,7 +16,9 @@ EMPLOYEE_EXCEL = "employee_list.xlsx"
 # ---------------------------
 def load_custom_font():
     font_path = "PPNeueMachina-PlainUltrabold.ttf"
-    if os.path.exists(font_path):
+    bg_path = "bgna.png"
+
+    if os.path.exists(font_path) and os.path.exists(bg_path):
         st.markdown(
             f"""
             <style>
@@ -24,16 +26,25 @@ def load_custom_font():
                 font-family: "PPNeue";
                 src: url("{font_path}");
             }}
-            html, body, [class*="css"]  {{
+            html, body, [class*="css"] {{
                 font-family: "PPNeue";
             }}
 
             /* BACKGROUND IMAGE */
-            .stApp {{
-                background-image: url("bgna.png");
+            [data-testid="stAppViewContainer"] {{
+                background: url("{bg_path}");
                 background-size: cover;
                 background-position: center;
                 background-repeat: no-repeat;
+            }}
+
+            /* Make main container transparent */
+            .css-18e3th9 {{
+                background: transparent;
+            }}
+
+            .css-1d391kg {{
+                background: transparent;
             }}
             </style>
             """,
