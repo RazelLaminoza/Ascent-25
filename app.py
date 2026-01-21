@@ -8,6 +8,47 @@ import time
 from PIL import Image, ImageDraw, ImageFont
 import qrcode
 
+st.markdown("""
+<style>
+/* FULL KIOSK LOCKDOWN */
+
+/* Hide Streamlit top-right toolbar (fork, rerun, settings) */
+[data-testid="stToolbar"] {
+    display: none !important;
+}
+
+/* Hide floating deploy / fork button */
+[data-testid="stDeployButton"] {
+    display: none !important;
+}
+
+/* Hide hamburger menu */
+#MainMenu {
+    visibility: hidden;
+}
+
+/* Hide footer */
+footer {
+    visibility: hidden;
+}
+
+/* Hide header bar */
+header {
+    visibility: hidden;
+}
+
+/* Lock scrolling */
+html, body {
+    overflow: hidden !important;
+    height: 100%;
+}
+
+/* Remove Streamlit padding */
+.block-container {
+    padding: 0 !important;
+}
+</style>
+""", unsafe_allow_html=True)
 
 def shuffle_effect(df):
     placeholder = st.empty()
