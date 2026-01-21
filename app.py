@@ -209,6 +209,11 @@ def show_admin_table():
     if st.button("Enter Raffle"):
         raffle(df)
 
+    # Back button (to Landing)
+    if st.button("Back"):
+        set_page("landing")
+
+
 # ---------------------------
 # Raffle Shuffle
 # ---------------------------
