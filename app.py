@@ -499,9 +499,12 @@ def show_admin_table():
 def raffle_page():
 
     # ---------- TOP CENTER IMAGE ----------
-    img = Image.open("1.png")  # Make sure this image exists
+    img_b64 = base64.b64encode(open("1.png", "rb").read()).decode()
+
+    img_data = base64.b64decode(img_b64)
+    img = Image.open(BytesIO(img_data))
     img = img.resize((80, int(80 * img.height / img.width)))
-    
+
     st.image(img, use_column_width=False)
 
     # ---------- BIG TITLE ----------
