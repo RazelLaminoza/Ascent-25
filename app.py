@@ -514,57 +514,36 @@ def set_background():
 # ---------------------------
 # Raffle Page (SAFE LONG SHUFFLE)
 # ---------------------------
-def raffle_page():
-
-    # ---------- TOP IMAGE (CENTERED) ----------
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        st.image("12.png", width=300)
-
-    # ---------- TOP PADDING TO LOWER CONTENT ----------
+def main():
+    # ---------- BIG TITLE (CENTERED) ----------
     st.markdown(
-        """
-        <style>
-        .lower-content {
-            padding-top: 50px; /* lowered by 50px */
-            text-align: center;
-        }
-        </style>
-        """,
+        "<h1 style='font-size: 30px; text-align:center;'>RAFFLE WINNER</h1>",
         unsafe_allow_html=True
     )
 
-    st.markdown("<div class='lower-content'>", unsafe_allow_html=True)
+    df = load_registered()
 
-# ---------- BIG TITLE (CENTERED) ----------
-st.markdown(
-    "<h1 style='font-size: 30px; text-align:center;'>RAFFLE WINNER</h1>",
-    unsafe_allow_html=True
-)
+    if df.empty:
+        st.warning("No entries yet.")
+        st.markdown("</div>", unsafe_allow_html=True)
+        return  # <-- OK because we are inside main()
 
-df = load_registered()
+    if "raffle_name" not in st.session_state:
+        st.session_state.raffle_name = "Press Draw Winner"
 
-if df.empty:
-    st.warning("No entries yet.")
+    placeholder = st.empty()
+
+    # ---------- BIG NAME DISPLAY (CENTERED) ----------
+    placeholder.markdown(
+        f"<h2 style='color:#FFD700; font-size: 60px; text-align:center;'>{st.session_state.raffle_name}</h2>",
+        unsafe_allow_html=True
+    )
+
+    # ---------- BACK BUTTON ----------
+    if st.button("⬅ Back", key="raffle_back_btn"):
+        set_page("admin")
+
     st.markdown("</div>", unsafe_allow_html=True)
-    return
-
-if "raffle_name" not in st.session_state:
-    st.session_state.raffle_name = "Press Draw Winner"
-
-placeholder = st.empty()
-
-# ---------- BIG NAME DISPLAY (CENTERED) ----------
-placeholder.markdown(
-    f"<h2 style='color:#FFD700; font-size: 60px; text-align:center;'>{st.session_state.raffle_name}</h2>",
-    unsafe_allow_html=True
-)
-
-# ---------- BACK BUTTON ----------
-if st.button("⬅ Back", key="raffle_back_btn"):
-    set_page("admin")
-
-st.markdown("</div>", unsafe_allow_html=True)
 
 
 if __name__ == "__main__":
