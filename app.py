@@ -374,7 +374,13 @@ if st.session_state.page == "landing":
 # ---------------- REGISTER ----------------
 # --------------------- Reset function ---------------------
 def reset_register():
-    for key in ["pass_bytes", "pass_emp", "emp", "go_admin"]:
+    for key in [
+        "pass_bytes",
+        "pass_emp",
+        "emp",
+        "go_admin",
+        "entries"   # ← THIS is missing
+    ]:
         if key in st.session_state:
             del st.session_state[key]
 
