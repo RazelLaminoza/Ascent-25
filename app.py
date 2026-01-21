@@ -373,13 +373,13 @@ def register_page():
         df_employees = pd.read_excel(EMPLOYEE_EXCEL)
 
         if emp_id not in df_employees["emp"].astype(str).tolist():
-            st.error("Already Login ❌")
+            st.error("Employee ID NOT VERIFIED ")
             return
 
         df_reg = load_registered()
 
         if emp_id in df_reg["emp_id"].astype(str).tolist():
-            st.error("Employee ID NOT VERIFIED ❌")
+            st.error("You have already registered")
             return
 
         name = df_employees[df_employees["emp"].astype(str) == emp_id]["name"].values[0]
@@ -503,7 +503,7 @@ def raffle_page():
     img = Image.open("1.png")  # Make sure this image exists
     img = img.resize((80, int(80 * img.height / img.width)))
     
-    st.image(img)
+    st.image(img, use_column_width=False)
 
     # ---------- BIG TITLE ----------
     st.markdown(
@@ -533,8 +533,8 @@ def raffle_page():
         start_time = time.time()
         names = df["name"].tolist()
 
-        # Shuffle for 10 seconds
-        while time.time() - start_time < 10:
+        # Shuffle for 5 seconds
+        while time.time() - start_time < 5:
             st.session_state.raffle_name = random.choice(names)
 
             placeholder.markdown(
