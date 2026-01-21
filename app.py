@@ -14,7 +14,7 @@ def shuffle_effect(df):
 
     # shuffle effect
     for _ in range(20):
-        name = random.choice(df["name"].tolist())
+        name = random.choice(df["Full Name"].tolist())
         placeholder.markdown(
             f"<h2 style='text-align:center; color:#FFD700;'>{name}</h2>",
             unsafe_allow_html=True
@@ -22,12 +22,13 @@ def shuffle_effect(df):
         time.sleep(0.05)
 
     # final winner
-    winner = random.choice(df["name"].tolist())
+    winner = random.choice(df["Full Name"].tolist())
     st.session_state.winner = winner
     placeholder.markdown(
         f"<h2 style='text-align:center; color:#FFD700;'>{winner}</h2>",
         unsafe_allow_html=True
     )
+
 
 def add_custom_font():
     font_path = "PPNeueMachina-PlainUltrabold.ttf"
@@ -43,14 +44,17 @@ def add_custom_font():
                     src: url("data:font/ttf;base64,{font_b64}") format("truetype");
                 }}
 
+                /* Apply font everywhere in Streamlit */
                 * {{
                     font-family: "PPNeueMachina" !important;
                 }}
 
+                /* Extra strong override for Streamlit internal elements */
                 [class*="css"] {{
                     font-family: "PPNeueMachina" !important;
                 }}
 
+                /* Buttons and Inputs */
                 button, input, textarea, select {{
                     font-family: "PPNeueMachina" !important;
                 }}
@@ -86,6 +90,7 @@ def load_custom_font():
             unsafe_allow_html=True,
         )
 
+
 def set_background():
     image_path = "bgna.png"
     if not os.path.exists(image_path):
@@ -110,6 +115,28 @@ def set_background():
         unsafe_allow_html=True,
     )
 
+
+# ---------------------------
+# HIDE STREAMLIT UI + LOCK SCROLL
+# ---------------------------
+def hide_streamlit_ui():
+    st.markdown("""
+        <style>
+            /* LOCK SCROLL */
+            html, body, .block-container {
+                overflow: hidden !important;
+                height: 100% !important;
+            }
+
+            /* HIDE STREAMLIT MENU (TOP RIGHT) */
+            #MainMenu {visibility: hidden;}
+
+            /* HIDE FOOTER */
+            footer {visibility: hidden;}
+        </style>
+    """, unsafe_allow_html=True)
+
+
 # ---------------------------
 # Data
 # ---------------------------
@@ -122,6 +149,7 @@ def load_registered():
 def save_registered(df):
     df.to_csv(DATA_FILE, index=False)
 
+
 # ---------------------------
 # Navigation
 # ---------------------------
@@ -130,12 +158,14 @@ def set_page(page_name):
     if page_name != "admin":
         st.session_state.admin_logged_in = False
 
+
 # ---------------------------
 # Image Resize Fix
 # ---------------------------
 def resize_keep_aspect(img, max_size):
     img.thumbnail(max_size, Image.Resampling.LANCZOS)
     return img
+
 
 # ---------------------------
 # QR & Pass Image
@@ -146,6 +176,7 @@ def generate_qr(data):
     qr.make(fit=True)
     img = qr.make_image(fill_color="black", back_color="white")
     return img
+
 
 def create_pass_image(name, emp, qr_img):
     bg = Image.open("bgna.png").convert("RGBA")
@@ -192,16 +223,17 @@ def create_pass_image(name, emp, qr_img):
 
     return img.convert("RGB")
 
+
 # ---------------------------
 # Main App
 # ---------------------------
 def main():
     load_custom_font()
     set_background()
+    hide_streamlit_ui()  # <<-- HERE
 
     if "page" not in st.session_state:
         st.session_state.page = "landing"
-        st.session_state.winner = None
 
     if st.session_state.page == "landing":
         landing_page()
@@ -212,6 +244,7 @@ def main():
     elif st.session_state.page == "raffle":
         raffle_page()
 
+
 # ---------------------------
 # Landing Page
 # ---------------------------
@@ -221,11 +254,6 @@ def landing_page():
 
     st.markdown("""
     <style>
-    html, body {
-        overflow: hidden !important;
-        height: 100% !important;
-    }
-
     .landing {
         display: flex;
         flex-direction: column;
@@ -281,6 +309,7 @@ def landing_page():
     if st.button("Pre-register"):
         set_page("register")
 
+
 # ---------------------------
 # Register Page
 # ---------------------------
@@ -292,6 +321,7 @@ def register_page():
         submit = st.form_submit_button("Submit")
 
     if submit:
+
         if emp_id == "admin123":
             set_page("admin")
             return
@@ -361,6 +391,7 @@ def register_page():
     if st.button("Back", key="register_back_btn"):
         set_page("landing")
 
+
 # ---------------------------
 # Admin Page
 # ---------------------------
@@ -387,16 +418,19 @@ def admin_page():
     if st.button("Back", key="admin_back_btn"):
         set_page("landing")
 
+
 def delete_all_entries():
     if os.path.exists(DATA_FILE):
         os.remove(DATA_FILE)
     st.success("All entries deleted!")
+
 
 def delete_entry(emp_id):
     df = load_registered()
     df = df[df["emp_id"].astype(str) != str(emp_id)]
     save_registered(df)
     st.success(f"Deleted entry: {emp_id}")
+
 
 def show_admin_table():
     st.markdown("<h2>Registered Users</h2>", unsafe_allow_html=True)
@@ -419,41 +453,44 @@ def show_admin_table():
     if st.button("Back", key="admin_table_back_btn"):
         set_page("landing")
 
+
 # ---------------------------
-# Raffle Page (WORKING!)
+# Raffle Page (Only 1 Name)
 # ---------------------------
 def raffle_page():
-    st.markdown("<h1 style='text-align:center;'>🎰 Raffle Draw</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align:center;'>Raffle</h1>", unsafe_allow_html=True)
 
     df = load_registered()
     if df.empty:
         st.warning("No entries yet.")
         return
 
-    st.button(
-        "🎰 Run Raffle",
-        on_click=shuffle_effect,
-        args=(df,),
-        type="primary",
-        key="run_raffle"
+    if "raffle_name" not in st.session_state:
+        st.session_state.raffle_name = "Press Draw Winner"
+
+    placeholder = st.empty()
+    placeholder.markdown(
+        f"<h2 style='text-align:center; color:#FFD700;'>{st.session_state.raffle_name}</h2>",
+        unsafe_allow_html=True
     )
 
-    if st.session_state.get("winner"):
-        st.markdown(
-            f"""
-            <div style="text-align:center;margin-top:40px;">
-                <h2>🎉 WINNER 🎉</h2>
-                <h1 style="color:gold;font-size:70px;">
-                    {st.session_state.winner}
-                </h1>
-            </div>
-            """,
+    if st.button("Draw Winner", key="draw_winner_btn"):
+        for _ in range(15):
+            st.session_state.raffle_name = random.choice(df["name"].tolist())
+            placeholder.markdown(
+                f"<h2 style='text-align:center; color:#FFD700;'>{st.session_state.raffle_name}</h2>",
+                unsafe_allow_html=True
+            )
+
+        st.session_state.raffle_name = random.choice(df["name"].tolist())
+        placeholder.markdown(
+            f"<h2 style='text-align:center; color:#FFD700;'>{st.session_state.raffle_name}</h2>",
             unsafe_allow_html=True
         )
 
-    st.markdown("---")
-    if st.button("Back to Admin"):
+    if st.button("Back", key="raffle_back_btn"):
         set_page("admin")
+
 
 if __name__ == "__main__":
     main()
