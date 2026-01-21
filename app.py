@@ -498,8 +498,10 @@ def show_admin_table():
 # ---------------------------
 def raffle_page():
 
-    # ---------- TOP CENTER IMAGE ----------
-    img_b64 = base64.b64encode(open("1.png", "rb").read()).decode()
+     # Check if image exists
+    if not os.path.exists("1.png"):
+        st.error("Image file 1.png not found!")
+        return
 
     img_data = base64.b64decode(img_b64)
     img = Image.open(BytesIO(img_data))
