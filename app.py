@@ -7,6 +7,41 @@ import base64
 from PIL import Image, ImageDraw, ImageFont
 import qrcode
 
+
+
+def add_custom_font():
+    font_path = "PPNeueMachina-PlainUltrabold.ttf"
+
+    if os.path.exists(font_path):
+        with open(font_path, "rb") as f:
+            font_b64 = base64.b64encode(f.read()).decode()
+
+        st.markdown(f"""
+            <style>
+                @font-face {{
+                    font-family: "PPNeueMachina";
+                    src: url("data:font/ttf;base64,{font_b64}") format("truetype");
+                }}
+
+                /* Apply font everywhere in Streamlit */
+                * {{
+                    font-family: "PPNeueMachina" !important;
+                }}
+
+                /* Extra strong override for Streamlit internal elements */
+                [class*="css"] {{
+                    font-family: "PPNeueMachina" !important;
+                }}
+
+                /* Buttons and Inputs */
+                button, input, textarea, select {{
+                    font-family: "PPNeueMachina" !important;
+                }}
+            </style>
+        """, unsafe_allow_html=True)
+
+add_custom_font()
+
 # ---------------------------
 # Constants
 # ---------------------------
