@@ -123,9 +123,8 @@ def hide_streamlit_ui():
     st.markdown("""
         <style>
             /* LOCK SCROLL */
-            html, body, .block-container {
+            html, body {
                 overflow: hidden !important;
-                height: 100% !important;
             }
 
             /* HIDE STREAMLIT MENU (TOP RIGHT) */
