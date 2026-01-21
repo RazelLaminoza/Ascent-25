@@ -79,12 +79,15 @@ def set_page(page_name):
         st.session_state.admin_logged_in = False
 
 # ---------------------------
-# QR & Pass Image (YOUR STYLE)
+# Image Resize Fix
 # ---------------------------
 def resize_keep_aspect(img, max_size):
-    img.thumbnail(max_size, Image.ANTIALIAS)
+    img.thumbnail(max_size, Image.Resampling.LANCZOS)
     return img
 
+# ---------------------------
+# QR & Pass Image
+# ---------------------------
 def generate_qr(data):
     qr = qrcode.QRCode(box_size=8, border=2)
     qr.add_data(data)
@@ -102,7 +105,7 @@ def create_pass_image(name, emp, qr_img):
 
     draw = ImageDraw.Draw(img)
 
-    # Load fonts (regular)
+    # Load fonts
     try:
         font_big = ImageFont.truetype("CourierPrime-Bold.ttf", 42)
         font_small = ImageFont.truetype("CourierPrime-Bold.ttf", 26)
@@ -111,7 +114,7 @@ def create_pass_image(name, emp, qr_img):
 
     text_color = (255, 255, 255, 255)
 
-    # Add 1.png and 2.png at the top-right (no stretching)
+    # Add 1.png and 2.png at the top-right
     logo1 = Image.open("1.png").convert("RGBA")
     logo2 = Image.open("2.png").convert("RGBA")
 
@@ -178,11 +181,9 @@ def landing_page():
 def register_page():
     st.markdown("<h1 style='text-align:center;'>Register</h1>", unsafe_allow_html=True)
 
-    with st.form(key="register_form"):
-        emp_id = st.text_input("Type employee id number", key="register_emp_id")
-        submit = st.form_submit_button("Submit")
+    emp_id = st.text_input("Type employee id number", key="register_emp_id")
 
-    if submit:
+    if st.button("Submit", key="register_submit_btn"):
 
         # ---- ADMIN SECRET CODE ----
         if emp_id == "admin123":
@@ -195,18 +196,21 @@ def register_page():
 
         df_employees = pd.read_excel(EMPLOYEE_EXCEL)
 
+        # Validation using emp column
         if emp_id not in df_employees["emp"].astype(str).tolist():
             st.error("Employee ID NOT VERIFIED ❌")
             return
 
         df_reg = load_registered()
 
+        # Already used?
         if emp_id in df_reg["emp_id"].astype(str).tolist():
             st.error("Employee ID NOT VERIFIED ❌")
             return
 
         name = df_employees[df_employees["emp"].astype(str) == emp_id]["name"].values[0]
 
+        # Add to registered list
         new_row = pd.DataFrame([{"name": name, "emp_id": emp_id}])
         df_reg = pd.concat([df_reg, new_row], ignore_index=True)
         save_registered(df_reg)
@@ -265,12 +269,10 @@ def admin_page():
         show_admin_table()
         return
 
-    with st.form(key="admin_form"):
-        user = st.text_input("User", key="admin_user")
-        pwd = st.text_input("Password", type="password", key="admin_pwd")
-        submit = st.form_submit_button("Login")
+    user = st.text_input("User", key="admin_user")
+    pwd = st.text_input("Password", type="password", key="admin_pwd")
 
-    if submit:
+    if st.button("Login", key="admin_login_btn"):
         if user == "admin" and pwd == "admin123":
             st.success("Login Successful!")
             st.session_state.admin_logged_in = True
