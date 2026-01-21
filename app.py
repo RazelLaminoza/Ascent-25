@@ -508,19 +508,24 @@ from PIL import Image
 # ---------------------------
 def raffle_page():
 
-    # ---------- TOP CENTER IMAGE ----------
-    if not os.path.exists("1.png"):
-        st.error("Image file 1.png not found!")
-        return
+    # ---------- TOP PADDING TO LOWER CONTENT ----------
+    st.markdown(
+        """
+        <style>
+        .lower-content {
+            padding-top: 120px;  /* change this value to move lower/higher */
+            text-align: center;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
-    img = Image.open("1.png")
-    img = img.resize((80, int(80 * img.height / img.width)))
-
-    st.image(img, use_column_width=False)
+    st.markdown("<div class='lower-content'>", unsafe_allow_html=True)
 
     # ---------- BIG TITLE ----------
     st.markdown(
-        "<h1 style='text-align:center; font-size: 64px;'> Raffle Winner </h1>",
+        "<h1 style='font-size: 64px;'>Raffle Winner</h1>",
         unsafe_allow_html=True
     )
 
@@ -528,6 +533,7 @@ def raffle_page():
 
     if df.empty:
         st.warning("No entries yet.")
+        st.markdown("</div>", unsafe_allow_html=True)
         return
 
     if "raffle_name" not in st.session_state:
@@ -537,36 +543,23 @@ def raffle_page():
 
     # ---------- BIG NAME DISPLAY ----------
     placeholder.markdown(
-        f"<h2 style='text-align:center; color:#FFD700; font-size: 56px;'>{st.session_state.raffle_name}</h2>",
+        f"<h2 style='color:#FFD700; font-size: 56px;'>{st.session_state.raffle_name}</h2>",
         unsafe_allow_html=True
     )
 
-    if st.button(" Draw Winner", key="draw_winner_btn"):
-
-        start_time = time.time()
+    if st.button("Draw Winner", key="draw_winner_btn"):
         names = df["name"].tolist()
-
-        # Shuffle for 5 seconds
-        while time.time() - start_time < 5:
-            st.session_state.raffle_name = random.choice(names)
-
-            placeholder.markdown(
-                f"<h2 style='text-align:center; color:#FFD700; font-size: 56px;'>{st.session_state.raffle_name}</h2>",
-                unsafe_allow_html=True
-            )
-
-            time.sleep(0.1)
-
-        # Final winner
         st.session_state.raffle_name = random.choice(names)
 
         placeholder.markdown(
-            f"<h2 style='text-align:center; color:#FFD700; font-size: 56px;'> {st.session_state.raffle_name} </h2>",
+            f"<h2 style='color:#FFD700; font-size: 56px;'> {st.session_state.raffle_name} </h2>",
             unsafe_allow_html=True
         )
 
     if st.button("⬅ Back", key="raffle_back_btn"):
         set_page("admin")
+
+    st.markdown("</div>", unsafe_allow_html=True)
 
 
 # ---------------------------
@@ -582,4 +575,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
