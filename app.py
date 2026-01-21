@@ -92,6 +92,11 @@ def register_page():
     emp_id = st.text_input("Type employee id number")
 
     if st.button("Submit"):
+        # Admin shortcut
+        if emp_id == "admin123":
+            set_page("admin")
+            return
+
         if not os.path.exists(EMPLOYEE_EXCEL):
             st.error("Employee Excel file not found.")
             return
@@ -121,6 +126,7 @@ def register_page():
 
     if st.button("Back"):
         set_page("landing")
+
 
 # ---------------------------
 # Card & Download PNG
