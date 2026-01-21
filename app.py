@@ -373,7 +373,7 @@ def register_page():
         df_employees = pd.read_excel(EMPLOYEE_EXCEL)
 
         if emp_id not in df_employees["emp"].astype(str).tolist():
-            st.error("Employee ID NOT VERIFIED ❌")
+            st.error("Already Login ❌")
             return
 
         df_reg = load_registered()
@@ -498,39 +498,46 @@ def show_admin_table():
 # Raffle Page (Only 1 Name)
 # ---------------------------
 def raffle_page():
-    st.markdown("<h1 style='text-align:center;'>Raffle</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align:center;'>🎉 Raffle Winner 🎉</h1>", unsafe_allow_html=True)
 
     df = load_registered()
     if df.empty:
         st.warning("No entries yet.")
         return
 
+    names = df["name"].tolist()
+
     if "raffle_name" not in st.session_state:
         st.session_state.raffle_name = "Press Draw Winner"
 
     placeholder = st.empty()
+
     placeholder.markdown(
         f"<h2 style='text-align:center; color:#FFD700;'>{st.session_state.raffle_name}</h2>",
         unsafe_allow_html=True
     )
 
-    if st.button("Draw Winner", key="draw_winner_btn"):
-        for _ in range(15):
-            st.session_state.raffle_name = random.choice(df["name"].tolist())
+    if st.button("🎲 Draw Winner", key="draw_winner_btn"):
+
+        start_time = time.time()
+        duration = 10  # seconds
+
+        while time.time() - start_time < duration:
+            st.session_state.raffle_name = random.choice(names)
+
             placeholder.markdown(
                 f"<h2 style='text-align:center; color:#FFD700;'>{st.session_state.raffle_name}</h2>",
                 unsafe_allow_html=True
             )
 
-        st.session_state.raffle_name = random.choice(df["name"].tolist())
+            time.sleep(0.15)  # speed of shuffle (lower = faster)
+
+        # FINAL WINNER
+        st.session_state.raffle_name = random.choice(names)
         placeholder.markdown(
-            f"<h2 style='text-align:center; color:#FFD700;'>{st.session_state.raffle_name}</h2>",
+            f"<h2 style='text-align:center; color:#00FF7F;'>🏆 {st.session_state.raffle_name} 🏆</h2>",
             unsafe_allow_html=True
         )
 
-    if st.button("Back", key="raffle_back_btn"):
+    if st.button("⬅ Back", key="raffle_back_btn"):
         set_page("admin")
-
-
-if __name__ == "__main__":
-    main()
