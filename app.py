@@ -493,16 +493,23 @@ def show_admin_table():
     if st.button("Back", key="admin_table_back_btn"):
         set_page("landing")
 
-import streamlit as st
-import random
-import time
+def set_background():
+    with open("bgna.png", "rb") as f:  # your background image
+        data = f.read()
+    b64 = base64.b64encode(data).decode()
 
-import streamlit as st
-import random
-import time
-import os
-from PIL import Image
-
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background-image: url("data:image/png;base64,{b64}");
+            background-size: cover;
+            background-attachment: fixed;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 # ---------------------------
 # Raffle Page (SAFE LONG SHUFFLE)
 # ---------------------------
