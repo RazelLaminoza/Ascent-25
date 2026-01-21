@@ -536,35 +536,35 @@ def raffle_page():
 
     st.markdown("<div class='lower-content'>", unsafe_allow_html=True)
 
-# ---------- BIG TITLE (CENTERED) ----------
-st.markdown(
-    "<h1 style='font-size: 30px; text-align:center;'>RAFFLE WINNER</h1>",
-    unsafe_allow_html=True
-)
+    # ---------- BIG TITLE (CENTERED) ----------
+    st.markdown(
+        "<h1 style='font-size: 30px; text-align:center;'>RAFFLE WINNER</h1>",
+        unsafe_allow_html=True
+    )
 
-df = load_registered()
+    df = load_registered()
 
-if df.empty:
-    st.warning("No entries yet.")
+    if df.empty:
+        st.warning("No entries yet.")
+        st.markdown("</div>", unsafe_allow_html=True)
+        return
+
+    if "raffle_name" not in st.session_state:
+        st.session_state.raffle_name = "Press Draw Winner"
+
+    placeholder = st.empty()
+
+    # ---------- BIG NAME DISPLAY (CENTERED) ----------
+    placeholder.markdown(
+        f"<h2 style='color:#FFD700; font-size: 60px; text-align:center;'>{st.session_state.raffle_name}</h2>",
+        unsafe_allow_html=True
+    )
+
+    # ---------- BACK BUTTON ----------
+    if st.button("⬅ Back", key="raffle_back_btn"):
+        set_page("admin")
+
     st.markdown("</div>", unsafe_allow_html=True)
-    return
-
-if "raffle_name" not in st.session_state:
-    st.session_state.raffle_name = "Press Draw Winner"
-
-placeholder = st.empty()
-
-# ---------- BIG NAME DISPLAY (CENTERED) ----------
-placeholder.markdown(
-    f"<h2 style='color:#FFD700; font-size: 60px; text-align:center;'>{st.session_state.raffle_name}</h2>",
-    unsafe_allow_html=True
-)
-
-# ---------- BACK BUTTON ----------
-if st.button("⬅ Back", key="raffle_back_btn"):
-    set_page("admin")
-
-st.markdown("</div>", unsafe_allow_html=True)
 
 
 if __name__ == "__main__":
