@@ -584,8 +584,9 @@ def raffle_page():
             unsafe_allow_html=True
         )
 
-    if st.button("⬅ Back", key="raffle_back_btn"):
-        set_page("admin")
+    if st.button("⬅ Back", key="raffle_back_btn_unique"):
+    set_page("admin")
+
 
     st.markdown("</div>", unsafe_allow_html=True)
 
