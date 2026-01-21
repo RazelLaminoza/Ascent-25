@@ -108,7 +108,7 @@ add_custom_font()
 # Constants
 # ---------------------------
 DATA_FILE = "registered.csv"
-EMPLOYEE_EXCEL = "employee_list.xlsx"
+EMPLOYEE_EXCEL = "clean_employees.xlsx"
 
 # ---------------------------
 # Custom Font + Background
