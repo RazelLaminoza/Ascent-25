@@ -495,7 +495,7 @@ def show_admin_table():
 
 
 # ---------------------------
-# Raffle Page (LONG Shuffle, NO TIME)
+# Raffle Page (SAFE LONG SHUFFLE)
 # ---------------------------
 def raffle_page():
 
@@ -523,18 +523,16 @@ def raffle_page():
     if "shuffle_count" not in st.session_state:
         st.session_state.shuffle_count = 0
 
-    MAX_SHUFFLES = 120  # 👈 make this bigger for longer shuffle
-
-    center = st.empty()
+    MAX_SHUFFLES = 150  # 👈 longer = more spins
 
     # ---------- CENTER DISPLAY ----------
-    center.markdown(
+    st.markdown(
         f"""
         <div style="text-align:center; margin-top:80px;">
             <div style="font-size:36px; color:#FFD700;">
                 Winner is :
             </div>
-            <div style="font-size:64px; font-weight:900;">
+            <div style="font-size:64px; font-weight:900; color:white;">
                 {st.session_state.raffle_name}
             </div>
         </div>
@@ -542,44 +540,22 @@ def raffle_page():
         unsafe_allow_html=True
     )
 
-    # ---------- START BUTTON ----------
+    # ---------- BUTTON ----------
     if st.button("🎲 Draw Winner") and not st.session_state.raffle_running:
         st.session_state.raffle_running = True
         st.session_state.shuffle_count = 0
-        st.experimental_rerun()
 
-    # ---------- SHUFFLE LOGIC ----------
+    # ---------- AUTO SHUFFLE (SAFE) ----------
     if st.session_state.raffle_running:
+        st.session_state.raffle_name = random.choice(names)
+        st.session_state.shuffle_count += 1
 
-        if st.session_state.shuffle_count < MAX_SHUFFLES:
-            st.session_state.raffle_name = random.choice(names)
-            st.session_state.shuffle_count += 1
-            time.sleep(0.08)  # visual speed (safe)
-            st.experimental_rerun()
+        if st.session_state.shuffle_count >= MAX_SHUFFLES:
+            st.session_state.raffle_running = False
+            st.balloons()
 
         else:
-            # FINAL WINNER
-            st.session_state.raffle_name = random.choice(names)
-            st.session_state.raffle_running = False
-
-            center.markdown(
-                f"""
-                <div style="text-align:center; margin-top:80px;">
-                    <div style="font-size:40px; color:#00FF7F;">
-                        🏆 Winner is :
-                    </div>
-                    <div style="
-                        font-size:72px;
-                        font-weight:900;
-                        color:#FFD700;
-                    ">
-                        {st.session_state.raffle_name}
-                    </div>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-            st.balloons()
+            st.autorefresh(interval=80, key="raffle_refresh")
 
     if st.button("⬅ Back"):
         set_page("admin")
