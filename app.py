@@ -639,7 +639,7 @@ st.button(
 
 
 # ---------------- RAFFLE PAGE ----------------
-elif st.session_state.page == "raffle":
+    elif st.session_state.page == "raffle":
 
     if not st.session_state.admin:
         st.session_state.page = "admin"
