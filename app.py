@@ -562,7 +562,7 @@ def raffle_page():
 
     C
 
-        if st.button("⬅ Back", key="raffle_back_btn"):
+    if st.button("⬅ Back", key="raffle_back_btn"):
             set_page("admin")
 
     st.markdown("</div>", unsafe_allow_html=True)
