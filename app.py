@@ -500,11 +500,12 @@ def show_admin_table():
 def raffle_page():
 
     # ---------- TOP CENTER IMAGE ----------
-    img = Image.open("1.png")  # <-- make sure file is named "1.png" and located in same folder
-    st.image(img, use_column_width=False, width=200, caption=None)
+    img = Image.open("1.png")  # Make sure this image exists
+    st.image(img, use_column_width=False, width=200)
 
+    # ---------- BIG TITLE ----------
     st.markdown(
-        "<h1 style='text-align:center;'>🎉 Raffle Winner 🎉</h1>",
+        "<h1 style='text-align:center; font-size: 64px;'> Raffle Winner </h1>",
         unsafe_allow_html=True
     )
 
@@ -519,12 +520,13 @@ def raffle_page():
 
     placeholder = st.empty()
 
+    # ---------- BIG NAME DISPLAY ----------
     placeholder.markdown(
-        f"<h2 style='text-align:center; color:#FFD700;'>{st.session_state.raffle_name}</h2>",
+        f"<h2 style='text-align:center; color:#FFD700; font-size: 56px;'>{st.session_state.raffle_name}</h2>",
         unsafe_allow_html=True
     )
 
-    if st.button("🎲 Draw Winner", key="draw_winner_btn"):
+    if st.button(" Draw Winner", key="draw_winner_btn"):
 
         start_time = time.time()
         names = df["name"].tolist()
@@ -534,7 +536,7 @@ def raffle_page():
             st.session_state.raffle_name = random.choice(names)
 
             placeholder.markdown(
-                f"<h2 style='text-align:center; color:#FFD700;'>{st.session_state.raffle_name}</h2>",
+                f"<h2 style='text-align:center; color:#FFD700; font-size: 56px;'>{st.session_state.raffle_name}</h2>",
                 unsafe_allow_html=True
             )
 
@@ -544,7 +546,7 @@ def raffle_page():
         st.session_state.raffle_name = random.choice(names)
 
         placeholder.markdown(
-            f"<h2 style='text-align:center; color:#FFD700;'>🏆 {st.session_state.raffle_name} 🏆</h2>",
+            f"<h2 style='text-align:center; color:#FFD700; font-size: 56px;'> {st.session_state.raffle_name} </h2>",
             unsafe_allow_html=True
         )
 
