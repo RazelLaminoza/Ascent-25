@@ -9,7 +9,25 @@ from PIL import Image, ImageDraw, ImageFont
 import qrcode
 
 
+def shuffle_effect(df):
+    placeholder = st.empty()
 
+    # shuffle effect
+    for _ in range(20):
+        name = random.choice(df["Full Name"].tolist())
+        placeholder.markdown(
+            f"<h2 style='text-align:center; color:#FFD700;'>{name}</h2>",
+            unsafe_allow_html=True
+        )
+        time.sleep(0.05)
+
+    # final winner
+    winner = random.choice(df["Full Name"].tolist())
+    st.session_state.winner = winner
+    placeholder.markdown(
+        f"<h2 style='text-align:center; color:#FFD700;'>{winner}</h2>",
+        unsafe_allow_html=True
+    )
 def add_custom_font():
     font_path = "PPNeueMachina-PlainUltrabold.ttf"
 
@@ -420,37 +438,41 @@ def show_admin_table():
 # ---------------------------
 # Raffle Page (Only 1 Name)
 # ---------------------------
-def raffle_page():
-    st.markdown("<h1 style='text-align:center;'>Raffle</h1>", unsafe_allow_html=True)
+elif st.session_state.page == "raffle":
+
+    if not st.session_state.admin:
+        st.session_state.page = "admin"
+
+    st.markdown("<h1>🎰 Raffle Draw</h1>", unsafe_allow_html=True)
 
     df = load_registered()
-    if df.empty:
-        st.warning("No entries yet.")
-        return
 
-    # Placeholder for showing the name
-    if "raffle_name" not in st.session_state:
-        st.session_state.raffle_name = "Press Draw Winner"
-
-    placeholder = st.empty()
-    placeholder.markdown(
-        f"<h2 style='text-align:center; color:#FFD700;'>{st.session_state.raffle_name}</h2>",
-        unsafe_allow_html=True
+    st.button(
+        "🎰 Run Raffle",
+        on_click=shuffle_effect,
+        args=(df,),
+        type="primary",
+        key="run_raffle"
     )
 
-    # Draw Winner Button
-    if st.button("Draw Winner", key="draw_winner_btn"):
-        # shuffle 15 times
-        for _ in range(15):
-            st.session_state.raffle_name = random.choice(df["name"].tolist())
-            placeholder.markdown(
-                f"<h2 style='text-align:center; color:#FFD700;'>{st.session_state.raffle_name}</h2>",
-                unsafe_allow_html=True
-            )
+    if st.session_state.winner:
+        winner_name = (
+            st.session_state.winner.get("Full Name")
+            if isinstance(st.session_state.winner, dict)
+            else st.session_state.winner
+        )
 
-        # Final winner
-        st.session_state.raffle_name = random.choice(df["name"].tolist())
-        placeholder.markdown(
-            f"<h2 style='text-align:center; color:#FFD700;'>{st.session_state.raffle_name}</h2>",
+        st.markdown(
+            f"""
+            <div style="text-align:center;margin-top:40px;">
+                <h2>🎉 WINNER 🎉</h2>
+                <h1 style="color:gold;font-size:70px;">
+                    {winner_name}
+                </h1>
+            </div>
+            """,
             unsafe_allow_html=True
         )
+
+    st.markdown("---")
+    st.button("Logout", on_click=logout, key="logout_raffle")
