@@ -538,7 +538,7 @@ def raffle_page():
 
     # ---------- BIG TITLE (CENTERED) ----------
     st.markdown(
-        "<h1 style='font-size: 80px; text-align:center;'>Raffle Winner</h1>",
+        "<h1 style='font-size: 30px; text-align:center;'>RAFFLE WINNER</h1>",
         unsafe_allow_html=True
     )
 
@@ -556,32 +556,11 @@ def raffle_page():
 
     # ---------- BIG NAME DISPLAY (CENTERED) ----------
     placeholder.markdown(
-        f"<h2 style='color:#FFD700; font-size: 100px; text-align:center;'>{st.session_state.raffle_name}</h2>",
+        f"<h2 style='color:#FFD700; font-size: 60px; text-align:center;'>{st.session_state.raffle_name}</h2>",
         unsafe_allow_html=True
     )
 
-    # ---------- BUTTONS (CENTERED) ----------
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        if st.button("Draw Winner", key="draw_winner_btn"):
-            start_time = time.time()
-            names = df["name"].tolist()
-
-            # Shuffle for 5 seconds
-            while time.time() - start_time < 5:
-                st.session_state.raffle_name = random.choice(names)
-                placeholder.markdown(
-                    f"<h2 style='color:#FFD700; font-size: 80px; text-align:center;'>{st.session_state.raffle_name}</h2>",
-                    unsafe_allow_html=True
-                )
-                time.sleep(0.1)
-
-            # Final winner
-            st.session_state.raffle_name = random.choice(names)
-            placeholder.markdown(
-                f"<h2 style='color:#FFD700; font-size: 60px; text-align:center;'> {st.session_state.raffle_name} </h2>",
-                unsafe_allow_html=True
-            )
+    C
 
         if st.button("⬅ Back", key="raffle_back_btn"):
             set_page("admin")
