@@ -497,66 +497,66 @@ def show_admin_table():
 # ---------------------------
 # Raffle Page (SAFE LONG SHUFFLE)
 # ---------------------------
+# ---------------------------
+# Raffle Page (Only 1 Name)
+# ---------------------------
 def raffle_page():
 
-    # ---------- TOP CENTER IMAGE ----------
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        st.image("1.png", use_container_width=True)
-
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown(
+        "<h1 style='text-align:center;'>🎉 Raffle Winner 🎉</h1>",
+        unsafe_allow_html=True
+    )
 
     df = load_registered()
+
     if df.empty:
         st.warning("No entries yet.")
         return
 
-    names = df["name"].tolist()
-
-    # ---------- SESSION STATE ----------
+    # Initialize session state
     if "raffle_name" not in st.session_state:
         st.session_state.raffle_name = "Press Draw Winner"
 
-    if "raffle_running" not in st.session_state:
-        st.session_state.raffle_running = False
+    placeholder = st.empty()
 
-    if "shuffle_count" not in st.session_state:
-        st.session_state.shuffle_count = 0
-
-    MAX_SHUFFLES = 150  # 👈 longer = more spins
-
-    # ---------- CENTER DISPLAY ----------
-    st.markdown(
-        f"""
-        <div style="text-align:center; margin-top:80px;">
-            <div style="font-size:36px; color:#FFD700;">
-                Winner is :
-            </div>
-            <div style="font-size:64px; font-weight:900; color:white;">
-                {st.session_state.raffle_name}
-            </div>
-        </div>
-        """,
+    placeholder.markdown(
+        f"<h2 style='text-align:center; color:#FFD700;'>{st.session_state.raffle_name}</h2>",
         unsafe_allow_html=True
     )
 
-    # ---------- BUTTON ----------
-    if st.button("🎲 Draw Winner") and not st.session_state.raffle_running:
-        st.session_state.raffle_running = True
-        st.session_state.shuffle_count = 0
+    # -------- DRAW WINNER --------
+    if st.button("🎲 Draw Winner", key="draw_winner_btn"):
 
-    # ---------- AUTO SHUFFLE (SAFE) ----------
-    if st.session_state.raffle_running:
+        start_time = time.time()
+        names = df["name"].tolist()
+
+        # Shuffle for 10 seconds
+        while time.time() - start_time < 10:
+            st.session_state.raffle_name = random.choice(names)
+
+            placeholder.markdown(
+                f"<h2 style='text-align:center; color:#FFD700;'>{st.session_state.raffle_name}</h2>",
+                unsafe_allow_html=True
+            )
+
+            time.sleep(0.1)  # speed of shuffle (lower = faster)
+
+        # Final winner
         st.session_state.raffle_name = random.choice(names)
-        st.session_state.shuffle_count += 1
 
-        if st.session_state.shuffle_count >= MAX_SHUFFLES:
-            st.session_state.raffle_running = False
-            st.balloons()
+        placeholder.markdown(
+            f"""
+            <h2 style='text-align:center; color:#FFD700;'>
+                🏆 {st.session_state.raffle_name} 🏆
+            </h2>
+            """,
+            unsafe_allow_html=True
+        )
 
-        else:
-            st.autorefresh(interval=80, key="raffle_refresh")
-
-    if st.button("⬅ Back"):
+    # -------- BACK BUTTON --------
+    if st.button("⬅ Back", key="raffle_back_btn"):
         set_page("admin")
 
+
+if __name__ == "__main__":
+    main()
