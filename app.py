@@ -415,6 +415,8 @@ def show_admin_table():
     if st.button("Back", key="admin_table_back_btn"):
         set_page("landing")
 
+import time
+
 # ---------------------------
 # Raffle Page (Only 1 Name)
 # ---------------------------
@@ -427,11 +429,24 @@ def raffle_page():
         return
 
     if st.button("Draw Winner", key="draw_winner_btn"):
+
+        placeholder = st.empty()  # placeholder for shuffle effect
+
+        start_time = time.time()
+        while time.time() - start_time < 5:  # run shuffle for 5 seconds
+            shuffled_name = random.choice(df["name"].tolist())
+            placeholder.markdown(
+                f"<h2 style='text-align:center; color:#FFD700;'>{shuffled_name}</h2>",
+                unsafe_allow_html=True
+            )
+            time.sleep(0.1)  # speed of shuffle
+
+        # Final winner
         winner = random.choice(df["name"].tolist())
-        st.markdown(f"<h2 style='text-align:center; color:#FFD700;'>{winner}</h2>", unsafe_allow_html=True)
+        placeholder.markdown(
+            f"<h2 style='text-align:center; color:#FFD700;'>{winner}</h2>",
+            unsafe_allow_html=True
+        )
 
     if st.button("Back", key="raffle_back_btn"):
         set_page("admin")
-
-if __name__ == "__main__":
-    main()
