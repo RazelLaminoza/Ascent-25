@@ -513,7 +513,7 @@ def raffle_page():
         """
         <style>
         .lower-content {
-            padding-top: 200px;  /* change this value to move lower/higher */
+            padding-top: 400px;  /* change this value to move lower/higher */
             text-align: center;
         }
         </style>
