@@ -418,13 +418,13 @@ if st.session_state.page == "register":
                 go_to("admin")  # <-- redirect immediately
 
             elif not emp:
-                st.error("Employee ID NOT VERIFIED ❌")
+                st.error("Employee ID NOT VERIFIED 1❌")
 
             elif any(e["emp"] == emp for e in st.session_state.entries):
-                st.error("You already registered ❌")
+                st.error("You already registered 2❌")
 
             elif emp not in st.session_state.valid_employees:
-                st.error("Employee ID NOT VERIFIED ❌")
+                st.error("Employee ID NOT VERIFIED 3❌")
 
             else:
                 name = st.session_state.valid_employees.get(emp, "Unknown")
