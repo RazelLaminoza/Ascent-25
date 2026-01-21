@@ -498,16 +498,6 @@ def show_admin_table():
 # ---------------------------
 def raffle_page():
 
-    # ---------- TOP CENTER IMAGE ----------
-    if not os.path.exists("1.png"):
-        st.error("Image file 1.png not found!")
-        return
-
-    img = Image.open("1.png")
-    img = img.resize((80, int(80 * img.height / img.width)))
-
-    st.image(img, use_column_width=False)
-
     # ---------- BIG TITLE ----------
     st.markdown(
         "<h1 style='text-align:center; font-size: 64px;'> Raffle Winner </h1>",
