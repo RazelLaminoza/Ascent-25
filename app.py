@@ -197,20 +197,19 @@ def show_admin_table():
     st.dataframe(df)
 
     emp_to_delete = st.text_input("Enter employee ID to delete", key="delete_emp")
-    if st.button("Delete Entry"):
+    if st.button("Delete Entry", key="delete_entry_btn"):
         if emp_to_delete.strip() == "":
             st.error("Please enter an employee ID")
         else:
             delete_entry(emp_to_delete)
 
-    if st.button("Delete All Entries"):
+    if st.button("Delete All Entries", key="delete_all_btn"):
         delete_all_entries()
 
-    if st.button("Enter Raffle"):
+    if st.button("Enter Raffle", key="raffle_btn"):
         raffle(df)
 
-    # Back button (to Landing)
-    if st.button("Back"):
+    if st.button("Back", key="admin_table_back_btn"):
         set_page("landing")
 
 
